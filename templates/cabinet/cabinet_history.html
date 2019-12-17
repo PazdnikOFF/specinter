@@ -1,0 +1,56 @@
+{reduce:nothing}
+{mask:main}
+<div class="b-cabinet">
+	<div class="b-container-content">
+		<h1 class="b-cabinet__title">Здравствуйте{if:{name} != ""}, {name}{/if}!</h1>
+		<hr>
+		<a href="#" class="cabinet-out">Выйти</a>
+
+		<div class="b-sale">
+			{*<div class="b-sale__title">Ваша персональная скидка:</div>
+			<span class="note">Скидка в интернет-магазине {discountinet}%</span>
+			<br>
+			<span class="note">Скидка в магазине</span> (доступна при самовывозе и покупке в м-нах Маэстрия) <span
+				class="note">{discountshop}%</span>
+			<br>*}
+			<a href="{cabinetUrl}">Мои данные</a>
+		</div>
+		<hr>
+
+		{set:item}
+		<table class="table-history">
+			<thead class="table-history__thead">
+				<tr class="table-history__thead-row">
+					<td class="table-history__thead-cell">№</td>
+					<td class="table-history__thead-cell">Дата</td>
+					<td class="table-history__thead-cell">№ для отслеживания</td>
+					<td class="table-history__thead-cell">Сумма</td>
+					<td class="table-history__thead-cell">Статус</td>
+				</tr>
+			</thead>
+			<tbody class="table-history__tbody">
+				{mask:item}
+				<tr class="table-history__row">
+					<td class="table-history__cell">
+						<a href="{url}">{id}</a>
+					</td>
+					<td class="table-history__cell">{date_1}</td>
+					<td class="table-history__cell">{code}</td>
+					<td class="table-history__cell">{totalprice}</td>
+					<td class="table-history__cell">{status}</td>
+				</tr>
+				{/mask}
+			</tbody>
+		</table>
+		{/set}
+
+
+
+
+	</div>
+
+</div>
+
+
+
+{/mask}

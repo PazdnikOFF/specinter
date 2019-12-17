@@ -1,0 +1,404 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<title>{sitename} - *Добавление шаблона блока*</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/calendar.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--iCheck-->
+	<link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+	<script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+	<!--chosen-->
+	<link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+	<script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+	<script>
+		$(function() {
+			$(".ch").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+			$(".select-styled").chosen();
+		});
+	</script>
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Добавление шаблона блока</h1>
+
+			<form action="/manage/blocktemplate/_aadd/" method="post" enctype="multipart/form-data" name="form1">
+
+
+				<div class="block">
+					<h2>Основные параметры</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Название</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="name" value="" required>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Ключ</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="key" value="" required>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="block longleft">
+					<h2>Права доступа</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на удаление</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="candel" value="1" checked>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на редактирование</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canedit" value="1" checked>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на создание</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canadd" value="1" checked>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на перенос</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canmove" value="1" checked>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на копирование</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="cancopy" value="1" checked>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на скрытие/показ</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canhide" value="1" checked>
+						</div>
+					</div>
+				</div>
+
+				<div class="block longleft">
+					<h2>Отдельные настройки</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Включить SEO</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="seo" value="1" checked>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Виртуальный блок?</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="virtual" value="1">
+						</div>
+					</div>
+				</div>
+
+				<!--FIELDS TABBER-->
+				<div class="block" id="addFields" style="display: none;">
+					<h2>Поля шаблона</h2>
+
+					<!--TABBER-->
+					<ul class="nav nav-pills tabber" id="tabber">
+						<li class="active" data-tab="0" id="nav-tab_0"><a href="#">Основная вкладка</a></li>
+					</ul>
+					<!--/TABBER-->
+
+
+					<!--TAB CONTENT-->
+					<div id="tab-content" class="tab-content">
+
+
+						<table cellspacing="1" cellpadding="0" border="0" width="100%" id="addFieldsTable_0">
+							<tr>
+								<th>Имя</th>
+								<th>Ключ</th>
+								<th>Тип данных</th>
+								<th>По умолчанию</th>
+								<th>Служебная информация</th>
+								<th>Сорт.</th>
+								<th>R.only</th>
+								<th>Отобр.</th>
+								<th>Уд.</th>
+							</tr>
+							<tr id="addFields_0_0" class="addFieldsTr" style="display: none;">
+								<td>
+									<input type="text" name="addname[]" class="required text form-control">
+								</td>
+								<td>
+									<input type="text" name="addkey[]"class="required text form-control">
+								</td>
+								<td>
+									<select name="addtype[]" class="addtype select-styled-hidden">
+										{mask:dtypes}
+											<option value="{key}"{if:{_first}} selected{/if}>{name} - ({key})</option>
+										{/mask}
+									</select>
+								</td>
+								<td>
+									<input type="text" name="adddefault[]" class="text form-control">
+								</td>
+								<td>
+									<input type="text" name="addinfo[]" class="text form-control">
+								</td>
+								<td>
+									<input type="text" name="addsort[]" class="text small form-control" autocomplete="off">
+									<input type="hidden" name="addtab[]" value="0" class="tab-input">
+								</td>
+								<td>
+									<input type="checkbox" value="1" class="checkbox-ro" name="addro[]">
+									<input type="hidden" value="0" name="addroh[]">
+								</td>
+								<td>
+									<input type="checkbox" value="1" class="checkbox-ro" name="addshow[]">
+									<input type="hidden" value="0" name="addshowh[]">
+								</td>
+								<td>
+									<a href="#" class="delIcon" onclick="deleteAddField(); return false;"><i class="glyphicon glyphicon-trash"></i></a>
+								</td>
+							</tr>
+						</table>
+
+					</div>
+					<!--/TAB CONTENT-->
+
+				</div>
+				<!--/FIELDS TABBER-->
+
+
+				<div class="buttons">
+					<input type="submit" class="btn btn-success" name="add" value="Добавить">
+					<input type="button" class="btn btn-danger" value="Отмена" onclick="javascript:location.href='/manage/blocktemplate/'; return false;">
+					<input type="button" class="btn btn-primary" value="Добавить поле" onclick="addField();">
+					<input type="button" class="btn btn-primary" value="Добавить вкладку" onclick="addTab();">
+				</div>
+
+			</form>
+		</div>
+
+		<script>
+				var tabber = [0],
+					curTab = 0,
+					countTabs = 1;
+
+				//Добавления поля
+				function addField() {
+					var tab = curTab,
+						newitem,
+						i = 0;
+
+					//Увеличиваем счетчик полей для текущей вкладки
+					tabber[tab] += 1;
+
+					//Создаем новую строку путем клонирования
+					newitem = $("#addFields_0_0").clone();
+
+					//Меняем в новой строке кнопку удаления
+					newitem.find('a.delIcon').attr("onclick", "deleteAddField("+tab+","+tabber[tab]+"); return false;");
+
+
+					//Меняем в новой строке значение вкладки
+					newitem.find('.tab-input').val(tab);
+
+					//Добавляем новую строку к таблице, ставим новый ID и показываем ее
+					newitem.appendTo("#addFieldsTable_"+tab).attr("id", "addFields_"+tab+"_"+tabber[tab]).show();
+
+					//Показываем блок с полями
+					$("#addFields").show();
+
+
+					//Проставляем новые значения поля sort для текущей вкладки
+					if (tab > 0) {
+						i ++;
+					}
+					$("#addFieldsTable_"+tab+" input.small").each(function() {
+						$(this).val(i);
+						i ++;
+					});
+
+					// Присваиваем required
+					newitem.find(".required").prop("required", true);
+
+					// Стайлим чекбоксы
+					newitem.find(".checkbox-ro").iCheck({
+						checkboxClass: 'icheckbox_flat-blue',
+						radioClass: 'iradio_flat-blue'
+					})
+					.on("ifToggled", function(e) {
+						var $t = $(this);
+						if ($t.prop("checked") === true) {
+							$t.parent().next().val("1");
+						}
+						else {
+							$t.parent().next().val("0");
+						}
+					});
+
+					// Стайлим селектбокс
+					newitem.find(".select-styled-hidden").chosen({
+						width: "260px"
+					});
+				}
+
+				//Удаление поля
+				function deleteAddField(tab, id) {
+					var tab = curTab,
+						i = 0,
+						count = tabber.length,
+						length = 0;
+
+					//Уменьшаем счетчик полей текущей строки
+					tabber[tab] -= 1;
+
+					//Удаляем строку из HTML
+					$("#addFields_"+tab+"_"+id).remove();
+
+					//Если строк нету ни в одной вкладке - скрываем блок с полями
+					for (i = 0; i < count; i ++) {
+						length += tabber[i];
+					}
+					if (length == 0) {
+						$("#addFields").hide();
+					}
+
+					i = 0;
+
+					//Проставляем новые значения поля sort для текущей вкладки
+					if (tab > 0) {
+						i ++;
+					}
+					$("#addFieldsTable_"+tab+" input.small").each(function() {
+						$(this).val(i);
+						i ++;
+					});
+
+				}
+
+
+				//Добавление новой вкладки
+				function addTab() {
+					var el,
+						newitem,
+						tab = 0;
+
+					//Увеличиваем количество вкладок
+					countTabs ++;
+
+					tab = countTabs - 1;
+
+					//Добавляем элемент в массив вкладок
+					tabber.push(0);
+
+					//Создаем новый элемент для закладки вкладки
+					el = $("<li data-tab='"+tab+"' id='nav-tab_"+tab+"'><a href='#'>Вкладка "+tab+" <i class='glyphicon glyphicon-trash' onclick='deleteTab("+tab+"); return false;'></i></a> </li>");
+					$("#tabber").append(el);
+
+					//Создаем новую таблицу путем клонирования
+					newitem = $("#addFieldsTable_0").clone();
+
+					//Удаляем из таблиццы все строки
+					newitem.find(".addFieldsTr").remove();
+
+					//Добавляем таблицу к HTML, ставим новый ID и скрываем (не текущая вкладка)
+					newitem.appendTo("#tab-content").attr("id", "addFieldsTable_"+tab).hide();
+				}
+
+				//Удаление вкладки
+				function deleteTab(tab) {
+
+					//Удаляем элемент массива
+					tabber.splice(tab, 1);
+
+					//Уменьшаем количество вкладок
+					countTabs --;
+
+					//Удаляем закладку вкладки
+					$("#nav-tab_"+tab).remove();
+
+					//Удаляем вкладку
+					$("#addFieldsTable_"+tab).remove();
+
+					//Передаем фокус на начальную вкладку в случае, если удаляемая была текущая
+					if (curTab == tab) {
+						$("#nav-tab_0").trigger("click");
+					}
+				}
+
+		</script>
+
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

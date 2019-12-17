@@ -1,0 +1,77 @@
+.bg-contact-wrapp {
+	background: url('@{img_bg}bg-kontakti.jpg') left 50%;
+	background-repeat: no-repeat;
+}
+.b-contact {
+	margin: 60px 0;
+	&__title {
+		font-size: 42px;
+		color: #f60c00;
+		margin-bottom: 22px;
+	}
+	&__container {
+		margin: 30px 0;
+		overflow: hidden;
+	}
+	&__info {
+		float: left;
+		color: #fff;
+		text-align: center;
+		background: @col2;
+		padding: 30px;
+		width: 255px;
+		height: 400px;
+		font-size: 15px;
+		position: relative;
+		&:before {
+			content: '';
+			margin-left: -5px;
+			.inblock(middle);
+			height: 100%;
+		}
+		&:after {
+			content: '';
+			display: block;
+			position: absolute;
+			right: -4px;
+			top: 0;
+			background: url('@{img_bg}bg-contact-info.png');
+			background-repeat: repeat-y;
+			width: 12px;
+			height: 100%;
+		}
+	}
+	&__info-content {
+		.inblock(middle);
+		a {
+			color: inherit;
+			text-decoration: none;
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+	&__map {
+		overflow: hidden;
+	}
+}
+
+.b-contact-info-title {
+	border-bottom: 1px solid #fff;
+	font-size: 18px;
+	text-transform: uppercase;
+	padding: 15px 30px;
+	background: url('@{img_bg}b-contact-info-title.png') no-repeat left 50%;
+	margin-bottom: 20px;
+}
+
+/*============= 960px ============================*/
+@media only screen and (max-width: 960px) {
+	.b-contact {
+		&__info {
+			float: none;
+			width: auto;
+			height: auto;
+		}
+	}
+}

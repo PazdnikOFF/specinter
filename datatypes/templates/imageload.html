@@ -1,0 +1,56 @@
+{reduce:nothing}
+{mask:main}
+	{sizesScript}
+
+	{set:data}
+	<ul class="grid cs-style-2" id="gridimages_{name}">
+		{mask:data}
+			<li class="ff-item-type-2" id="{sname}">
+				<figure>
+
+					<div class="img-precontainer">
+						<div class="img-container">
+							<span></span>
+							<img alt="image" src="/files/tmb/{name}">
+						</div>
+					</div>
+
+					<div class="box">
+						 <a href="javascript:void('');" class="erase-button" data-delete-sname="{sname}" data-delete-name="{name}" data-field-name="{../name}" title="Удалить изображение"><i class=" glyphicon glyphicon-trash"></i> Удалить</a>
+					</div>
+
+				</figure>
+			</li>
+		{/mask}
+	</ul>
+	{/set}
+
+	<script>
+
+		$(function() {
+
+			//Создаем дропзону
+			var myDropzone{name} = new Dropzone(
+				'#imageLoad{name}',
+				{
+					url: '/admin/uploadimage.php',
+					paramName: 'file',
+					uploadMultiple: false,
+					acceptedFiles: 'image/*'
+				}
+			);
+
+			//Вешаем триггер на загрузку
+			myDropzone{name}.on('success', function(file, response) {
+					var val = $('#{name}imageload').val();
+					$('#{name}imageload').val(val+";"+response+";");
+					successImageLoad(file, response, '{name}');
+				}
+			);
+		});
+
+	</script>
+
+
+	<div id="imageLoad{name}" class="dropzone"></div>
+{/mask}

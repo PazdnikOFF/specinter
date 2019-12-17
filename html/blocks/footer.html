@@ -1,0 +1,631 @@
+<footer class="">
+<div class="js-wrapp-sidebar wrapp-sidebar">
+		<div class="wid">
+			<div class="foot-conteiner">
+				<p class="copy">Создание сайта, Elgrow 2014</p>
+			</div>
+		</div>
+	</div>
+</footer>
+<!-- FORMIFRAME -->
+<div class="hidden">
+	<iframe src="" frameborder="0" name="formIframe"></iframe>
+</div>
+<!-- /FORMIFRAME -->
+<!-- МОДАЛЬНЫЕ ОКНА -->
+<div class="modal-boxes">
+	<!-- MODAL CALL ME -->
+	<div class="box-modal" id="modal-call-me">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<form action="" method="post" id="form-call-me" class="form-call-me" target="formIframe">
+				<div class="form-call-me__title">Представьтесь пожалуйста:</div>
+				<div class="field">
+					<input type="text" placeholder="Вам следует называть меня" name="login">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="Мой номер телефона" name="phone">
+				</div>
+				<div class="field field_btn ta-center">
+					<input type="submit" class="btn btn_green btn_big btn_in" value="Перезвонить мне">
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- /MODAL CALL ME -->
+	<!-- MODAL CALL ME OK-->
+	<div class="box-modal" id="modal-call-me-ok">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title ta-center"><span class="i-gray i-ok">Благодарим вас!</span></div>
+			<p class="ta-center">В ближайшее время наши специалисты свяжутся с Вами и ответят на все интересующие Вас вопросы</p>
+			<div class="field field_btn ta-center">
+				<a href="javascript:void(0);" class="btn btn_green btn_big btn_in arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL CALL ME OK-->
+	<!-- MODAL AUTORIZATION -->
+	<div class="box-modal" id="modal-autoriz">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title"><span class="i-gray i-door">Добро пожаловать в закрытый раздел нашего сайта</span></div>
+			
+			<p>Пожалуйста, ведите свое имя пользователя и пароль, чтобы мы могли идентифицировать Вас:</p>
+			<form action="" method="post" id="form-autoriz" target="formIframe">
+				<div class="field">
+					<input type="text" name="login" placeholder="Имя пользователя">
+				</div>
+				<div class="field">
+					<input type="password" name="psw" placeholder="Пароль">
+				</div>
+				<div class="field-row field-row_just">
+					<a href="javascript:void(0);" onclick="$('#modal-remember-psw').arcticmodal();" class="arcticmodal-close">Забыли пароль?</a>
+					<a href="javascript:void(0);" onclick="$('#modal-registration').arcticmodal();" class="arcticmodal-close">Регистрация</a>
+				</div>
+				<div class="field field_btn ta-center">
+					<input type="submit" class="btn btn_green btn_big btn_in" value="Войти">
+				</div>
+				<hr>
+				<div class="ta-center">
+					<p>Войти, используя:</p>
+					<p>
+						<a href="#" class="i-soc i-soc_vk"></a>
+						<a href="#" class="i-soc i-soc_fb"></a>
+						<a href="#" class="i-soc i-soc_tw"></a>
+					</p>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- /MODAL AUTORIZATION -->
+	<!-- MODAL AUTORIZATION OK-->
+	<div class="box-modal" id="modal-autoriz-ok">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title"><span class="i-gray i-ok">Вход успешно выполнен</span></div>
+			
+			<p>Желаем Вам приятных покупок!</p>
+			<div class="field-row field-row_just">
+				<a href="#" class="btn btn_in btn_green btn_small">В мой кабинет</a>
+				<a href="javascript:void(0);" class="btn btn_in btn_red btn_small arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL AUTORIZATION OK-->
+	<!-- MODAL REGISTRATION -->
+	<div class="box-modal" id="modal-registration">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title"><span class="i-reg i-gray">Впервые приветствуем Вас на нашем сайте!</span></div>
+			
+			<p>Для доступа к личным данным пожалуйста пройдите регистрацию</p>
+			<form action="" method="post" id="form-registration" target="formIframe">
+				<div class="field">
+					<input type="text" name="email" placeholder="Ваш e-mail:">
+				</div>
+				<div class="field">
+					<input type="password" name="psw" placeholder="Ваш пароль:">
+				</div>
+				<div class="field">
+					<label for="check-distribution"><input type="checkbox" id="check-distribution" name="check-distribution"> <span>Хочу получать рассылку</span></label>
+				</div>
+				<div class="field field_btn ta-center">
+					<input type="submit" class="btn btn_green btn_big btn_in" value="Регистрация">
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- /MODAL REGISTRATION -->
+	<!-- MODAL REGISTRATION OK-->
+	<div class="box-modal" id="modal-registration-ok">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title ta-center"><span class="i-ok i-gray">Поздравляем!</span></div>
+			
+			<p>Вы успешно зарегестрировались на сайте Maestria. В скором времени Вам на e-mail придет письмо с дальнейшими инструкциями.</p>
+			<div class="field field_btn ta-center">
+				<a href="javascript:void(0);" class="btn btn_big btn_green btn_in arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL REGISTRATION OK -->
+	<!-- MODAL REMEMBER PSW -->
+	<div class="box-modal" id="modal-remember-psw">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title"><span class="i-quest i-gray">Забыли пароль? Не страшно!</span></div>
+			
+			<p>Введите в поле ниже e-mail, который вы указывали при регистрации и мы моментально отправим на него Ваш пароль.</p>
+			<form action="" method="post" id="form-remember-psw" target="formIframe">
+				<div class="field">
+					<input type="text" placeholder="Ваш e-mail:" name="email">
+				</div>
+				<div class="field field_btn ta-center">
+					<input type="submit" class="btn btn_in btn_green btn_big" value="Получить пароль">
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- /MODAL REMEMBER PSW -->
+	<!-- MODAL REMEMBER PSW  OK -->
+	<div class="box-modal" id="modal-remember-psw-ok">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title"><span class="i-gray i-ok">Пароль успешно отправлен на Ваш электронный адрес!</span></div>
+			<div class="field field_btn ta-center">
+				<a href="javascript:void(0);" class="btn btn_big btn_green btn_in arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL REMEMBER PSW OK -->
+	<!-- MODAL SEARCH -->
+	<div class="box-modal modal-search" id="modal-search">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title ta-center"><span class="i-gray i-search">Не нашли, что искали?</span></div>
+			<p>Ну это еще ни о чем не говорит! Скорее всего, мы сможем найти для Вас то, что нужно, если Вы расскажете нам об этом:</p>
+			<form action="" method="post" id="form-search" target="formIframe">
+				<div class="field">
+					<input type="text" placeholder="Вам следует называть меня" name="login">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="Мой номер телефона" name="phone">
+				</div>
+				<div class="field">
+					<textarea name="" id="" cols="30" rows="10" placeholder="Нужная вещь..."></textarea>
+				</div>
+				<div class="field field_btn ta-center">
+					<input type="submit" class="btn btn_big btn_green btn_in" value="Перезвонить мне">
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- /MODAL SEARCH -->
+	<!-- MODAL ADD TO CART -->
+	<div class="box-modal modal-add-to-cart" id="modal-add-to-cart">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="b-add-cart">
+				<div class="b-add-cart__title">Вы добавили в корзину:</div>
+				<div class="prod__name">Краски акварельные "Maestria"</div>
+				<div class="prod__color">Цвет: <span class="val">Английская красная</span></div>
+				<p class="forbtn">
+					<a href="#" class="btn btn_red btn_mid">Оформить заказ</a>
+					<a href="javascript:void(0);" class="arcticmodal-close">Продолжить покупки</a>
+				</p>
+				<hr>
+				<div class="b-add-cart__title">С этим товаром обычно покупают:</div>
+				<!-- С ЭТИМ ТОВАРОМ ПОКУПАЮТ -->
+	
+			
+			
+				<ul class="carousel-list">
+					<li class="carousel-item">
+						<div class="carousel-item__container">
+							<a href="javascript:void(0)"></a>
+							<div class="carousel-item__top">
+								<div class="carousel-item__title">
+									<div class="category">Краски акварельные</div>
+									<div class="name">MAESTRIA</div>
+								</div>
+							</div>
+							<div class="carousel-item__center">
+								<img src="img/carousel-item1.jpg" alt="">
+								<div class="carousel-item__button">
+									<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Купить</a></div>
+									<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Отложить</a></div>
+								</div>
+							</div>
+							<div class="carousel-item__bottom">
+								<div class="price"><span class="price__summ">1 250.<sup class="price__penny">20</sup></span> Р</div>
+							</div>
+						</div>
+					</li>
+					<li class="carousel-item">
+						<div class="carousel-item__container">
+							<a href="javascript:void(0)"></a>
+							<div class="carousel-item__top">
+								<div class="carousel-item__title">
+									<div class="category">Краски акварельные</div>
+									<div class="name">MAESTRIA</div>
+								</div>
+							</div>
+							<div class="carousel-item__center">
+								<img src="img/carousel-item1.jpg" alt="">
+								<div class="carousel-item__button">
+									<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Купить</a></div>
+									<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Отложить</a></div>
+								</div>
+							</div>
+							<div class="carousel-item__bottom">
+								<div class="price"><span class="price__summ">1 250.<sup class="price__penny">20</sup></span> Р</div>
+							</div>
+						</div>
+					</li>
+
+				
+					
+					
+				</ul>
+			
+		
+		
+		<!-- /С ЭТИМ ТОВАРОМ ПОКУПАЮТ -->
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL ADD TO CART -->
+	<!-- MODAL REPLACEMENT -->
+	<div class="box-modal modal-replacement" id="modal-replacement">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="b-replacement">
+				<div class="b-replacement__title">Ускорить срок доставки:</div>
+				<h4 class="font1">В вашей корзине:</h4>
+				<div class="prod__name">Краски акварельные "Maestria"</div>
+				<div class="prod__color">Цвет: <span class="val">Английская красная</span></div>
+				<p>Доставка 21.08.2014</p>
+				<hr>
+				<div class="b-replacement__title">Можно заменить на подобный товар:</div>
+				<p>Доставка 18.08.2014</p>
+	
+				<ul class="prod-list">
+					<li class="prod-list__item">
+						<div class="prod-list__item-box">
+							<div class="carousel-item__container">
+								<a href="javascript:void(0)"></a>
+								<div class="carousel-item__top">
+									<div class="carousel-item__title">
+										<div class="category">Краски акварельные</div>
+										<div class="name">MAESTRIA</div>
+									</div>
+								</div>
+								<div class="carousel-item__center">
+									<img src="img/carousel-item1.jpg" alt="">
+									<div class="carousel-item__button">
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Купить</a></div>
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Отложить</a></div>
+									</div>
+								</div>
+								<div class="carousel-item__bottom">
+									<div class="price"><span class="price__summ">1 250.<sup class="price__penny">20</sup></span> Р</div>
+								</div>
+							</div>
+						</div>
+						<a href="#" class="btn btn_green btn_mid btn_in">Заменить</a>
+					</li>
+					<li class="prod-list__item">
+						<div class="prod-list__item-box">
+							<div class="carousel-item__container">
+								<a href="javascript:void(0)"></a>
+								<div class="carousel-item__top">
+									<div class="carousel-item__title">
+										<div class="category">Краски акварельные</div>
+										<div class="name">MAESTRIA</div>
+									</div>
+								</div>
+								<div class="carousel-item__center">
+									<img src="img/carousel-item1.jpg" alt="">
+									<div class="carousel-item__button">
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Купить</a></div>
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Отложить</a></div>
+									</div>
+								</div>
+								<div class="carousel-item__bottom">
+									<div class="price"><span class="price__summ">1 250.<sup class="price__penny">20</sup></span> Р</div>
+								</div>
+							</div>
+						</div>
+						<a href="#" class="btn btn_green btn_mid btn_in">Заменить</a>
+					</li>
+					<li class="prod-list__item">
+						<div class="prod-list__item-box">
+							<div class="carousel-item__container">
+								<a href="javascript:void(0)"></a>
+								<div class="carousel-item__top">
+									<div class="carousel-item__title">
+										<div class="category">Краски акварельные</div>
+										<div class="name">MAESTRIA</div>
+									</div>
+								</div>
+								<div class="carousel-item__center">
+									<img src="img/carousel-item1.jpg" alt="">
+									<div class="carousel-item__button">
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Купить</a></div>
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Отложить</a></div>
+									</div>
+								</div>
+								<div class="carousel-item__bottom">
+									<div class="price"><span class="price__summ">1 250.<sup class="price__penny">20</sup></span> Р</div>
+								</div>
+							</div>
+						</div>
+						<a href="#" class="btn btn_green btn_mid btn_in">Заменить</a>
+					</li>
+					<li class="prod-list__item">
+						<div class="prod-list__item-box">
+							<div class="carousel-item__container">
+								<a href="javascript:void(0)"></a>
+								<div class="carousel-item__top">
+									<div class="carousel-item__title">
+										<div class="category">Краски акварельные</div>
+										<div class="name">MAESTRIA</div>
+									</div>
+								</div>
+								<div class="carousel-item__center">
+									<img src="img/carousel-item1.jpg" alt="">
+									<div class="carousel-item__button">
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Купить</a></div>
+										<div class="field"><a href="javascript:void(0);" class="btn btn_white btn_small">Отложить</a></div>
+									</div>
+								</div>
+								<div class="carousel-item__bottom">
+									<div class="price"><span class="price__summ">1 250.<sup class="price__penny">20</sup></span> Р</div>
+								</div>
+							</div>
+						</div>
+						<a href="#" class="btn btn_green btn_mid btn_in">Заменить</a>
+					</li>
+				</ul>
+			</div>
+			<div class="ta-center">
+				<a href="javascript:void(0);" class="btn btn_in btn_red btn_mid arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL REPLACEMENT -->
+	<!-- MODAL ORDER OK -->
+	<div class="box-modal" id="modal-order-ok">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title"><span class="i-gray i-ok">Благодарим Вас за заказ!</span></div>
+			<p>В ближайшее время на Вашу будет отправлено письмо с подтверждением заказа.</p>
+			<div class="field field_btn ta-center">
+				<a href="javascript:void(0);" class="btn btn_big btn_green btn_in arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL ORDER OK -->
+	<!-- MODAL ACTIONS -->
+	<div class="box-modal box-modal_respons" id="modal-actions">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title box-modal__title_noindent">Акции с этим товаром:</div>
+			<div class="action-list">
+				<ul class="b-masterclass__list">
+						<li class="b-masterclass__item">
+							<a href="#">
+								<img src="img/bg-master-1.jpg" alt="">
+								<span class="b-masterclass__name"><span>Создание мягкой игрушки из шерсти</span></span>
+							</a>
+						</li>
+						<li class="b-masterclass__item">
+							<a href="#">
+								<img src="img/bg-master-2.jpg" alt="">
+								<span class="b-masterclass__name"><span>Подарки на новый год своими руками</span></span>
+							</a>
+						</li>
+						<li class="b-masterclass__item">
+							<a href="#">
+								<img src="img/bg-master-3.jpg" alt="">
+								<span class="b-masterclass__name"><span>Винтажное украшение</span></span>
+							</a>
+						</li>
+						<li class="b-masterclass__item">
+							<a href="#">
+								<img src="img/bg-master-4.jpg" alt="">
+								<span class="b-masterclass__name"><span>Каллиграфия</span></span>
+							</a>
+						</li>
+					</ul>
+			</div>
+			<div class="field field_btn ta-center">
+				<a href="javascript:void(0);" class="btn btn_big btn_green btn_in arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL ACTIONS -->
+	<!-- MODAL ADD PARAMETERS -->
+	<div class="box-modal" id="modal-add-parameters">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title"><span class="i-gray i-reg">Дополнительные параметры оформления</span></div>
+			<form action="" method="post" id="form-add-parameters" class="form-add-parameters">
+				<div class="field-row field-row_just">
+					<div class="field">
+						<input type="text" placeholder="Ширина (см)" name="width">
+					</div>
+					<div class="field">
+						<input type="text" placeholder="Высота (см)" name="height">
+					</div>
+				</div>
+				<div class="field">
+					<label for="check-parameter-1"><input type="checkbox" id="check-parameter-1"> <span>Ламинация  художественная матовая</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-2"><input type="checkbox" id="check-parameter-2"> <span>Ламинация  художественная глянцевая</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-3"><input type="checkbox" id="check-parameter-3"> <span>Ламинация  художественная "грубый холст"</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-4"><input type="checkbox" id="check-parameter-4"> <span>Ламинация  художественная "средний холст"</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-5"><input type="checkbox" id="check-parameter-5"> <span>Стекло  глянцевое</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-6"><input type="checkbox" id="check-parameter-6"> <span>Стекло  пластиковое</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-7"><input type="checkbox" id="check-parameter-7"> <span>Стекло  антибликовое</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-8"><input type="checkbox" id="check-parameter-8"> <span>Стекло безбликовое  музейное ClearColorUV60 (Германия)</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-9"><input type="checkbox" id="check-parameter-9"> <span>Паспарту</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-10"><input type="checkbox" id="check-parameter-10"> <span>Двойное паспарту  и более</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-11"><input type="checkbox" id="check-parameter-11"> <span>Наклейка работы  на основу</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-12"><input type="checkbox" id="check-parameter-12"> <span>Задник из  картона</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-13"><input type="checkbox" id="check-parameter-13"> <span>Задник из  ДВП</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-14"><input type="checkbox" id="check-parameter-14"> <span>Задник из  пенокартона</span></label>
+				</div>
+				<div class="field">
+					<label for="check-parameter-15"><input type="checkbox" id="check-parameter-15"> <span>Натяжка на подрамник</span></label>
+				</div>
+				<div class="field">
+					<textarea name="" id="" cols="30" rows="10" placeholder="Хотите сообщить что-нибудь еще?"></textarea>
+				</div>
+				<div class="field field_btn ta-center">
+					<input type="submit" value="Отправить" class="btn btn_green btn_in btn_big">
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- /MODAL ADD PARAMETERS -->
+	<!-- MODAL ORDER MOLDING OK -->
+	<div class="box-modal" id="modal-order-molding-ok">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title ta-center"><span class="i-gray i-ok">Благодарим Вас!</span></div>
+			<p>Спасибо за заказ! В ближайшее время Вам позвонят по Вашему заказу.</p>
+			<div class="field field_btn ta-center">
+				<a href="javascript:void(0);" class="btn btn_big btn_green btn_in arcticmodal-close">Закрыть</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL ORDER MOLDING OK -->
+	<!-- MODAL ОТКАЗАТЬСЯ ОТ РАССЫЛКИ-->
+	<div class="box-modal" id="modal-unsubscribe">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title">Вы действительно хотите отказаться от рассылки?</div>
+			
+			
+			<div class="field-row field-row_just">
+				<a href="#" class="btn btn_in btn_green btn_small">Да</a>
+				<a href="javascript:void(0);" class="btn btn_in btn_red btn_small arcticmodal-close">Нет</a>
+			</div>
+		</div>
+	</div>
+	<!-- /MODAL ОТКАЗАТЬСЯ ОТ РАССЫЛКИ-->
+	<!-- MODAL CURRENT ACCOUNT-->
+	<div class="box-modal box-modal_respons" id="modal-current-account">
+		<div class="box-modal__bd-left"></div>
+		<div class="box-modal__bd-right"></div>
+		<div class="box-modal__close arcticmodal-close"></div>
+		<div class="box-modal__content">
+			<div class="box-modal__title">Расчетный счет</div>
+			<form action="" method="post" id="form-current-account" class="form-current-account">
+				<div class="field">
+					<input type="text" placeholder="Наименование организации" name="companyname">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="ИНН" name="inn">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="КПП" name="kpp">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="р/с" name="currentAccount">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="к/с" name="ks">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="Банк" name="bank">
+				</div>
+				<div class="field">
+					<input type="text" placeholder="БИК" name="bik">
+				</div>
+				<div class="field-row ta-center">
+					<a href="javascript:void(0);" class="btn btn_in btn_green btn_small arcticmodal-close">Закрыть</a>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- /MODAL CURRENT ACCOUNT-->
+</div>
+<!-- /МОДАЛЬНЫЕ ОКНА -->
+<!-- SCRIPTS -->
+<script src="scripts/vendor/modernizr-2.6.2.min.js"></script>
+<script src="scripts/vendor/jquery-1.11.0.min.js"></script>
+
+<!-- ARCTICMODAL -->
+<script src="scripts/jquery.arcticmodal-0.3/jquery.arcticmodal-0.3.min.js"></script>
+<link rel="stylesheet" href="scripts/jquery.arcticmodal-0.3/jquery.arcticmodal-0.3.css">
+<!-- BXSLIDER -->
+<script src="scripts/bxslider/jquery.bxslider.min.js"></script>
+<link rel="stylesheet" href="scripts/bxslider/jquery.bxslider.css">
+<!-- FORMSTYLER -->
+<script src="scripts/formstyler/jquery.formstyler.min.js"></script>
+<link rel="stylesheet" href="scripts/formstyler/jquery.formstyler.css">
+
+<!-- JQUERY-VALIDATION -->
+<script src="scripts/jquery-validation-1.13.0/dist/jquery.validate.min.js"></script>
+<script src="scripts/jquery-validation-1.13.0/dist/additional-methods.min.js"></script>
+<script src="scripts/jquery-validation-1.13.0/dist/localization/messages_ru.min.js"></script>
+
+<!-- RESPONSIVE-TABLES -->
+<script src="scripts/responsive-tables/responsive-tables.js"></script>
+<link rel="stylesheet" href="scripts/responsive-tables/responsive-tables.css">
+
+<!-- SCROLLPANE -->
+<script src="scripts/scrollpane/jquery.mousewheel.pack.js"></script>
+<script src="scripts/scrollpane/jquery.jscrollpane.min.js"></script>
+<link rel="stylesheet" href="scripts/scrollpane/jquery.jsscrollpane.css">
+
+<!-- LIGHTGALLERY -->
+<script src=scripts/lightGallery/lightGallery.min.js></script>
+<link rel="stylesheet" href="scripts/lightGallery/lightGallery.css">
+<!-- CUSTOM -->
+<script src="scripts/custom.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+{reduce:nothing}
+{mask:main}
+	<ul class="map">
+		{item}
+	</ul>	
+{/mask}
+
+{mask:item}
+	<li>
+		<label for="cat_{id}">{name}</label> <input type="checkbox" name="cat[]" id="cat_{id}" value="{id}"{if:{canedit}==true} checked="checked"{/if}/>
+		{set:item}
+			<ul>
+				{item}
+			</ul>
+		{/set}
+	</li>
+{/mask}

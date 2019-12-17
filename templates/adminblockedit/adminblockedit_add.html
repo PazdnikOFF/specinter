@@ -1,0 +1,238 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *{set:add}Добавление{/set}{mis:add}Редактирование{/mis} блока*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/calendar.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<script src="/admin/scripts/calendar.js"></script>
+	<script src="/admin/scripts/calendar-ru.js"></script>
+	<script src="/admin/scripts/calendar-setup.js"></script>
+
+	<!--seo url-->
+	<script src="/admin/scripts/seo-url.js"></script>
+
+	<!--chosen-->
+	<link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+	<script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+	<!--iCheck-->
+	<link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+	<script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+	<!--CROPPER-->
+	<script src="/admin/scripts/jcrop/js/jquery.color.js"></script>
+	<script src="/admin/scripts/jcrop/js/jquery.Jcrop.min.js"></script>
+	<link rel="stylesheet" href="/admin/scripts/jcrop/css/jquery.Jcrop.css">
+
+	<!--dropzone-->
+	<script src="/admin/scripts/dropzone/dropzone.min.js"></script>
+	<link rel="stylesheet" href="/admin/scripts/dropzone/dropzone.css">
+
+	<!--fancybox-->
+	<script src="/admin/scripts/fancybox/source/jquery.fancybox.pack.js"></script>
+	<link rel="stylesheet" href="/admin/scripts/fancybox/source/jquery.fancybox.css">
+
+	<script>
+		$(document).ready(function() {
+			$(".ch").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+			$(".select-styled").chosen({
+				width: "400px"
+			});
+		});
+	</script>
+
+</head>
+
+<body>
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>{set:add}Добавление{/set}{mis:add}Редактирование{/mis} блока</h1>
+
+					{set:add}
+					<form action="/manage/blockedit/_aadd{queryString}/" method="post" enctype="multipart/form-data" name="form1">
+					{/set}
+					{mis:add}
+					<form action="/manage/blockedit/_aedit{queryString}/" method="post" enctype="multipart/form-data" name="form1">
+					{/mis}
+
+			<input type="hidden" name="template" value="{template}">
+			<input type="hidden" name="parent" value="{parent}">
+			<input type="hidden" name="page" value="{lpage}">
+			{mis:add}
+			<input type="hidden" name="blockid" value="{blockid}">
+			{/mis}
+
+
+			{set:tabs}
+			<!--TABBER-->
+			<ul class="nav nav-pills block-tabber" id="block-tabber">
+				{mask:tabs}
+				<li{if:{_first}} class="active"{/if} data-tab="{id}" id="nav-tab_{id}"><a href="#">Вкладка {php}{id}+1{/php}</a></li>
+				{/mask}
+
+				{mask:imageload}
+				<li data-tab="{number}" id="nav-tab_{number}"><a href="#">{name}</a></li>
+				{/mask}
+
+				{set:addFields}
+				<li data-tab="1000" id="nav-tab_1000"><a href="#">SEO поля</a></li>
+				{/set}
+
+			</ul>
+			<!--/TABBER-->
+			{/set}
+
+			{set:tabs}
+			<div id="block-tab-content" class="block-tab-content">
+
+				{mask:tabs}
+
+				<div class="block block-tab" id="block-tab_{id}"{if:!{_first}} style="display: none;"{/if}>
+					<h2>Параметры блока</h2>
+					{mask:fields}
+						{if:{datatkey} == "imageload"}
+						<div class="stroke hidden-element">
+						{/if}
+						{if:{datatkey} != "imageload"}
+						<div class="stroke clearline">
+						{/if}
+							<div class="name">
+								<p>{name}</p>
+								{if:{//super}}
+									<span>{key}</span>
+								{/if}
+							</div>
+							<div class="value">
+								{if:{key} == good_id}
+								<a href="/manage/blockedit/_aedit_id{data_value}_templatecatitem_parent245_page0?back_url={//blockid}_{//template}/">Редактировать товар</a>{/if}
+								{value}
+								<input type="hidden" name="dat[{index}]" value="{key}">
+								<input type="hidden" name="dkey[{index}]" value="{datatkey}">
+							</div>
+						</div>
+					{/mask}
+				</div>
+
+				{/mask}
+
+				{set:addFields}
+				<div class="block block-tab" id="block-tab_1000" style="display: none;">
+					<h2>SEO поля</h2>
+					{mask:addFields}
+						<div class="stroke">
+							<div class="name">
+								<p>{name}</p>
+							</div>
+							<div class="value">
+								<input class="text form-control" name="{key}" type="text" value="{value}"{if:{_first} && {value} == ""} id="cat_key"{/if}>
+							</div>
+						</div>
+					{/mask}
+				</div>
+				{/set}
+
+
+
+			</div>
+			{/set}
+
+
+			{set:back_url}
+						<input name="back_url_items" value="{back_url}" type="hidden">
+			{/}
+			<div class="buttons">
+				<input type="submit" class="btn btn-success" name="add" value="{set:add}Добавить{/set}{mis:add}Сохранить{/mis}">
+				<input type="button" class="btn btn-danger" value="Отмена" onclick="javascript:location.href='/manage/blockedit/_alist_parent{parent}_page{lpage}{queryString}/'; return false;">
+			</div>
+
+		</form>
+
+
+		{mask:imageload}
+		<div class="block block-tab" id="block-tab_{number}" style="display: none;">
+			<h2>Изображения</h2>
+
+			<div class="stroke">
+				<div class="name">
+					<p>{name}</p>
+					{if:{//super}}
+						<span>{key}</span>
+					{/if}
+				</div>
+				<div class="value">
+					{value}
+				</div>
+			</div>
+
+		</div>
+		{/mask}
+
+		</div>
+		<!--/CONTENT-->
+
+	</div>
+	<!--/MAIN-->
+
+
+	<div class="hidden-element form" id="form-image">
+
+
+		<div class="clearline form-top">
+			<div class="clearline">
+				<h2>Пожалуйста, кадрируйте изображение</h2>
+			</div>
+		</div>
+
+		<div id="image-cont">
+
+		</div>
+
+		<input type="hidden" id="x1" name="x1">
+		<input type="hidden" id="y1" name="y1">
+		<input type="hidden" id="x2" name="x2">
+		<input type="hidden" id="y2" name="y2">
+		<input type="hidden" id="w" name="w">
+		<input type="hidden" id="h" name="h">
+		<input type="hidden" id="realW" name="realW">
+		<input type="hidden" id="realH" name="realH">
+		<input type="hidden" id="fileName" name="fileName">
+		<input type="hidden" id="fieldName" name="fieldName">
+
+		<div class="btn-center">
+			<button id="imageSave" class="btn btn-success">Сохранить</button>
+		</div>
+
+	</div>
+
+
+</body>
+</html>
+{/mask}

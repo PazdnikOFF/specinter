@@ -1,0 +1,43 @@
+{reduce:space}
+{mask:main}
+
+
+				<ul>
+					<li><a href="/manage/"><i class="glyphicon glyphicon-list-alt"></i>&nbsp;Структура сайта</a></li>
+						{set:super}
+							<li><a href="/manage/cattemplate/"><i class="glyphicon glyphicon-folder-open"></i>&nbsp;Шаблоны папок</a></li>
+							<li><a href="/manage/blocktemplate/"><i class="glyphicon glyphicon-file"></i>&nbsp;Шаблоны блоков</a></li>
+							<li><a href="/manage/admindatatypes/"><i class="glyphicon glyphicon-briefcase"></i>&nbsp;Типы данных</a></li>
+						{/set}
+
+						{if:{status} == 5}<li><a href="/manage/moduleorders/"><i class="glyphicon glyphicon-barcode"></i>&nbsp;Заказы</a></li>{/if}
+						{if:{status} != 3}<li><a href="/manage/users/"><i class="glyphicon glyphicon-user"></i>&nbsp;Пользователи</a></li>{/if}
+					<li><a href="/manage/?logout=1" onClick="javascript:return confirm('Завершить сеанс администрирования?');">Выход</a></li>
+
+					<!-- Раскомментировать и скорректировать при наличии языковых версий -->
+
+					<!-- <li class="breakline"></li>
+
+					<li class="lang">
+						<p>Язык:</p>
+						<p>
+							<a href="#" data-id="ru" class="lang-change{if:{lang}=='ru'} active{/if}">ru</a>
+							<a href="#" data-id="cz" class="lang-change{if:{lang}=='cz'} active{/if}">cz</a>
+							<a href="#" data-id="en" class="lang-change{if:{lang}=='en'} active{/if}">en</a>
+							<a href="#" data-id="de" class="lang-change{if:{lang}=='de'} active{/if}">de</a>
+						</p>
+					</li> -->
+
+					<li class="breakline"></li>
+					{set:super}
+					<li><a href="#" id="clean-cache"><i class="glyphicon glyphicon-trash"></i>&nbsp;Очистить кэш</a></li>
+					{/set}
+				</ul>
+
+
+
+
+
+
+
+{/mask}

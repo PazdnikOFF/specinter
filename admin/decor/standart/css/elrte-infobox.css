@@ -1,0 +1,57 @@
+@CHARSET "UTF-8";
+/*reset css*/
+.el-rte-structure {overflow: hidden; font: 1.15em/1.5em tahoma; color: #575757;}
+/*TEXT STYLES*/
+.el-rte-structure h1 {color: black; font: 2em tahoma; margin-bottom: 10px;}
+.el-rte-structure h2 {color: black; font: 1.33em tahoma; margin-bottom: 7px;}
+
+.el-rte-structure p {color: #575757; font: 1em/1.5em tahoma; margin-bottom: 15px;}
+.el-rte-structure p a {color: #36507a; font: 1em tahoma}
+.el-rte-structure p a:hover {text-decoration: none;}
+.el-rte-structure p a:visited {color: #9912d8;}
+.el-rte-structure p b {font: bold 1em tahoma;}
+.el-rte-structure p strong {font: bold 1em tahoma;}
+.el-rte-structure p strike {font: 1em tahoma;}
+.el-rte-structure p i {font: italic 1em tahoma;}
+.el-rte-structure p em {font: italic 1em tahoma;}
+.el-rte-structure a {color: #36507a; font: 1em tahoma}
+.el-rte-structure a:hover {text-decoration: none;}
+.el-rte-structure a:visited {color: #9912d8;}
+.el-rte-structure b {font: bold 1em tahoma;}
+.el-rte-structure strong {font: bold 1em tahoma;}
+.el-rte-structure i {font: italic 1em tahoma;}
+.el-rte-structure em {font: italic 1em tahoma;}
+.el-rte-structure sup {font: 0.81em "Lucida Sans Unicode";}
+.el-rte-structure sub {font: 0.81em "Lucida Sans Unicode";}
+.el-rte-structure strike {font: 1em tahoma;}
+
+.el-rte-structure .img-left {float: left; margin: 0 20px 20px 0;}
+.el-rte-structure .img-right {float: right; margin: 0 0 20px 20px;}
+.el-rte-structure img {}
+
+.el-rte-structure .blockquote {margin: 10px 0;}
+.el-rte-structure .blockquote .left {background: url("/images/quotes-left.png") no-repeat 0 100%;}
+.el-rte-structure .blockquote .right {background: url("/images/quotes-right.png") no-repeat 100% 0; padding: 0 44px;}
+.el-rte-structure .blockquote .right blockquote {font: 1.3em/2.15em georgia; color: #888888;}
+
+.el-rte-structure ul {list-style: none; margin: 15px 0;}
+.el-rte-structure ul li {background: url("/img/ul-marker.png") no-repeat 0 3px; padding-left: 20px; padding-bottom: 4px; color: #575757; font: 1em tahoma;}
+.el-rte-structure ul li a {font-size: 1em; color: #36507a;}
+.el-rte-structure ul li p {font-size: 1em;}
+.el-rte-structure ul li b {font-size: 1em;}
+.el-rte-structure ul li i {font-size: 1em;}
+
+.el-rte-structure ol {margin: 15px 0; list-style-position: inside;}
+.el-rte-structure ol li {padding-bottom: 4px; font: 1em tahoma; color: #575757;}
+.el-rte-structure ol li a {font-size: 1em; color: #36507a;}
+.el-rte-structure ol li p {font-size: 1em;}
+.el-rte-structure ol li b {font-size: 1em;}
+.el-rte-structure ol li i {font-size: 1em;}
+
+
+.el-rte-structure table {	
+	border-collapse: separate; border-spacing: 1px;}
+
+.el-rte-structure table th {color: white; padding: 7px 15px; color: white; background: #1f3e60; font: 1em tahoma; text-align: center;}
+.el-rte-structure table td {padding: 7px 15px; background: #d2d8df; color: black; font: 1em tahoma; text-align: center;}
+.el-rte-structure table tr.odd td {padding: 7px 15px; background: #bbc5cf; color: black; font: 1em tahoma;}

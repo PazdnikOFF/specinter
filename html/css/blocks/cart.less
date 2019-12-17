@@ -1,0 +1,137 @@
+.bg-cart-wrapp {
+	background: url('@{img_bg}bg-cart-1.jpg') left 1360px,
+				url('@{img_bg}bg-cart-2.jpg') right 1744px;
+	background-repeat: no-repeat;
+}
+.b-bg-cart {
+	background: url('@{img_bg}bg-cart.jpg') top right, 
+				url('@{img_bg}bg-about-1.jpg') left bottom;
+	background-repeat: no-repeat;
+	background-color: #f3f1eb;
+	position: relative;
+	padding: 15px 0;
+	margin-bottom: 70px;
+	-webkit-box-shadow: inset 1px 1px 3px rgba(102, 100, 94, 0.46);
+	box-shadow: inset 1px 1px 3px rgba(102, 100, 94, 0.46);
+	border-bottom: 1px solid #d0d0ce;
+}
+.b-cart {
+	
+	&__title {
+		color: #f60c00;
+		font-size: 42px;
+		margin: 30px 0;
+	}
+	&__txt {
+		margin: 23px 0;
+		h3 {
+			.font1;
+			font-size: 24px;
+			margin: 0;
+		}
+	}
+}
+
+.b-cart-table {
+	text-align: center;
+	width: 100%;
+	margin-bottom: 90px;
+	font-size: 16px;
+	th {
+		background: #f03f35;
+		color: #fff;
+		text-align: center;
+		border-left: 1px solid #fff;
+		border-right: 1px solid #fff;
+		font-size: 18px;
+		font-weight: normal;
+		padding: 9px 15px;
+	}
+	td {
+		text-align: center;
+		border: 1px solid #aaa8a9; border-top: none;
+		padding: 9px 15px;
+	}
+	&__date {
+		color: #6f6d74;
+		a {
+			color: inherit;
+		}
+		&:hover {
+			color: #333439;
+			text-decoration: underline;
+		}
+	}
+	&__imgtd {
+		background-color: #fff;
+		width: 122px;
+	}
+	&__img {
+
+		img {
+			max-width: 100%
+		}
+	}
+	&__del {
+		color: @coltxt3;
+	}
+	&__col {
+		font-size: 14px;
+		.val {
+			.font1_b;
+			color: #4d4f54;
+		}
+	}
+	&__result {
+		td {
+			border: none;
+			padding: 12px 35px;
+		}
+		.result-date {
+			text-align: right;
+			font-size: 18px;
+			color: @coltxt3;
+			line-height: 24px;
+			.val {
+				font-size: 24px;
+				.font1_b;
+			}
+		}
+	}
+	&__result-summ {
+		background: #f03f35;
+		color: #fff;
+		text-align: center;
+		font-size: 18px;
+		text-transform: uppercase;
+		.val {
+			font-size: 26px;
+			margin-left: 10px;
+		}
+	}
+}
+
+.pickup-price {
+	font-size: 16px; color: @coltxt3;
+	.inblock(middle);
+	&__val {
+		font-size: 24px;
+		margin-left: 10px;
+	}
+}
+.form-order__result-price {
+	font-size: 18px; color: @coltxt3;
+	.inblock(middle);
+	.val {
+		margin-left: 10px;
+		.font1_b;
+		font-size: 26px;
+	}
+}
+/*============= 960px ============================*/
+@media only screen and (max-width: 960px) {
+	.b-bg-cart {
+		background: none;
+		background-color: #f3f1eb;
+	}
+}

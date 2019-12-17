@@ -1,0 +1,29 @@
+ {reduce:space}
+	{mask:main}
+		{set:page}
+			<div class="pagination">
+				<ul>
+					{choose}
+						{when:{//url_p}}
+							<li class="pagination__nav pagination__nav_left"><a href="{//url_p}" class="i-gray i-arrow-left"></a></li>
+						{/when}
+					{/choose}
+
+					{mask:page}
+						{set:current}
+							<li><a href="#" class="on">{title}</a></li>
+						{/set}
+						{mis:current}
+							<li><a href="{url}{if:{//page_now}==1}/{/}">{title}</a></li>
+						{/mis}
+					{/mask}
+
+					{choose}
+						{when:{//url_n}}
+							<li class="pagination__nav pagination__nav_right"><a href="{url_n}" class="i-gray i-arrow-right"></a></li>
+						{/when}
+					{/choose}
+				</ul>
+			</div>
+		{/set}
+	{/mask}

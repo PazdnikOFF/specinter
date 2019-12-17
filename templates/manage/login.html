@@ -1,0 +1,69 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Вход*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+
+
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main no-bg">
+
+		<!--CONTENT-->
+		<div class="block-auth-only container">
+
+
+				<div class="auth" style="margin-top: 200px;">
+					<h4>Авторизуйтесь, пожалуйста</h4>
+					<div class="auth-form">
+						<form method="post" action="/manage/" id="auth-form">
+
+							<p>Логин</p>
+							<input type="text" name="authlogin" id="login" value="" autofocus class="form-control">
+
+							<p>Пароль</p>
+							<input type="password" name="authpass" id="pass" value="" class="form-control">
+
+							<div class="button">
+								<button type="submit" onclick="checkAuthForm(); return false;" class="btn btn-primary">Продолжить</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+
+		</div>
+		<!--/CONTENT-->
+
+
+
+		<script>
+			function checkAuthForm() {
+				if ($("#login").val() != "" && $("#pass").val() != "") {
+					document.getElementById("auth-form").submit();
+				}
+			}
+		</script>
+
+
+	</div>
+	<!--/MAIN-->
+
+</body>
+</html>
+{/mask}
+

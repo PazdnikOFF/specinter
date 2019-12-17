@@ -1,0 +1,182 @@
+{reduce:nothing}
+{mask:main}
+</div>
+{set:html_top}
+<div class="wrap">
+    {html_top}
+</div>
+{/}
+<div class="box">
+<div class="wrap"> 
+    <div class="detals">
+        <div class="detal-list">
+            <table>
+                {set:items}
+                <tr>
+                    <th>№</th>
+                    <th>Артикул</th>
+                    <th>Название</th>
+                    <th></th>
+                    <th>Цена</th>
+                </tr>
+                {mask:items}
+                <tr class="detal-list-one" data-url="{url}">
+                    <td>{nnum}</td>
+                    <td><a href="javascript:void(0);" class="detal-art">{art}</a></td>
+                    <td><span title="{name_rus}">{name_rus}</span></td>
+                    <td><span>{name_eng}</span></td>
+                    <td>
+                        <div class="detal-price">Цена</div>
+                    </td>
+                </tr>
+
+                <tr class="detal-one">
+                    <td colspan="5">
+                        <div class="detal-one-inn">
+                            <div class="detal-one-top">
+                                <div class="detal-one__title">{name_eng} / {name_rus}</div>
+
+                                <div class="detal-one-slider">
+                                    <div class="swiper-wrapper">
+                                        {set:images}
+                                            {mask:images}
+                                            <a href="/files/0/{img}" class="swiper-slide">
+                                                <img src="/files/0/{img}">
+                                            </a>
+                                            {/}
+                                        {/}
+                                        {set:img}
+                                        <a href="/files/0/{img}" class="swiper-slide">
+                                            <img src="/files/0/{img}">
+                                        </a>
+                                        {/}
+
+                                        {set:img_1}
+                                        <a href="/files/0/{img_1}" class="swiper-slide">
+                                            <img src="/files/0/{img_1}">
+                                        </a>
+                                        {/}
+
+                                        {set:img_2}
+                                        <a href="/files/0/{img_2}" class="swiper-slide">
+                                            <img src="/files/0/{img_2}">
+                                        </a>
+                                        {/}
+
+                                        {set:img_3}
+                                        <a href="/files/0/{img_3}" class="swiper-slide">
+                                            <img src="/files/0/{img_3}">
+                                        </a>
+                                        {/}
+
+                                        {set:img_4}
+                                        <a href="/files/0/{img_4}" class="swiper-slide">
+                                            <img src="/files/0/{img_4}">
+                                        </a>
+                                        {/}
+                                    </div>
+                                    <div class="swiper-button-prev"></div>
+                                    <div class="swiper-button-next"></div>
+                                </div>
+
+
+                                {set:video}
+                                <a href="https://www.youtube.com/watch?v={video}" class="detal-one__video">
+                                    <img src="https://img.youtube.com/vi/{video}/default.jpg" alt="">
+                                </a>
+                                {/}
+                                <div class="detal-one__descr">
+                                    {html}
+                                    <a href="{url}" class="detal-one__more" style="margin-left: 0">Подробнее</a>
+                                </div>
+
+                            </div>
+                            {set:items}
+
+                            <div class="detal-one-table">
+                                <table>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Фото</th>
+                                        <th>Артикул</th>
+                                        <th>Производитель</th>
+                                        <th>Срок поставки</th>
+                                        <th>Цена</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                    {mask:items}
+                                    <tr>
+                                        <td>{_rank}</td>
+                                        <td>
+                                            <div class="detal-photo{mis:img} disable{/}"
+                                                 {set:img}data-url="/files/0/{img}"{/}></div>
+                                        </td>
+                                        <td>{art}</td>
+                                        <td>{manufacture}</td>
+                                        <td>{time}</td>
+                                        <td>{price} ₽</td>
+                                        <td>
+                                            <div class="good-quant">
+                                                <div class="good-quant__minus">-</div>
+                                                <input type="text" value="1" id="{*" *}good{id}{*"*}"
+                                                class="good-quant__input">
+                                                <div class="good-quant__plus">+</div>
+                                            </div>
+                                        </td>
+                                        <td>
+
+                                            <a href="#addToCart"
+                                               class="to-cart open-modal ajax_add_cart"
+                                               data-id="{id}"
+                                               {set:img}data-img="/files/0/{img}"{/}
+                                               {mis:img}data-img="/img/recom.jpg"{/}
+                                               data-title="{../name_rus} {art}"
+                                               data-art="{art}"
+                                            >{if:{price}}В счёт{/}{if:!{price}}В заказ{/}</a>
+                                        </td>
+                                    </tr>
+                                    {/}
+                                </table>
+                            </div>
+                            {/}
+                        </div>
+                    </td>
+                </tr>
+                {/}
+                {/}
+            </table>
+        </div>
+        {set:img}
+        <div class="detal-img">
+            <img class="detal-image" src="/files/0/{img}" alt="" >
+            <div class="center">
+                <a href="#" class="detal-img-open-trigger">На весь экран</a>
+            </div>
+        </div>
+
+        
+        <script type="text/javascript">
+
+            $('.detal-img-open-trigger').click(function(e) {
+                e.preventDefault();
+                $('.detal-image').click();
+              });
+        	/*if($('html').width() > 992) {
+		       $('.detal-img').zoom({
+                   magnify: 0.8,
+                   url: '/files/0/{img}' 
+               });
+		    } */
+        </script>
+        <div style="clear:both"></div>
+        {/}
+    </div>
+</div>
+</div>
+{set:html_bot}
+<div class="wrap">
+    {html_bot}
+</div>
+{/}
+{/mask}

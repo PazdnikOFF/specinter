@@ -1,0 +1,34 @@
+{reduce:nothing}
+{mask:main}
+{set:items}
+   <div class="slider">
+    	<div class="slider-inn">
+    		<div class="swiper-wrapper">
+				{mask:items}
+    	        <div class="swiper-slide">
+					{set:img}
+    				<img src="/files/1/{img}" alt="">
+					{/}
+    				<div class="slider-title">
+    					<div class="slider-title__top">
+    						{title}
+    					</div>
+    					<div class="slider-title__bottom">
+    						{discription}
+    					</div>
+    					<a href="{url}">Перейти в каталог</a>
+    				</div>
+    	        </div>
+				{/}
+    	    </div>
+    	    <!-- If we need pagination -->
+    	    <div class="swiper-pagination"></div>
+    	    <!-- If we need navigation buttons -->
+    	</div>
+    	<div class="slider-nav">
+    		<div class="swiper-button-prev"></div>
+    		<div class="swiper-button-next"></div>
+    	</div>
+    </div>
+	{/}
+{/mask}

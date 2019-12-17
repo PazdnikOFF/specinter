@@ -1,0 +1,24 @@
+{reduce:space}
+{mask:main}
+
+{if:{send}!=1}
+<div class="lk-cols clearfix">
+    <div class="lk-col">
+        <form action="/profile/_recovery/" id="recover" method="post">
+            {error}
+            <div class="form-line">
+                <label for="">E-mail*:</label>
+                <input type="text" name="email" value="{email}">
+            </div>
+
+            <div class="form-line">
+                <button class="form-send">Восстановить</button>
+            </div>
+        </form>
+    </div>
+</div>
+{/}
+{if:{send}==1}<h2>На указанную почту отправлена ссылка для восстановления пароля</h2>{/}
+
+
+{/mask}

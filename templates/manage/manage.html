@@ -1,0 +1,256 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Структура сайта*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--right click and cookie-->
+	<script src="/admin/scripts/jquery.jscontext-1.0.js"></script>
+	<script src="/admin/scripts/jquery.cookie.js"></script>
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Структура сайта</h1>
+			<input type="hidden" id="hide-parent" name="hide-parent" value="0">
+			<table width="100%" id="tree" class="itemtree">
+
+					{set:super}
+					<tr style="cursor:hand" id="tr0">
+					{/set}
+
+					{mis:super}
+					<tr id="tr0">
+					{/mis}
+
+						<td class="simpletd"><i class="glyphicon glyphicon-home"></i></td>
+						<td colspan="100">Корень сайта</td>
+
+					</tr>
+
+					{item}
+
+
+			</table>
+		</div>
+		<!--/CONTENT-->
+
+		<!--POPUP-->
+		<div class="popup-index" id="popup-index">
+			<div class="popup-index">
+				<div class="top"><h1>Действие</h1></div>
+				<ul>
+					<li><a href="#" rel="1" class="aAdd" id="aAdd" onclick="addCat(this); return false;"><i class="glyphicon glyphicon-plus-sign"></i>&nbsp;Создать новую</a></li>
+
+					<li><a href="#" rel="1" class="aEdit" id="aEdit" onclick="editCat(this); return false;"><i class="glyphicon glyphicon-pencil"></i>&nbsp;Редактировать</a></li>
+
+					<li><a href="#" rel="1" class="aEditbl" id="aEditbl" onclick="blockList(this); return false;"><i class="glyphicon glyphicon-th"></i>&nbsp;Блоки</a></li>
+
+					<li><a href="#" rel="1" class="aMove" id="aMove" onclick="moveCat(this); return false;"><i class="glyphicon glyphicon-move"></i>&nbsp;Переместить</a></li>
+
+					<li><a href="#" rel="1" class="aCopy" id="aCopy" onclick="copyCat(this); return false;"><i class="glyphicon glyphicon-edit"></i>&nbsp;Копировать</a></li>
+
+					<li><a href="#" rel="1" class="aHide" id="aHide" onclick="showHideCat(this); return false;"><i class="glyphicon glyphicon-eye-close"></i>&nbsp;Скрыть/показать</a></li>
+
+					<li id="a"><a href="#" rel="1" class="aDel" id="aDel" onclick="delCat(this); return false;"><i class="glyphicon glyphicon-trash"></i>&nbsp;Удалить</a></li>
+				</ul>
+			</div>
+		</div>
+		<!--/POPUP-->
+
+		<script type="text/javascript">
+		{#
+			$(".trtree-click").jscontext({
+				html: $("#popup-index").html(),
+				closeOnMouseLeave : true,
+				open : function() {
+					$("#hide-parent").val(this.substr(2));
+					#}
+					{mis:super}
+						var id = $("#hide-parent").val(),
+							candel = parseInt($("#candel_"+id).val()),
+							canedit = parseInt($("#canedit_"+id).val()),
+							canaddcat = parseInt($("#canaddcat_"+id).val()),
+							canaddbl = parseInt($("#canaddbl_"+id).val()),
+							canmoveto = parseInt($("#canmoveto_"+id).val()),
+							cancopyto = parseInt($("#cancopyto_"+id).val()),
+							canhide = parseInt($("#canhide_"+id).val());
+
+						if (canedit < 1) $(".aEdit").attr("rel", "0").parents("li").addClass("disabled");
+						else $(".aEdit").attr("rel", "1").parents("li").removeClass("disabled");
+
+						if (candel < 1) $(".aDel").attr("rel", "0").parents("li").addClass("disabled");
+						else $(".aDel").attr("rel", "1").parents("li").removeClass("disabled");
+
+						if (canaddcat < 1) $(".aAdd").attr("rel", "0").parents("li").addClass("disabled");
+						else $(".aAdd").attr("rel", "1").parents("li").removeClass("disabled");
+
+						if (canaddbl < 1) $(".aEditbl").attr("rel", "0").parents("li").addClass("disabled");
+						else $(".aEditbl").attr("rel", "1").parents("li").removeClass("disabled");
+
+						if (canmoveto < 1) $(".aMove").attr("rel", "0").parents("li").addClass("disabled");
+						else $(".aMove").attr("rel", "1").parents("li").removeClass("disabled");
+
+						if (cancopyto < 1) $(".aCopy").attr("rel", "0").parents("li").addClass("disabled");
+						else $(".aCopy").attr("rel", "1").parents("li").removeClass("disabled");
+
+						if (canhide < 1) $(".aHide").attr("rel", "0").parents("li").addClass("disabled");
+						else $(".aHide").attr("rel", "1").parents("li").removeClass("disabled");
+
+
+					{/mis}
+					{#
+				}
+
+			});
+
+			$(".trtree-no").jscontext({
+
+
+			});
+
+			$(".plus").click(function() {
+				var id = $(this).attr("id").substr(10);
+				$.cookie("hs_"+id, 1);
+				window.location.href = '/manage/#'+id;
+                location.reload();
+				return false;
+			});
+
+			$(".minus").click(function() {
+				var id = $(this).attr("id").substr(10);
+				$.cookie("hs_"+id, 0);
+                window.location.href = '/manage/#'+id;
+                location.reload();
+				return false;
+			});
+
+
+		#}
+
+		</script>
+
+		{set:error}
+		<script>
+			$(document).ready(function() {
+				if ({error}==1) {
+					alert("Перемещение в выбранную папку невозможно");
+				}
+				if ({error}==2) {
+					alert("Перемещение этой папки запрещено");
+				}
+				if ({error}==3) {
+					alert("Копирование в выбранную папку невозможно");
+				}
+				if ({error}==4) {
+					alert("Копирование этой папки запрещено");
+				}
+
+				window.location.href = '/manage/';
+			});
+		</script>
+		{/set}
+
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}
+
+{mask:item}
+
+	<tr class="trtree{mis:no} trtree-click{/mis}{set:no} trtree-no{/set}" style="cursor: pointer;" id="tr{id}" onclick="window.location.href = '/manage/blockedit/_alist_parent{id}/';">
+		{mask:td}
+			<td class="{class}">
+				{if:{class}!="none" && {../hs}==1 && {_last}}{set:../item}<div id="openclose_{id}" class="plus"></div>{/set}{/if}
+				{if:{class}!="none" && {../hs}==2 && {_last}}{set:../item}<div id="openclose_{id}" class="minus"></div>{/set}{/if}
+			</td>
+		{/mask}
+		{set:item}
+			<td class="icon{set:visible:0} not-visible{/set}"><i class="glyphicon glyphicon-folder-open"></i></td>
+		{/set}
+		{mis:item}
+			<td class="icon{set:visible:0} not-visible{/set}"><i class="glyphicon glyphicon-folder-close"></i></td>
+		{/mis}
+
+
+		{if:{//super}}
+			<td colspan="{php}100-{level}-1{/php}"{set:visible:0} class="hiddentext"{/set}>
+				{set:item}<b>{name}</b>{/set}
+				{mis:item}{name}{/mis}
+				{if:!{virtual}}
+					{if:{id}!=1}
+						(<a href="/{url}" target="_blank" class="ext"><i class="glyphicon glyphicon-share-alt"></i>&nbsp;{php}htmlspecialchars({key}){/php}</a>)
+					{/if}
+					{if:{id}==1}
+						(<a href="/" target="_blank" class="ext"><i class="glyphicon glyphicon-share-alt"></i>&nbsp;Главная</a>)
+					{/if}
+				{/if}
+				- {template} - {id}
+			</td>
+		{/if}
+		{if:!{//super}}
+			<td colspan="{php}100-{level}-1{/php}"{set:visible:0} class="hiddentext"{/set}>
+				{set:no}<strike>{/set}{name}
+				{if:!{virtual}}
+					{if:{id}!=1}
+						(<a href="/{url}" target="_blank" class="ext"><i class="glyphicon glyphicon-share-alt"></i>&nbsp;{php}htmlspecialchars({key}){/php}</a>)
+					{/if}
+					{if:{id}==1}
+						(<a href="/" target="_blank" class="ext"><i class="glyphicon glyphicon-share-alt"></i>&nbsp;Главная</a>)
+					{/if}
+				{/if}
+				{set:no}</strike>{/set}</td>
+		{/if}
+		<td>
+			{mis:no}
+			<input type="hidden" id="candel_{id}" name="candel_{id}" value="{candel}">
+			<input type="hidden" id="canedit_{id}" name="canedit_{id}" value="{canedit}">
+			<input type="hidden" id="canaddcat_{id}" name="canaddcat_{id}" value="{canaddcat}">
+			<input type="hidden" id="canaddbl_{id}" name="canaddbl_{id}" value="{canaddbl}">
+			<input type="hidden" id="canmoveto_{id}" name="canmoveto_{id}" value="{canmoveto}">
+			<input type="hidden" id="cancopyto_{id}" name="cancopyto_{id}" value="{cancopyto}">
+			<input type="hidden" id="canhide_{id}" name="canhide_{id}" value="{canhide}">
+			{/mis}
+		</td>
+	</tr>
+	{if:{hs}==0 || {hs}==2}
+	{set:item}
+		{item}
+	{/set}
+	{/if}
+
+
+{/mask}

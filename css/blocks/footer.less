@@ -1,0 +1,41 @@
+/*  ==================================
+	FOOTER
+	================================== */
+.footWrap {clear:both; height:@footer-height;}
+footer {
+	clear:both; min-height:@footer-height; margin-top:0 - @footer-height ; position:relative;
+	overflow: hidden;
+	color: #7b7b7c;
+	font-size: 13px;
+}
+
+.foot-conteiner {
+	padding: 0px 0;
+	border-top: 1px solid #dcdbdc;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	height:@footer-height;
+	.copy {
+		.i-elgrow;
+		.inblock(middle);
+	}
+	&:before {
+		content:'';
+		height:100%;
+		.inblock(middle);
+		margin-left: -4px;
+	}
+}
+.i-elgrow {
+	&:before {
+		content:'';
+		.inblock(middle);
+		width: 25px; height: 29px;
+		background: url('@{img_bg}i-elgrow.png') no-repeat;
+		margin-right: 10px;
+	}
+}
+
+
+/*//FOOTER*/

@@ -1,0 +1,190 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *{set:add}Добавление{/set}{mis:add}Редактирование{/mis} страницы*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/calendar.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<script src="/admin/scripts/calendar.js"></script>
+	<script src="/admin/scripts/calendar-ru.js"></script>
+	<script src="/admin/scripts/calendar-setup.js"></script>
+
+	<!--seo url-->
+	<script src="/admin/scripts/seo-url.js"></script>
+
+	<!--chosen-->
+	<link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+	<script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+	<!--iCheck-->
+	<link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+	<script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+
+	<!--CROPPER-->
+	<script src="/admin/scripts/jcrop/js/jquery.color.js"></script>
+	<script src="/admin/scripts/jcrop/js/jquery.Jcrop.min.js"></script>
+	<link rel="stylesheet" href="/admin/scripts/jcrop/css/jquery.Jcrop.css">
+
+	<script>
+		$(document).ready(function() {
+			$(".ch").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+			$(".select-styled").chosen();
+		});
+	</script>
+
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>{set:add}Добавление{/set}{mis:add}Редактирование{/mis} страницы</h1>
+
+			{set:add}
+			<form action="/manage/catedit/_aadd/" method="post" enctype="multipart/form-data" name="form1">
+			{/set}
+			{mis:add}
+			<form action="/manage/catedit/_aedit/" method="post" enctype="multipart/form-data" name="form1">
+			{/mis}
+
+				<!--FIRST BLOCK-->
+				<div class="block">
+
+					<h2>Параметры страницы</h2>
+
+					<input type="hidden" name="parent" value="{parent}"/>
+
+
+					<div class="stroke clearline">
+						<div class="name"><p>Название</div>
+						<div class="value">
+							<input class="text form-control" type="text" name="cat_name" id="cat_name" maxlength="255" value="{mask:item}{php}htmlspecialchars({uname}){/php}{/mask}"/>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name"><p>Адрес страницы</div>
+						<div class="value">
+							{set:add}
+							<input class="text form-control" type="text" name="cat_key" id="cat_key" maxlength="255" value="{mask:item}{key}{/mask}"/>
+							{/set}
+							{mis:add}
+							<input class="text form-control" type="text" name="cat_key" {mask:item}{if:{key}==""} id="cat_key"{/if}{/mask} maxlength="255" value="{mask:item}{key}{/mask}"/>
+							{/mis}
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name"><p>Шаблон страницы:</div>
+						<div class="value">
+							<select class="select select-styled" name="template" maxlength="255"{set:dis} disabled="disabled"{/set}>
+								{mask:templates}
+									<option value="{value}"{set:sel} selected="selected"{/set}>{name}</option>
+								{/mask}
+							</select>
+
+							{mis:add}
+							<input type="hidden" name="oldtemplate" value="{template}"/>
+							{/mis}
+
+						</div>
+					</div>
+				</div>
+				<!--FIRST BLOCK-->
+
+				{mis:add}
+					{set:additem}
+					<div class="block">
+						<h2>Дополнительные поля</h2>
+						{mask:additem}
+							<div class="stroke clearline">
+								<div class="name">
+									<p>{name}</p>
+									{if:{//super}}
+										<span>{key}</span>
+									{/if}
+								</div>
+								<div class="value">
+									{value}
+								</div>
+							</div>
+						{/mask}
+					</div>
+					{/set}
+
+					<div class="block">
+						<h2>SEO поля</h2>
+
+						<div class="stroke clearline">
+							<div class="name"><p>Title:</div>
+							<div class="value">
+								<input class="text form-control" type="text" name="utitle" maxlength="255" value="{mask:item}{utitle}{/mask}"/>
+							</div>
+						</div>
+
+						<div class="stroke clearline">
+							<div class="name"><p>Keywords:</div>
+							<div class="value">
+								<textarea name="ukeywords" class="form-control">{mask:item}{ukeywords}{/mask}</textarea>
+							</div>
+						</div>
+
+						<div class="stroke clearline">
+							<div class="name"><p>Description:</div>
+							<div class="value">
+								<textarea name="udescription" class="form-control">{mask:item}{udescription}{/mask}</textarea>
+							</div>
+						</div>
+					</div>
+
+				{/mis}
+
+				<div class="buttons clearline">
+					<input type="submit" class="btn btn-success" name="add" value="{set:add}Добавить{/set}{mis:add}Сохранить{/mis}">
+					<input type="button" class="btn btn-danger" value="Отмена" onclick="javascript:location.href='/manage/#tr{id}'; return false;">
+				</div>
+
+			</form>
+		</div>
+		<!--/CONTENT-->
+
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

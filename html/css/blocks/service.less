@@ -1,0 +1,125 @@
+.bg-service-wrapp {
+	background: url('@{img_bg}bg-servis-01.png') left 612px,
+				url('@{img_bg}bg-servis-02.jpg') right top;
+	background-repeat: no-repeat;
+}
+.b-service {
+	margin: 60px 0;
+	&__title {
+		font-size: 42px;
+		color: #f60c00;
+		margin-bottom: 22px;
+	}
+}
+
+.service-list {
+	padding: 0; margin: 0; list-style: none;
+	margin: 0 -22px;
+	.clearfix;
+}
+.service-item {
+	display: block; padding: 0; margin: 0; list-style: none;
+	margin: 22px;
+	float: left;
+	border: 1px solid #98969d;
+	background: #fff;
+	width: 230px;
+	max-width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	text-align: center;
+	font-size: 16px;
+	&:hover {
+		.service-item__name {
+			text-decoration: underline;
+		}
+	}
+	a {
+		color: inherit;
+		text-decoration: none;
+		display: block;
+		
+	}
+	&__top {
+		.inblock();
+		&:before {
+			content: '';
+			height: 65px;
+			.inblock(middle);
+			margin-left: -5px;
+		}
+	}
+	&__name {
+		.inblock(middle);
+		padding: 10px;
+		color: #98969d;
+	}
+	&__count {
+		color: #4f4d54;
+	}
+	&__img {
+		position: relative;
+		overflow: hidden;
+		.inblock();
+		width: 100%; height: 152px;
+		border-top: 1px solid #98969d;
+		img {
+			max-width: 100%;
+			position: absolute;
+			left: 0; top: 0; right: 0; bottom: 0; margin: auto;
+		}
+	}
+}
+
+//В ТАБЛИЦЕ С БАГЕТАМИ ИНФОРМАЦИЯ О БАГЕТЕ
+.b-molding-info {
+	text-align: left;
+	margin: 0 40px;
+	font-size: 14px;
+	color: #4d4f54;
+	&__name {
+		.font1_b;
+	}
+	&__label {
+		.inblock(baseline);
+		padding-right: 10px;
+		min-width: 85px;
+	}
+	&__val {
+		.font1_b;
+	}
+}
+
+.checked-molding + .btn {
+	color: @col3;
+	&:hover {
+		color: #fff;
+		.on {
+			.i-white;
+		}
+	}
+	.on {
+		display: none;
+	}
+}
+.checked-molding.checked + .btn {
+	.btn_green;
+	.no {
+		display: none;
+	}
+	.on {
+		.inblock(middle);
+	}
+}
+
+.b-molding-order {
+	max-width: 365px;
+	margin: 75px 0;
+	&__title {
+		font-size: 30px;
+	}
+	.forbtn {
+		margin: 2em 0;
+	}
+}

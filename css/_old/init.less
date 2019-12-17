@@ -1,0 +1,596 @@
+/*! normalize.css v1.1.3 | MIT License | git.io/normalize */article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block}audio,canvas,video{display:inline-block;*display:inline;*zoom:1}audio:not([controls]){display:none;height:0}[hidden]{display:none}html{font-size:100%;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}html,button,input,select,textarea{font-family:sans-serif}body{margin:0}a:focus{outline:thin dotted}a:active,a:hover{outline:0}h1{font-size:2em;margin:.67em 0}h2{font-size:1.5em;margin:.83em 0}h3{font-size:1.17em;margin:1em 0}h4{font-size:1em;margin:1.33em 0}h5{font-size:.83em;margin:1.67em 0}h6{font-size:.67em;margin:2.33em 0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:bold}blockquote{margin:1em 40px}dfn{font-style:italic}hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}mark{background:#ff0;color:#000}p,pre{margin:1em 0}code,kbd,pre,samp{font-family:monospace,serif;_font-family:'courier new',monospace;font-size:1em}pre{white-space:pre;white-space:pre-wrap;word-wrap:break-word}q{quotes:none}q:before,q:after{content:'';content:none}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-0.5em}sub{bottom:-0.25em}dl,menu,ol,ul{margin:1em 0}dd{margin:0 0 0 40px}menu,ol,ul{padding:0 0 0 40px}nav ul,nav ol{list-style:none;list-style-image:none}img{border:0;-ms-interpolation-mode:bicubic}svg:not(:root){overflow:hidden}figure{margin:0}form{margin:0}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{border:0;padding:0;white-space:normal;*margin-left:-7px}button,input,select,textarea{font-size:100%;margin:0;vertical-align:baseline;*vertical-align:middle}button,input{line-height:normal}button,select{text-transform:none}button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer;*overflow:visible}button[disabled],html input[disabled]{cursor:default}input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0;*height:13px;*width:13px}input[type="search"]{-webkit-appearance:textfield;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;box-sizing:content-box}input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}textarea{overflow:auto;vertical-align:top}table{border-collapse:collapse;border-spacing:0}
+
+/*! HTML5 Boilerplate v4.3.0 | MIT License | http://h5bp.com/ */
+html,
+button,
+input,
+select,
+textarea {
+	color: #222;
+}
+input[type="radio"],
+input[type="checkbox"] {
+    width: auto !important;
+}
+html {
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #c3c2c6;
+    margin: 1em 0;
+    padding: 0;
+}
+hr.hr-bold {
+	border-top: 7px solid #c3c2c6;
+	margin: 0;
+}
+audio,
+canvas,
+img,
+video {
+    vertical-align: middle;
+}
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+.ir {
+    background-color: transparent;
+    border: 0;
+    overflow: hidden;
+    *text-indent: -9999px;
+}
+
+.ir:before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 150%;
+}
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+
+
+.img-respons {
+	max-width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	/*border: 1px solid #ccc;*/
+}
+/* ==========================================================================
+   Print styles
+   ========================================================================== */
+
+@media print {
+    * {
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    .ir a:after,
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    @page {
+        margin: 0.5cm;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+// МИКСИНЫ И ПЕРЕМЕННЫЕ ДЛЯ САЙТА
+//Примешивание кроссбраузерный inline-block
+.inblock (@val:top) {
+	display: -moz-inline-stack;
+ 	display: inline-block;
+	vertical-align: @val;
+	zoom: 1;
+	*display: inline;
+}
+// Примешивание для очистки float-ов
+.clearfix  {
+	*zoom: 1;
+	&:after {content: "";  display: table;    clear: both; }
+}
+// Примешивание из CSS3
+// Анимация при наведении
+.animated-css3 (@prop, @seconds: 0.4s) {
+  -webkit-transition: @prop @seconds ease;
+  -o-transition: @prop @seconds ease;
+  -ms-transition: @prop @seconds ease;
+  -moz-transition: @prop @seconds ease;
+  transition: @prop @seconds ease;
+}
+//Отмена анимации
+.animated-css3-none {
+	-webkit-transition: none!important;
+	-o-transition: none!important;
+	-ms-transition: none!important;
+	-moz-transition: none!important;
+	transition: none!important;
+}
+
+// Уголки скруглены
+.rounded (@radius: 5px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+	position: relative;
+	behavior: url('public/css/PIE.htc');
+}
+
+// градиент - классный скрипток с поддержкой ie
+.linear-gradient( @dir: top, @start-color: #c30000, @end-color: #b20000 ) {
+	background: -webkit-linear-gradient(@dir, @start-color 0%, @end-color 100%);
+	background: -moz-linear-gradient(@dir, @start-color 0%, @end-color 100%);
+	background: -ms-linear-gradient(@dir, @start-color 0%, @end-color 100%);
+	background: -o-linear-gradient(@dir, @start-color 0%, @end-color 100%);
+	background: linear-gradient(@dir, @start-color 0%, @end-color 100%);
+	position: relative;
+  behavior: url('public/css/PIE.htc');
+  -pie-background: url(bg-image.png) no-repeat, linear-gradient(@start-color, @end-color);
+
+}
+.grayscale {  //фильт серого по ховеру убираем
+
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 3.5+ */
+  -webkit-filter: grayscale(100%);
+  -moz-filter: grayscale(100%);
+  -ms-filter: grayscale(100%);
+  -o-filter: grayscale(100%);
+  filter: grayscale (100%);
+ filter: gray; /* IE 6-9 */
+    &:hover {
+         filter: none;
+      -webkit-filter: grayscale(0%);
+      -moz-filter: grayscale(0%);
+      -ms-filter: grayscale(0%);
+      -o-filter: grayscale(0%);
+     filter: grayscale (0%);
+    }
+}
+.gray {
+    filter: url(#gray);
+}
+// Переменные для сайта
+@max-width: 1055px; // Максимальная ширина контента сайта
+@left-column-width: 260px; // Ширина левой колонки
+@footer-height: 105px; // Высота футера
+
+
+@link: @coltxt2; // Цвет ссылок и подчеркивания в тексте
+@link-hov: @coltxt3;
+@img_bg: "/img/";// Путь к картинкам фона
+
+//ОСНОВНЫЕ ЦВЕТА
+@col1: #adabb1;
+@col2: #95c363;
+@col3: #e76745;
+
+
+@coltxt1: #959499;
+@coltxt2: #8fc25d;
+@coltxt3: #e55c38;
+
+
+
+
+
+
+.g-left {float: left;}
+.g-right {float: right;}
+.wid { // максимальная ширина контента
+    margin: 0 auto;
+    .clearfix;
+    max-width: @max-width;
+    padding: 0 10px;
+}
+// Общие пиновые положения для сайта
+article, aside, footer, header, hgroup, main, nav, section {
+    display: block; // this is HTML5!!!
+}
+/*COMMON*/
+body {margin:0;  padding:0;  word-wrap: break-word; //чтобы длиные слова по буквам переносились
+	background-image: url('@{img_bg}bg-body.jpg');
+	font-size: 14px;
+}
+#mainWrapper, #footer, #header, body {}
+html, body {height:100%;  .font1; color: @coltxt1; color: #615e5e;}
+
+a {color: @link; text-decoration:underline;}
+a:hover { text-decoration: none; color: @link-hov;}
+
+
+h1,h2,h3,h4 { margin:0; padding:0; line-height: normal; font-weight: inherit;  margin-bottom: 1em; .font1;
+
+}
+h1 {font-size: 32px; text-transform: uppercase;}
+h2 {font-size: 27px; text-transform: uppercase;}
+h3 {font-size: 24px; text-transform: uppercase;}
+h4 {font-size: 18px; text-transform: uppercase;}
+
+strong, b {
+
+}
+ol {
+    /*list-style-position: inside;*/// раскомментить если надо чтобы текст обтекал маркер
+}
+ul {
+
+}
+
+/*MAIN*/
+#mainWrapper {margin:0 auto; min-height:100%; position:relative; text-align:left; overflow: hidden;}
+/*//MAIN*/
+.b-container-content {
+	.wid;
+}
+
+.tdLeft {
+	width: @left-column-width;
+	float: left;
+}
+.content {
+	margin-left: @left-column-width;
+	min-width: 250px;
+	&.nomarginleft {
+		margin-left: 0;
+	}
+}
+
+
+.ta-center {text-align: center;}
+.ta-just {text-align: justify;}
+
+
+.price {
+	font-size: 24px;
+	line-height: 30px;
+	.i-price;
+	padding: 5px 5px 5px 35px;
+	position: relative;
+	.inblock(middle);
+	&:before {
+		position: absolute;
+		left: 0;
+		top: 4px;
+	}
+	&__summ {
+		.font1_b;
+		font-size: 30px;
+		.inblock(baseline);
+	}
+	&__penny {
+		font-size: 16px;
+		position: relative;
+		top: -7px;
+		vertical-align: middle;
+	}
+	&.i-red {color: @coltxt3;}
+	&.i-white {color: #fff;}
+	&.i-green {color: @coltxt2;}
+	&.i-gray {color: @coltxt1;}
+
+	&_old {
+		.i-gray;
+		font-size: 18px;
+		padding: 0;
+		padding-left: 25px;
+		&:before {
+			background-image: url('@{img_bg}i-gray-price_min.png') !important;
+			background-position: 0 0;
+			width: 20px; height: 22px;
+		}
+		.price__summ {
+			font-size: 18px;
+		}
+		.price__penny {
+			font-size: 12px;
+		}
+	}
+	&_new {
+		color: @coltxt3;
+		font-size: 22px;
+		.price__summ {
+			font-size: 22px;
+		}
+		.price__penny {
+			font-size: 16px;
+		}
+	}
+}
+
+.b-txt {
+	color: #6d6a72;
+	margin: 60px 0;
+	&__title {
+		font-size: 30px;
+		&_border {
+			border-bottom: 1px solid #c9c8cb;
+			padding-bottom: 22px;
+			margin-bottom: 30px;
+		}
+	}
+	&_border {
+		border-bottom: 1px solid #c9c8cb;
+		padding-bottom: 10px;
+	}
+}
+.b-review {
+	margin: 60px 0;
+}
+.b-title-box {
+	.clearfix;
+	margin-bottom: 30px;
+	&__title {
+		margin: 0;
+		font-size: 30px;
+		line-height: 30px;
+		color: #4f4d54;
+		.inblock(bottom);
+	}
+	ul {
+			padding: 0; list-style: none;
+			.inblock(bottom);
+			margin: 0 15px;
+			font-size: 16px;
+			color: @coltxt1;
+			li {
+				position: relative;
+				padding: 0 14px;
+				&:before {
+					content:'';
+					height: 27px;
+					width: 1px;
+					background: #a2a0a6;
+					display: block;
+					position: absolute;
+					left: 0;
+					bottom: 3px;
+				}
+				&:hover {
+					i {
+						.i-red;
+					}
+				}
+			}
+		}
+	&_border {
+		border-bottom: 1px solid #c9c8cb;
+		padding-bottom: 22px;
+		margin-bottom: 30px;
+	}
+}
+
+
+//TITLE
+.b-title {
+	&_tdLeft {
+		padding-left: @left-column-width;
+	}
+	padding: 15px 0;
+	margin: 30px 0; margin-bottom: 20px;
+	.title {
+		margin: 0; padding: 0;
+	}
+}
+.title {
+	font-size: 42px;
+	line-height: 42px;
+	&_red {
+		color: #f60c00;
+	}
+}
+
+
+
+//CSS TOOLTIP
+.data-tooltip {
+	position: relative;
+	&:hover {
+		&:after {
+			visibility: visible;
+			opacity: 1;
+			//display: block;
+		}
+	}
+	&:after {
+		-webkit-box-shadow: 0 0 5px rgba(0,0,0,0.28);
+		box-shadow: 0 0 5px rgba(0,0,0,0.28);
+		white-space: pre-line;  /* это правило позволит использовать перенос строки */
+		position: absolute;
+		font-size: 14px;
+		text-transform:none;
+		color: @coltxt1;
+		width: 155px;
+		background-color: #fff ;
+		background-image: url('@{img_bg}bg-tooltip.png');
+		background-position: 3px 3px;
+		background-repeat: no-repeat;
+		padding: 20px 20px;
+		text-align: left;
+		top: 100%;
+		left: 51px;
+		margin-top: 5px;
+		content: attr(data-title);
+		visibility: hidden;
+		opacity: 0;
+		z-index: 5;
+		//display: none;
+		.animated-css3(all);
+	}
+}
+
+
+
+
+.txt-gray {color: @coltxt1;}
+.txt-green {color: @coltxt2;}
+.txt-red {color: @coltxt3;}
+
+.txt-bg {
+	padding: 10px 35px;
+	color: #fff;
+	&_red {
+		background: @coltxt3;;
+	}
+	&_green {
+		background: @coltxt2;
+	}
+	&_gray {
+		background: @coltxt1;
+	}
+}
+
+.margin-bottom-10 {margin-bottom: 10px;}
+.margin-bottom-20 {margin-bottom: 20px;}
+.margin-bottom-30 {margin-bottom: 30px;}
+.margin-bottom-40 {margin-bottom: 40px;}
+.margin-bottom-50 {margin-bottom: 50px;}
+.margin-bottom-60 {margin-bottom: 60px;}
+.margin-bottom-70 {margin-bottom: 70px;}
+.margin-bottom-80 {margin-bottom: 80px;}
+.margin-bottom-90 {margin-bottom: 90px;}
+
+.b-path {
+	margin: 20px 0;
+}
+.adaptive-table {
+	overflow: auto;
+	//width: 100%;
+	margin: 0 -10px;
+}
+/*==================== 1010px ==============================*/
+@media only screen and (max-width: 1010px) {
+	#mainWrapper {
+		background-image: none;
+	}
+}

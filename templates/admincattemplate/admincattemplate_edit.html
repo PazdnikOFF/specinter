@@ -1,0 +1,425 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Ред. шаблона модуля*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/calendar.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--iCheck-->
+	<link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+	<script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+	<!--chosen-->
+	<link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+	<script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+	<script>
+		$(function() {
+			$(".ch").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+			$(".checkbox-vis").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+			$(".select-styled").chosen();
+			$(".select-styled-vis").chosen({
+				width: "260px"
+			});
+		});
+	</script>
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Редактирование шаблона модуля</h1>
+
+			<form action="/manage/cattemplate/_aedit/" method="post" enctype="multipart/form-data" name="form1">
+
+				<input type="hidden" name="hide-parent" value="{parent}" form-control>
+
+				{mask:info}
+				<div class="block">
+					<h2>Основные параметры</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Название</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="name" value="{name}" required>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Ключ</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="key" value="{key}" required>
+							<input type="hidden" class="text" name="oldkey" value="{key}">
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Файл основного шаблона</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="alias" value="{alias}">
+						</div>
+					</div>
+				</div>
+
+				<div class="block longleft">
+					<h2>Права доступа</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на удаление</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="candel" value="1"{if:{candel}==1} checked{/if}>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на редактирование</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canedit" value="1"{if:{canedit}==1} checked{/if}>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на создание подпапок</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canadd" value="1"{if:{canaddcat}==1} checked{/if}>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на управление блоками</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canaddbl" value="1"{if:{canaddbl}==1} checked{/if}>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на перенос папки</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canmoveto" value="1"{if:{canmoveto}==1} checked{/if}>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на копирование папки</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="cancopyto" value="1"{if:{cancopyto}==1} checked{/if}>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Право на скрытие/показ</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="canhide" value="1"{if:{canhide}==1} checked{/if}>
+						</div>
+					</div>
+				</div>
+
+				<div class="block longleft">
+					<h2>Другие настройки</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Скрывать структуру</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="hidestr" value="1"{if:{hidestructure}==1} checked{/if}>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Виртуальная папка (без УРЛ)</p>
+						</div>
+						<div class="value">
+							<input type="checkbox" class="ch" name="virtual" value="1"{if:{virtual}==1} checked{/if}>
+						</div>
+					</div>
+				</div>
+				{/mask}
+
+				<div class="block">
+					<h2>Блоки/папки</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Возможные шаблоны блоков</p>
+						</div>
+						<div class="value">
+							<select name="btypes[]" data-placeholder="Выберите блоки" multiple class="multiple select-styled" id="btypes">
+								{mask:btypes}
+									<option value="{key}"{set:sel} selected{/set}>{name} ({key})</option>
+								{/mask}
+							</select>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Возможные шаблоны модулей</p>
+						</div>
+						<div class="value">
+							<select name="ctypes[]" data-placeholder="Выберите модули" multiple class="multiple select-styled" id="ctypes">
+								{mask:ctypes}
+									<option value="{key}"{set:sel} selected{/set}>{name} ({key})</option>
+								{/mask}
+							</select>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="block" id="addFields"{mis:addFields} style="display: none;"{/mis}>
+					<h2>Поля шаблона</h2>
+					<table cellspacing="1" cellpadding="0" border="0" width="100%" id="addFieldsTable">
+						<tr>
+							<th>Имя</th>
+							<th>Ключ</th>
+							<th>Тип данных</th>
+							<th>По умолчанию</th>
+							<th>Служебная информация</th>
+							<th>Сорт.</th>
+							<th>R.only</th>
+							<th>Уд.</th>
+						</tr>
+
+						<tr id="addFields_0" class="addFieldsTr" style="display: none;">
+							<td>
+								<input type="text" name="addname[]" value="" class="required text form-control">
+							</td>
+							<td>
+								<input type="text" name="addkey[]" value="" class="required text form-control">
+							</td>
+							<td>
+								<select name="addtype[]" class="addtype select-styled-hidden">
+									{mask:dtypes}
+										<option value="{key}"{if:{_first}} selected{/if}>{name} - ({key})</option>
+									{/mask}
+								</select>
+							</td>
+							<td>
+								<input type="text" name="adddefault[]" value="" class="text form-control">
+							</td>
+							<td>
+								<input type="text" name="addinfo[]" value="" class="text form-control">
+							</td>
+							<td>
+								<input type="text" name="addsort[]" value="" class="text small form-control" autocomplete="off">
+							</td>
+							<td>
+								<input type="checkbox" value="1" class="checkbox-ro" name="addro[]">
+								<input type="hidden" value="0" name="addroh[]">
+							</td>
+							<td>
+								<a href="#" class="delIcon" onclick="deleteAddField(); return false;"><i class="glyphicon glyphicon-trash"></i></a>
+							</td>
+						</tr>
+
+						{mask:addFields}
+						<tr id="curFields_{id}" class="addFieldsTr">
+							<td>
+								<input type="text" name="curname[{id}]" value="{name}" class="text form-control" required>
+							</td>
+							<td>
+								<input type="text" name="curkey[{id}]" value="{key}" class="text form-control" required>
+							</td>
+							<td>
+
+							<select name="curtype[{id}]" class="addtype select-styled-vis">
+								{mask:dtypes}
+									<option value="{key}"{if:{key}=={../datatkey}} selected{/if}>{name} - ({key})</option>
+								{/mask}
+							</select>
+
+							</td>
+							<td>
+								<input type="text" name="curdefault[{id}]" value="{default}" class="text form-control">
+							</td>
+							<td>
+								<input type="text" name="curinfo[{id}]" value="{comment}" class="text form-control">
+							</td>
+							<td>
+								<input type="text" name="cursort[{id}]" value="{sort}" class="text small form-control" autocomplete="off">
+							</td>
+							<td>
+								<input type="checkbox" value="1" class="checkbox-ro checkbox-vis" name="curro[{id}]"{if:{readonly}==1} checked{/if}>
+								<input type="hidden" value="{readonly}" name="curroh[{id}]">
+							</td>
+							<td>
+								<a href="#" class="delIcon" onclick="deleteCurField({id}); return false;"><i class="glyphicon glyphicon-trash"></i></a>
+							</td>
+						</tr>
+						{/mask}
+					</table>
+				</div>
+
+
+
+				<div class="buttons">
+					<input type="submit" class="btn btn-success" value="Сохранить" name="add">
+					<input type="button" class="btn btn-danger" value="Отмена" onclick="javascript:location.href='/manage/cattemplate/'; return false;">
+					<input type="button" class="btn btn-primary" value="Добавить поле" onclick="addField();">
+				</div>
+
+			</form>
+		</div>
+		<!--/CONTENT-->
+
+		<script>
+
+			$(".checkbox-ro").on("ifToggled", function(e) {
+				var $t = $(this);
+				if ($t.prop("checked") === true) {
+					$t.parent().next().val("1");
+				}
+				else {
+					$t.parent().next().val("0");
+				}
+			});
+
+			var fi = {addCount};
+
+			//Добавления поля
+			function addField() {
+				fi ++;
+				var newitem = $("#addFields_0").clone();
+				newitem.find('a.delIcon').attr("onclick", "deleteAddField("+fi+"); return false;");
+				newitem.appendTo("#addFieldsTable").attr("id", "addFields_"+fi).show();
+				$("#addFields").show();
+
+				var i = 0;
+
+				// Значения поля sort
+				$("input.small").each(function() {
+					$(this).val(i);
+					i ++;
+				});
+
+				// Присваиваем required
+				newitem.find(".required").prop("required", true);
+
+				// Стайлим чекбоксы
+				newitem.find(".checkbox-ro").iCheck({
+					checkboxClass: 'icheckbox_flat-blue',
+					radioClass: 'iradio_flat-blue'
+				})
+				.on("ifToggled", function(e) {
+					var $t = $(this);
+					if ($t.prop("checked") === true) {
+						$t.parent().next().val("1");
+					}
+					else {
+						$t.parent().next().val("0");
+					}
+				});
+
+				// Стайлим селектбокс
+				newitem.find(".select-styled-hidden").chosen({
+					width: "260px"
+				});
+			}
+
+			//Удаление поля
+			function deleteAddField(id) {
+				if (confirm("Удалить поле?")) {
+					fi --;
+					$("#addFields_"+id).remove();
+					if (fi == 0) {
+						$("#addFields").hide();
+					}
+					// Значения поля sort
+					var i = 0;
+					$("input.small").each(function() {
+						$(this).val(i);
+						i ++;
+					});
+					return false;
+				}
+				else {
+					return false;
+				}
+			}
+
+			function deleteCurField(id) {
+				if (confirm("Удалить поле?")) {
+					fi --;
+					$("#curFields_"+id).remove();
+					if (fi == 0) {
+						$("#addFields").hide();
+					}
+					// Значения поля sort
+					var i = 0;
+					$("input.small").each(function() {
+						$(this).val(i);
+						i ++;
+					});
+					return false;
+				}
+				else {
+					return false;
+				}
+			}
+		</script>
+
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

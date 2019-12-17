@@ -1,0 +1,212 @@
+/* ==========================================================================
+    Modal-boxes
+   ========================================================================== */
+.modal_bottom-left{ background-position: 0 0; width: 25px; height: 37px; } 
+.modal_bottom-right{ background-position: 0 -87px; width: 16px; height: 37px; } 
+.modal_top-left{ background-position: 0 -174px; width: 25px; height: 17px; } 
+.modal_top-right{ background-position: 0 -241px; width: 16px; height: 17px; } 
+
+
+.modal-boxes {display: none;}
+.box-modal {
+    max-width: 495px;
+    width: 100%; 
+    margin: 0 auto;
+    position: relative;
+    text-align: left;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	&_respons {
+		max-width: 100%;
+	}
+	.action-list {
+		max-width: 865px;
+		width: 100%;
+		margin: 10px auto;
+	}
+	&__title {
+		padding: 7px 0;
+		margin: 1em 0;
+		min-height: 24px;
+		font-size: 24px; color: #6f6d74; text-transform: uppercase;
+		border-bottom: 1px solid #c3c2c6;
+		span {
+			padding-left: 30px;
+			position: relative;
+			.inblock();
+			&:before {
+				position: absolute;
+				left: 0px;
+				top: 4px;
+			}	
+		}
+		&_noindent {
+			margin-top: 0;
+			padding-top: 0;
+			padding-bottom: 17px;
+			margin-bottom: 14px;
+		}
+	}
+	&__bd-left, &__bd-right {
+		height: 100%;
+		position: absolute;
+		display: block;
+		top: 0;
+		&:before, &:after {
+			content: '';
+			display: block;
+			width: 100%;
+			position: absolute;
+			background-image: url('@{img_bg}modal/s-modal-angle.png');
+		}
+	}
+	&__bd-left {
+		left: -12px;
+		background: url('@{img_bg}modal/s-modal-left.png') repeat-y;
+		width: 25px;
+		&:before {
+			.modal_top-left;
+			top: -9px;
+			left: 0;
+		}
+		&:after {
+			.modal_bottom-left;
+			left: 2px;
+			bottom: -29px;
+		}
+	}
+	&__bd-right {
+		right: -8px;
+		background: url('@{img_bg}modal/s-modal-right.png') repeat-y;
+		width: 16px;
+		&:before {
+			.modal_top-right;
+			top: -8px;
+			right: 0;
+		}
+		&:after {
+			.modal_bottom-right;
+			right: -2px;
+			bottom: -29px;
+		}
+	}
+	&__content {
+		padding: 60px 55px;
+		background-color: #fbfbfb;
+    	background-color: rgba(251,251,251,0.91);
+		&:before {
+			content:'';
+			position: absolute;
+			display: block;
+			height: 17px;
+			width: 100%;
+			background: url('@{img_bg}modal/s-modal-top.png') repeat-x;
+			top: -9px;
+			left: 0;
+		}
+		&:after {
+			content:'';
+			position: absolute;
+			display: block;
+			height: 37px;
+			width: 100%;
+			left: 0;
+			bottom: -29px;
+			background: url('@{img_bg}modal/s-modal-bottom.png') repeat-x;
+		}
+	}
+	
+}
+.box-modal__close {
+    cursor: pointer;
+    position: absolute;
+    right: 14px;
+    top: 16px;
+    width: 21px;
+	height: 20px;
+	.i-close;
+	.i-red;
+    &:hover {
+		.i-green;
+    }
+}
+.modal-search {
+	.box-modal__title {
+		span {
+			padding-left: 46px;
+			&:before {
+				top: -1px;
+			}
+		}
+	}
+}
+
+.modal-add-to-cart, .modal-replacement {
+	max-width: 585px;
+	.box-modal__content {
+		padding: 60px 49px;
+	} 
+	.carousel-list {
+		white-space: normal;
+		margin-right: -23px;
+	}
+	.carousel-item {
+		margin-left: -23px;
+	}
+}
+
+#modal-add-parameters {
+	max-width: 575px;
+}
+.b-add-cart, .b-replacement {
+	&__title {
+		font-size: 24px; color: #6f6d74; text-transform: uppercase; margin-bottom: 13px;
+	}
+	.prod__name {
+		font-size: 18px;
+		margin: 5px 0;
+	}
+	.prod__color {
+		font-size: 16px;
+		margin: 5px 0;
+		.val {
+			.font1_b;
+			color: #4d4f54;
+		}
+	}
+	hr {
+		margin: 2em 0;
+	}
+	.forbtn {
+		margin: 2em 0;
+		.btn {
+			margin-right: 25px;
+		}
+	}
+}
+/* ==================================
+    arcticmodal CSS
+   ================================== */
+.arcticmodal-overlay,
+.arcticmodal-container { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1000; }
+.arcticmodal-container { overflow: auto; margin: 0; padding: 0; border: 0; border-collapse: collapse; }
+*:first-child+html .arcticmodal-container { height: 100% }
+.arcticmodal-container_i { height: 100%; margin: 0 auto; }
+.arcticmodal-container_i2 { padding: 24px; margin: 0; border: 0; vertical-align: middle; }
+.arcticmodal-error { padding: 20px; border-radius: 10px; background: #000; color: #fff; }
+.arcticmodal-loading { width: 80px; height: 80px; border-radius: 10px; background: #000 url(loading.gif) no-repeat 50% 50%; }
+
+.arcticmodal-container tr {background: none !important;}
+
+//Медиазапросы
+@media only screen and (max-width: 1024px) {
+	.box-modal {
+		.btn_big {
+			.btn_small;
+		}
+		&__content {
+			padding: 60px 25px;
+		}
+	}
+}

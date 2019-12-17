@@ -1,0 +1,37 @@
+{reduce:nothing}
+{mask:main}
+<div class="b-cabinet">
+	<div class="b-container-content">
+		<h1 class="b-cabinet__title">Здравствуйте{if:{name} != ""}, {name}{/if}!</h1>
+		<hr>
+		<a href="#" class="cabinet-out">Выйти</a>
+
+		<div class="b-sale">
+			{*<div class="b-sale__title">Ваша персональная скидка:</div>
+			<span class="note">Скидка в интернет-магазине {discountinet}%</span>
+			<br>
+			<span class="note">Скидка в магазине</span> (доступна при самовывозе и покупке в м-нах Маэстрия) <span
+				class="note">{discountshop}%</span>
+			<br>*}
+			<a href="{cabinetUrl}">Мои данные</a>
+		</div>
+		<hr>
+
+		{set:item}
+		<div class="order-one">
+			{mask:item}
+				<p class="order-one__info">Заказ №{id} от {date_1}</p>
+				<a href="{//historyUrl}" class="btn btn_green btn_small">Вернуться</a>
+				{order}
+			{/mask}
+		</div>
+		{/set}
+
+
+	</div>
+
+</div>
+
+
+
+{/mask}

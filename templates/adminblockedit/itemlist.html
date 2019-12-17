@@ -1,0 +1,148 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - **</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--right click and table sorter-->
+	<script src="/admin/scripts/jquery.jscontext-1.0.js"></script>
+	<script src="/admin/scripts/jquery.tablesorter.min.js"></script>
+
+
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main no-bg">
+
+		{set:no}
+			<div class="block"><p>Для создания вложений необходимо сохранить блок</p></div>
+		{/set}
+
+		{mis:no}
+			<!--CONTENT-->
+			<h1>Вложенные блоки</h1>
+			<input type="hidden" id="hide-blockid" name="hide-blockid" value="0">
+			<input type="hidden" id="hide-parent" name="hide-parent" value="{parent}">
+			<input type="hidden" id="hide-template" name="hide-template" value="{template}">
+			<input type="hidden" id="hide-blockparent" name="hide-blockparent" value="{blockparent}">
+
+
+			<div class="block">
+
+
+				{set:item}
+				<table cellspacing="1" cellpadding="0" border="0" id="tree" class="blocks">
+					<thead>
+						<tr>
+							<th class="none"></th>
+							<th>№</th>
+							<th>ID</th>
+							{mask:fields}
+								<th>{name}</th>
+							{/mask}
+						</tr>
+					</thead>
+
+					<tbody>
+						{mask:item}
+						<tr class="trtree" id="block_{id}" style="cursor: pointer;">
+							<td class="none">
+								{set:visible:0}
+									<i class="glyphicon glyphicon-eye-close not-visible"></i>
+								{/set}
+								{set:visible:1}
+									<i class="glyphicon glyphicon-eye-open"></i>
+								{/set}
+							</td>
+							<td>{_rank}</td>
+							<td>{id}</td>
+							{mask:fields}
+								<td{if:{../visible}==0} class="hiddentext"{/if}>{val}</td>
+							{/mask}
+						</tr>
+						{/mask}
+					</tbody>
+				</table>
+				{/set}
+				{mis:item}
+					<p>Вложенных блоков нет</p>
+				{/mis}
+
+
+			</div>
+
+
+
+			<div class="buttons">
+				{if:{super} || {canAdd}}
+				<input type="button" class="btn btn-primary" value="Создать" onclick="javascript:location.href='/manage/blockedit/_aitemadd_parent{parent}_blockparent{blockparent}_template{template}/'; return false;">
+				{/if}
+			</div>
+		{/mis}
+
+		<!--/CONTENT-->
+
+		<!--POPUP-->
+		<div class="popup-index" id="popup-index">
+			<div class="popup-index">
+				<div class="top"><h1>Действие</h1></div>
+				<ul>
+
+					{mask:rights}
+
+						{if:{canedit}==1 || {super}}
+							<li><a href="#" rel="1" class="aEdit" id="aEdit" onclick="editItemBlock(); return false;"><i class=" glyphicon glyphicon-pencil"></i>&nbsp;Редактировать</a></li>
+						{/if}
+
+						{if:{candel}==1 || {super}}
+							<li id="a"><a href="#" rel="1" class="aDel" id="aDel" onclick="delItemBlock(); return false;"><i class="glyphicon glyphicon-trash"></i>&nbsp;Удалить</a></li>
+						{/if}
+
+					{/mask}
+
+				</ul>
+			</div>
+		</div>
+		<!--/POPUP-->
+
+		<script>
+		{#
+			$(".trtree").jscontext({
+				html: $("#popup-index").html(),
+				closeOnMouseLeave : true,
+				open : function() {
+					$("#hide-blockid").val(this.substr(6));
+				}
+			});
+
+
+		#}
+
+	</script>
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

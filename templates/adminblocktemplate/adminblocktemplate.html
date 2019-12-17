@@ -1,0 +1,147 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Шаблоны блоков*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--right click-->
+	<script src="/admin/scripts/jquery.jscontext-1.0.js"></script>
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Шаблоны блоков</h1>
+			<input type="hidden" id="hide-parent" name="hide-parent" value="0"/>
+			<table  width="100%" id="tree" class="itemtree">
+				{mask:tpl}
+					<tr class="trtree trtree-click" style="cursor: pointer;" id="tr{id}">
+						<td class="none"><i class="glyphicon glyphicon-file"></i></td>
+						<td>{name} - ({key})</td>
+					</tr>
+				{/mask}
+			</table>
+
+
+			<div class="buttons">
+				<input type="button" class="btn btn-primary" value="Добавить шаблон" onclick="javascript:location.href='/manage/blocktemplate/_aadd/'; return false;">
+			</div>
+			<div class="buttons">
+				<form action="/manage/blocktemplate/" method="post" enctype="multipart/form-data">
+					<input name="import" type="file" required style="margin-bottom: 30px;">
+					<button class="btn btn-danger">Импортировать шаблон</button>
+				</form>
+
+			</div>
+		</div>
+		<!--/CONTENT-->
+
+		<!--POPUP-->
+		<div class="popup-index" id="popup-index">
+			<div class="popup-index">
+				<div class="top"><h1>Действие</h1></div>
+				<ul>
+					<li><a href="#" class="aEdit" id="aEdit" onclick="editTpl(); return false;"><i class="glyphicon glyphicon-pencil"></i>&nbsp;Редактировать</a></li>
+
+					<li><a href="#" class="aCopy" id="aCopy" onclick="copyTpl(); return false;"><i class="glyphicon glyphicon-edit"></i>&nbsp;Копировать</a></li>
+
+					<li><a href="#" class="aExport" id="aExport" onclick="exportTpl(); return false;"><i class="glyphicon glyphicon-download-alt"></i>&nbsp;Экспорт</a></li>
+
+					<li><a href="#"  class="aDel" id="aDel" onclick="delTpl(); return false;"><i class="glyphicon glyphicon-trash"></i>&nbsp;Удалить</a></li>
+				</ul>
+			</div>
+		</div>
+		<!--/POPUP-->
+
+		<script type="text/javascript">
+		{#
+			$(".trtree-click").jscontext({
+				html: $("#popup-index").html(),
+				closeOnMouseLeave : true,
+				open : function() {
+					$("#hide-parent").val(this.substr(2));
+				}
+			});
+
+			function editTpl() {
+				var parent = $("#hide-parent").val();
+				if (!parent) return false;
+				window.location.href = '/manage/blocktemplate/_aedit_parent'+parent+'/';
+			}
+
+			function copyTpl() {
+				var parent = $("#hide-parent").val();
+				if (!parent) return false;
+				window.location.href = '/manage/blocktemplate/_acopy_parent'+parent+'/';
+			}
+
+			function exportTpl() {
+				var parent = $("#hide-parent").val();
+				if (!parent) return false;
+				window.location.href = '/manage/blocktemplate/_aexport_parent'+parent+'/';
+			}
+
+			function delTpl() {
+				var parent = $("#hide-parent").val();
+				if (!parent) return false;
+
+				if (confirm('Вы действительно хотите удалить шаблон?')) {
+					window.location.href = '/manage/blocktemplate/_adel_id'+parent+'/';
+				}
+				else {
+					$(".trtree").removeClass("click");
+				}
+			}
+
+		#}
+
+	</script>
+
+	{set:error}
+	<script>
+		$(document).ready(function() {
+			if ({error}==1) {
+				alert("Удаление невозможно, так как этот шаблон используется");
+			}
+
+			window.location.href = '/manage/blocktemplate/';
+		});
+	</script>
+	{/set}
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

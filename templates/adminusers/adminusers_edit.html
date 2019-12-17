@@ -1,0 +1,337 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Редактирование пользователя*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--chosen-->
+	<link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+	<script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+	<!--iCheck-->
+	<link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+	<script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+	<script>
+		$(document).ready(function() {
+			$(".ch").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+
+			$(".rad").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			})
+			.on("ifToggled", function() {
+				if ($(this).val() == 3) {
+					$("#mapblock").show();
+				}
+				else {
+					$("#mapblock").hide();
+				}
+			});
+
+
+			$(".select-styled").chosen({
+				width: "400px"
+			});
+		});
+	</script>
+
+
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Редактирование пользователя</h1>
+
+			<form action="/manage/users/_aedit/" method="post" enctype="multipart/form-data" name="form1" autocomplete="off">
+				<input type="hidden" value="{parent}" name="parent">
+				{mask:info}
+				<div class="block">
+					<h2>Основные параметры</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Ник (латиницей)</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="name" value="{admin_name}" disabled>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Часовой пояс</p>
+						</div>
+						<div class="value">
+							<select name="timezone" class="select-styled">
+								<option value="Europe/Amsterdam"{if:{timezone}=='Europe/Amsterdam'} selected{/if}>Europe/Amsterdam</option>
+								<option value="Europe/Andorra"{if:{timezone}=='Europe/Andorra'} selected{/if}>Europe/Andorra</option>
+								<option value="Europe/Athens"{if:{timezone}=='Europe/Athens'} selected{/if}>Europe/Athens</option>
+								<option value="Europe/Belfast"{if:{timezone}=='Europe/Belfast'} selected{/if}>Europe/Belfast</option>
+								<option value="Europe/Belgrade"{if:{timezone}=='Europe/Belgrade'} selected{/if}>Europe/Belgrade</option>
+								<option value="Europe/Berlin"{if:{timezone}=='Europe/Berlin'} selected{/if}>Europe/Berlin</option>
+								<option value="Europe/Bratislava"{if:{timezone}=='Europe/Bratislava'} selected{/if}>Europe/Bratislava</option>
+								<option value="Europe/Brussels"{if:{timezone}=='Europe/Brussels'} selected{/if}>Europe/Brussels</option>
+								<option value="Europe/Bucharest"{if:{timezone}=='Europe/Bucharest'} selected{/if}>Europe/Bucharest</option>
+								<option value="Europe/Budapest"{if:{timezone}=='Europe/Budapest'} selected{/if}>Europe/Budapest</option>
+								<option value="Europe/Busingen"{if:{timezone}=='Europe/Busingen'} selected{/if}>Europe/Busingen</option>
+								<option value="Europe/Chisinau"{if:{timezone}=='Europe/Chisinau'} selected{/if}>Europe/Chisinau</option>
+								<option value="Europe/Copenhagen"{if:{timezone}=='Europe/Copenhagen'} selected{/if}>Europe/Copenhagen</option>
+								<option value="Europe/Dublin"{if:{timezone}=='Europe/Dublin'} selected{/if}>Europe/Dublin</option>
+								<option value="Europe/Gibraltar"{if:{timezone}=='Europe/Gibraltar'} selected{/if}>Europe/Gibraltar</option>
+								<option value="Europe/Guernsey"{if:{timezone}=='Europe/Guernsey'} selected{/if}>Europe/Guernsey</option>
+								<option value="Europe/Helsinki"{if:{timezone}=='Europe/Helsinki'} selected{/if}>Europe/Helsinki</option>
+								<option value="Europe/Isle_of_Man"{if:{timezone}=='Europe/Isle_of_Man'} selected{/if}>Europe/Isle_of_Man</option>
+								<option value="Europe/Istanbul"{if:{timezone}=='Europe/Istanbul'} selected{/if}>Europe/Istanbul</option>
+								<option value="Europe/Jersey"{if:{timezone}=='Europe/Jersey'} selected{/if}>Europe/Jersey</option>
+								<option value="Europe/Kaliningrad"{if:{timezone}=='Europe/Kaliningrad'} selected{/if}>Europe/Kaliningrad</option>
+								<option value="Europe/Kiev"{if:{timezone}=='Europe/Kiev'} selected{/if}>Europe/Kiev</option>
+								<option value="Europe/Lisbon"{if:{timezone}=='Europe/Lisbon'} selected{/if}>Europe/Lisbon</option>
+								<option value="Europe/Ljubljana"{if:{timezone}=='Europe/Ljubljana'} selected{/if}>Europe/Ljubljana</option>
+								<option value="Europe/London"{if:{timezone}=='Europe/London'} selected{/if}>Europe/London</option>
+								<option value="Europe/Luxembourg"{if:{timezone}=='Europe/Luxembourg'} selected{/if}>Europe/Luxembourg</option>
+								<option value="Europe/Madrid"{if:{timezone}=='Europe/Madrid'} selected{/if}>Europe/Madrid</option>
+								<option value="Europe/Malta"{if:{timezone}=='Europe/Malta'} selected{/if}>Europe/Malta</option>
+								<option value="Europe/Mariehamn"{if:{timezone}=='Europe/Mariehamn'} selected{/if}>Europe/Mariehamn</option>
+								<option value="Europe/Minsk"{if:{timezone}=='Europe/Minsk'} selected{/if}>Europe/Minsk</option>
+								<option value="Europe/Monaco"{if:{timezone}=='Europe/Monaco'} selected{/if}>Europe/Monaco</option>
+								<option value="Europe/Moscow"{if:{timezone}=='Europe/Moscow'} selected{/if}>Europe/Moscow</option>
+								<option value="Europe/Nicosia"{if:{timezone}=='Europe/Nicosia'} selected{/if}>Europe/Nicosia</option>
+								<option value="Europe/Oslo"{if:{timezone}=='Europe/Oslo'} selected{/if}>Europe/Oslo</option>
+								<option value="Europe/Paris"{if:{timezone}=='Europe/Paris'} selected{/if}>Europe/Paris</option>
+								<option value="Europe/Podgorica"{if:{timezone}=='Europe/Podgorica'} selected{/if}>Europe/Podgorica</option>
+								<option value="Europe/Prague"{if:{timezone}=='Europe/Prague'} selected{/if}>Europe/Prague</option>
+								<option value="Europe/Riga"{if:{timezone}=='Europe/Riga'} selected{/if}>Europe/Riga</option>
+								<option value="Europe/Rome"{if:{timezone}=='Europe/Rome'} selected{/if}>Europe/Rome</option>
+								<option value="Europe/Samara"{if:{timezone}=='Europe/Samara'} selected{/if}>Europe/Samara</option>
+								<option value="Europe/San_Marino"{if:{timezone}=='Europe/San_Marino'} selected{/if}>Europe/San_Marino</option>
+								<option value="Europe/Sarajevo"{if:{timezone}=='Europe/Sarajevo'} selected{/if}>Europe/Sarajevo</option>
+								<option value="Europe/Simferopol"{if:{timezone}=='Europe/Simferopol'} selected{/if}>Europe/Simferopol</option>
+								<option value="Europe/Skopje"{if:{timezone}=='Europe/Skopje'} selected{/if}>Europe/Skopje</option>
+								<option value="Europe/Sofia"{if:{timezone}=='Europe/Sofia'} selected{/if}>Europe/Sofia</option>
+								<option value="Europe/Stockholm"{if:{timezone}=='Europe/Stockholm'} selected{/if}>Europe/Stockholm</option>
+								<option value="Europe/Tallinn"{if:{timezone}=='Europe/Tallinn'} selected{/if}>Europe/Tallinn</option>
+								<option value="Europe/Tirane"{if:{timezone}=='Europe/Tirane'} selected{/if}>Europe/Tirane</option>
+								<option value="Europe/Tiraspol"{if:{timezone}=='Europe/Tiraspol'} selected{/if}>Europe/Tiraspol</option>
+								<option value="Europe/Uzhgorod"{if:{timezone}=='Europe/Uzhgorod'} selected{/if}>Europe/Uzhgorod</option>
+								<option value="Europe/Vaduz"{if:{timezone}=='Europe/Vaduz'} selected{/if}>Europe/Vaduz</option>
+								<option value="Europe/Vatican"{if:{timezone}=='Europe/Vatican'} selected{/if}>Europe/Vatican</option>
+								<option value="Europe/Vienna"{if:{timezone}=='Europe/Vienna'} selected{/if}>Europe/Vienna</option>
+								<option value="Europe/Vilnius"{if:{timezone}=='Europe/Vilnius'} selected{/if}>Europe/Vilnius</option>
+								<option value="Europe/Volgograd"{if:{timezone}=='Europe/Volgograd'} selected{/if}>Europe/Volgograd</option>
+								<option value="Europe/Warsaw"{if:{timezone}=='Europe/Warsaw'} selected{/if}>Europe/Warsaw</option>
+								<option value="Europe/Zagreb"{if:{timezone}=='Europe/Zagreb'} selected{/if}>Europe/Zagreb</option>
+								<option value="Europe/Zaporozhye"{if:{timezone}=='Europe/Zaporozhye'} selected{/if}>Europe/Zaporozhye</option>
+								<option value="Europe/Zurich"{if:{timezone}=='Europe/Zurich'} selected{/if}>Europe/Zurich</option>
+								<option value="Asia/Aden"{if:{timezone}=='Asia/Aden'} selected{/if}>Asia/Aden</option>
+								<option value="Asia/Almaty"{if:{timezone}=='Asia/Almaty'} selected{/if}>Asia/Almaty</option>
+								<option value="Asia/Amman"{if:{timezone}=='Asia/Amman'} selected{/if}>Asia/Amman</option>
+								<option value="Asia/Anadyr"{if:{timezone}=='Asia/Anadyr'} selected{/if}>Asia/Anadyr</option>
+								<option value="Asia/Aqtau"{if:{timezone}=='Asia/Aqtau'} selected{/if}>Asia/Aqtau</option>
+								<option value="Asia/Aqtobe"{if:{timezone}=='Asia/Aqtobe'} selected{/if}>Asia/Aqtobe</option>
+								<option value="Asia/Ashgabat"{if:{timezone}=='Asia/Ashgabat'} selected{/if}>Asia/Ashgabat</option>
+								<option value="Asia/Ashkhabad"{if:{timezone}=='Asia/Ashkhabad'} selected{/if}>Asia/Ashkhabad</option>
+								<option value="Asia/Baghdad"{if:{timezone}=='Asia/Baghdad'} selected{/if}>Asia/Baghdad</option>
+								<option value="Asia/Bahrain"{if:{timezone}=='Asia/Bahrain'} selected{/if}>Asia/Bahrain</option>
+								<option value="Asia/Baku"{if:{timezone}=='Asia/Baku'} selected{/if}>Asia/Baku</option>
+								<option value="Asia/Bangkok"{if:{timezone}=='Asia/Bangkok'} selected{/if}>Asia/Bangkok</option>
+								<option value="Asia/Beirut"{if:{timezone}=='Asia/Beirut'} selected{/if}>Asia/Beirut</option>
+								<option value="Asia/Bishkek"{if:{timezone}=='Asia/Bishkek'} selected{/if}>Asia/Bishkek</option>
+								<option value="Asia/Brunei"{if:{timezone}=='Asia/Brunei'} selected{/if}>Asia/Brunei</option>
+								<option value="Asia/Calcutta"{if:{timezone}=='Asia/Calcutta'} selected{/if}>Asia/Calcutta</option>
+								<option value="Asia/Chita"{if:{timezone}=='Asia/Chita'} selected{/if}>Asia/Chita</option>
+								<option value="Asia/Choibalsan"{if:{timezone}=='Asia/Choibalsan'} selected{/if}>Asia/Choibalsan</option>
+								<option value="Asia/Chongqing"{if:{timezone}=='Asia/Chongqing'} selected{/if}>Asia/Chongqing</option>
+								<option value="Asia/Chungking"{if:{timezone}=='Asia/Chungking'} selected{/if}>Asia/Chungking</option>
+								<option value="Asia/Colombo"{if:{timezone}=='Asia/Colombo'} selected{/if}>Asia/Colombo</option>
+								<option value="Asia/Dacca"{if:{timezone}=='Asia/Dacca'} selected{/if}>Asia/Dacca</option>
+								<option value="Asia/Damascus"{if:{timezone}=='Asia/Damascus'} selected{/if}>Asia/Damascus</option>
+								<option value="Asia/Dhaka"{if:{timezone}=='Asia/Dhaka'} selected{/if}>Asia/Dhaka</option>
+								<option value="Asia/Dili"{if:{timezone}=='Asia/Dili'} selected{/if}>Asia/Dili</option>
+								<option value="Asia/Dubai"{if:{timezone}=='Asia/Dubai'} selected{/if}>Asia/Dubai</option>
+								<option value="Asia/Dushanbe"{if:{timezone}=='Asia/Dushanbe'} selected{/if}>Asia/Dushanbe</option>
+								<option value="Asia/Gaza"{if:{timezone}=='Asia/Gaza'} selected{/if}>Asia/Gaza</option>
+								<option value="Asia/Harbin"{if:{timezone}=='Asia/Harbin'} selected{/if}>Asia/Harbin</option>
+								<option value="Asia/Hebron"{if:{timezone}=='Asia/Hebron'} selected{/if}>Asia/Hebron</option>
+								<option value="Asia/Ho_Chi_Minh"{if:{timezone}=='Asia/Ho_Chi_Minh'} selected{/if}>Asia/Ho_Chi_Minh</option>
+								<option value="Asia/Hong_Kong"{if:{timezone}=='Asia/Hong_Kong'} selected{/if}>Asia/Hong_Kong</option>
+								<option value="Asia/Hovd"{if:{timezone}=='Asia/Hovd'} selected{/if}>Asia/Hovd</option>
+								<option value="Asia/Irkutsk"{if:{timezone}=='Asia/Irkutsk'} selected{/if}>Asia/Irkutsk</option>
+								<option value="Asia/Istanbul"{if:{timezone}=='Asia/Istanbul'} selected{/if}>Asia/Istanbul</option>
+								<option value="Asia/Jakarta"{if:{timezone}=='Asia/Jakarta'} selected{/if}>Asia/Jakarta</option>
+								<option value="Asia/Jayapura"{if:{timezone}=='Asia/Jayapura'} selected{/if}>Asia/Jayapura</option>
+								<option value="Asia/Jerusalem"{if:{timezone}=='Asia/Jerusalem'} selected{/if}>Asia/Jerusalem</option>
+								<option value="Asia/Kabul"{if:{timezone}=='Asia/Kabul'} selected{/if}>Asia/Kabul</option>
+								<option value="Asia/Kamchatka"{if:{timezone}=='Asia/Kamchatka'} selected{/if}>Asia/Kamchatka</option>
+								<option value="Asia/Karachi"{if:{timezone}=='Asia/Karachi'} selected{/if}>Asia/Karachi</option>
+								<option value="Asia/Kashgar"{if:{timezone}=='Asia/Kashgar'} selected{/if}>Asia/Kashgar</option>
+								<option value="Asia/Kathmandu"{if:{timezone}=='Asia/Kathmandu'} selected{/if}>Asia/Kathmandu</option>
+								<option value="Asia/Katmandu"{if:{timezone}=='Asia/Katmandu'} selected{/if}>Asia/Katmandu</option>
+								<option value="Asia/Khandyga"{if:{timezone}=='Asia/Khandyga'} selected{/if}>Asia/Khandyga</option>
+								<option value="Asia/Kolkata"{if:{timezone}=='Asia/Kolkata'} selected{/if}>Asia/Kolkata</option>
+								<option value="Asia/Krasnoyarsk"{if:{timezone}=='Asia/Krasnoyarsk'} selected{/if}>Asia/Krasnoyarsk</option>
+								<option value="Asia/Kuala_Lumpur"{if:{timezone}=='Asia/Kuala_Lumpur'} selected{/if}>Asia/Kuala_Lumpur</option>
+								<option value="Asia/Kuching"{if:{timezone}=='Asia/Kuching'} selected{/if}>Asia/Kuching</option>
+								<option value="Asia/Kuwait"{if:{timezone}=='Asia/Kuwait'} selected{/if}>Asia/Kuwait</option>
+								<option value="Asia/Macao"{if:{timezone}=='Asia/Macao'} selected{/if}>Asia/Macao</option>
+								<option value="Asia/Macau"{if:{timezone}=='Asia/Macau'} selected{/if}>Asia/Macau</option>
+								<option value="Asia/Magadan"{if:{timezone}=='Asia/Magadan'} selected{/if}>Asia/Magadan</option>
+								<option value="Asia/Makassar"{if:{timezone}=='Asia/Makassar'} selected{/if}>Asia/Makassar</option>
+								<option value="Asia/Manila"{if:{timezone}=='Asia/Manila'} selected{/if}>Asia/Manila</option>
+								<option value="Asia/Muscat"{if:{timezone}=='Asia/Muscat'} selected{/if}>Asia/Muscat</option>
+								<option value="Asia/Nicosia"{if:{timezone}=='Asia/Nicosia'} selected{/if}>Asia/Nicosia</option>
+								<option value="Asia/Novokuznetsk"{if:{timezone}=='Asia/Novokuznetsk'} selected{/if}>Asia/Novokuznetsk</option>
+								<option value="Asia/Novosibirsk"{if:{timezone}=='Asia/Novosibirsk'} selected{/if}>Asia/Novosibirsk</option>
+								<option value="Asia/Omsk"{if:{timezone}=='Asia/Omsk'} selected{/if}>Asia/Omsk</option>
+								<option value="Asia/Oral"{if:{timezone}=='Asia/Oral'} selected{/if}>Asia/Oral</option>
+								<option value="Asia/Phnom_Penh"{if:{timezone}=='Asia/Phnom_Penh'} selected{/if}>Asia/Phnom_Penh</option>
+								<option value="Asia/Pontianak"{if:{timezone}=='Asia/Pontianak'} selected{/if}>Asia/Pontianak</option>
+								<option value="Asia/Pyongyang"{if:{timezone}=='Asia/Pyongyang'} selected{/if}>Asia/Pyongyang</option>
+								<option value="Asia/Qatar"{if:{timezone}=='Asia/Qatar'} selected{/if}>Asia/Qatar</option>
+								<option value="Asia/Qyzylorda"{if:{timezone}=='Asia/Qyzylorda'} selected{/if}>Asia/Qyzylorda</option>
+								<option value="Asia/Rangoon"{if:{timezone}=='Asia/Rangoon'} selected{/if}>Asia/Rangoon</option>
+								<option value="Asia/Riyadh"{if:{timezone}=='Asia/Riyadh'} selected{/if}>Asia/Riyadh</option>
+								<option value="Asia/Saigon"{if:{timezone}=='Asia/Saigon'} selected{/if}>Asia/Saigon</option>
+								<option value="Asia/Sakhalin"{if:{timezone}=='Asia/Sakhalin'} selected{/if}>Asia/Sakhalin</option>
+								<option value="Asia/Samarkand"{if:{timezone}=='Asia/Samarkand'} selected{/if}>Asia/Samarkand</option>
+								<option value="Asia/Seoul"{if:{timezone}=='Asia/Seoul'} selected{/if}>Asia/Seoul</option>
+								<option value="Asia/Shanghai"{if:{timezone}=='Asia/Shanghai'} selected{/if}>Asia/Shanghai</option>
+								<option value="Asia/Singapore"{if:{timezone}=='Asia/Singapore'} selected{/if}>Asia/Singapore</option>
+								<option value="Asia/Srednekolymsk"{if:{timezone}=='Asia/Srednekolymsk'} selected{/if}>Asia/Srednekolymsk</option>
+								<option value="Asia/Taipei"{if:{timezone}=='Asia/Taipei'} selected{/if}>Asia/Taipei</option>
+								<option value="Asia/Tashkent"{if:{timezone}=='Asia/Tashkent'} selected{/if}>Asia/Tashkent</option>
+								<option value="Asia/Tbilisi"{if:{timezone}=='Asia/Tbilisi'} selected{/if}>Asia/Tbilisi</option>
+								<option value="Asia/Tehran"{if:{timezone}=='Asia/Tehran'} selected{/if}>Asia/Tehran</option>
+								<option value="Asia/Tel_Aviv"{if:{timezone}=='Asia/Tel_Aviv'} selected{/if}>Asia/Tel_Aviv</option>
+								<option value="Asia/Thimbu"{if:{timezone}=='Asia/Thimbu'} selected{/if}>Asia/Thimbu</option>
+								<option value="Asia/Thimphu"{if:{timezone}=='Asia/Thimphu'} selected{/if}>Asia/Thimphu</option>
+								<option value="Asia/Tokyo"{if:{timezone}=='Asia/Tokyo'} selected{/if}>Asia/Tokyo</option>
+								<option value="Asia/Ujung_Pandang"{if:{timezone}=='Asia/Ujung_Pandang'} selected{/if}>Asia/Ujung_Pandang</option>
+								<option value="Asia/Ulaanbaatar"{if:{timezone}=='Asia/Ulaanbaatar'} selected{/if}>Asia/Ulaanbaatar</option>
+								<option value="Asia/Ulan_Bator"{if:{timezone}=='Asia/Ulan_Bator'} selected{/if}>Asia/Ulan_Bator</option>
+								<option value="Asia/Urumqi"{if:{timezone}=='Asia/Urumqi'} selected{/if}>Asia/Urumqi</option>
+								<option value="Asia/Ust-Nera"{if:{timezone}=='Asia/Ust-Nera'} selected{/if}>Asia/Ust-Nera</option>
+								<option value="Asia/Vientiane"{if:{timezone}=='Asia/Vientiane'} selected{/if}>Asia/Vientiane</option>
+								<option value="Asia/Vladivostok"{if:{timezone}=='Asia/Vladivostok'} selected{/if}>Asia/Vladivostok</option>
+								<option value="Asia/Yakutsk"{if:{timezone}=='Asia/Yakutsk'} selected{/if}>Asia/Yakutsk</option>
+								<option value="Asia/Yekaterinburg"{if:{timezone}=='Asia/Yekaterinburg'} selected{/if}>Asia/Yekaterinburg</option>
+								<option value="Asia/Yerevan"{if:{timezone}=='Asia/Yerevan'} selected{/if}>Asia/Yerevan</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Пароль</p>
+						</div>
+						<div class="value">
+							<input type="password" class="text form-control" name="password">
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Повторите пароль</p>
+						</div>
+						<div class="value">
+							<input type="password" class="text form-control" name="passwordrep">
+						</div>
+					</div>
+
+				</div>
+
+				<div class="block">
+					<h2>Статус</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Статус</p>
+						</div>
+						<div class="value">
+							{if:{status}>1}
+								<p><input type="radio" class="rad" name="status" value="2"{if:{status}==2} checked{/if}> Администратор</p>
+								<p><input type="radio" class="rad" name="status" value="3"{if:{status}==3} checked={/if}> Редактор</p>
+							{/if}
+							{if:{status}==1}
+								<p>Суперадмин<input type="hidden" name="status" value="1"></p>
+							{/if}
+						</div>
+					</div>
+				</div>
+
+
+				<div class="block" id="mapblock"{if:{status}<3} style="display: none;"{/if}>
+				{/mask}
+					<h2>Права редактора</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Права редактора</p>
+						</div>
+						<div class="value">
+							<ul class="map">
+								{item}
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="buttons">
+					<input type="submit" class="btn btn-success" name="add" value="Сохранить">
+					<input type="button" class="btn btn-danger" value="Отмена" onclick="javascript:location.href='/manage/users/'; return false;">
+				</div>
+
+			</form>
+		</div>
+		<!--/CONTENT-->
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}
+
+{mask:item}
+	<li>
+		<label><input type="checkbox" class="ch" name="cat[]" value="{id}"{if:{canedit}==true} checked{/if}> {name}</label>
+		{set:item}
+			<ul>
+				{item}
+			</ul>
+		{/set}
+	</li>
+{/mask}

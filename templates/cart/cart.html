@@ -1,0 +1,175 @@
+{reduce:nothing}
+{mask:main}
+{set:items}
+<form action="" id="cart-order">
+    <div class="cart-list">
+        {set:price}
+        <h3>
+            Товары в счет
+        </h3>
+        <table>
+            <tr>
+                <th>№</th>
+                <!--<th>Фото</th>-->
+                <th>Название и артикул</th>
+                <th>Срок поставки</th>
+                <th>Количество</th>
+                <th>Цена</th>
+                <th>Сумма</th>
+                <th></th>
+            </tr>
+            {mask:price}
+            <tr class="cart-list-line {class}">
+                <td>{_rank}</td>
+                <!--<td>-->
+                <!--<div class="detal-photo" {set:img}data-url="/files/0/{img}"{/}></div>-->
+                <!--</td>-->
+                <td>
+                    <div class="cart-list-title">
+                        <!--<a href="/{url}{set:bid}_aview_b{bid}/{/}"></a>-->
+                        {name}
+                        {art}
+                    </div>
+                </td>
+                <td>{time}</td>
+                <td>
+                    {set:count}
+                    <div class="good-quant">
+                        <div class="good-quant__minus" data-id="{id}">-</div>
+                        <input type="text" value="{count}" class="good-quant__input" name='goood[{id}]'>
+                        <div class="good-quant__plus" data-id="{id}">+</div>
+                    </div>
+                    {/}
+                </td>
+                <td>
+                    {set:price}
+                    <span class="good-price">{price}</span> ₽
+                    {/}
+                </td>
+                <td>
+                    {set:calc}
+                    <span class="good-summ">{calc}</span> ₽
+                    {/}
+                </td>
+                <td>
+                    <div class="good-remove" id="{id}"></div>
+                </td>
+            </tr>
+            {/}
+
+            <tr class="cart-list-bottom">
+                <td colspan="5"></td>
+                <td>
+                    <div class="good-total-title">Итого:</div>
+                </td>
+                <td colspan="2" class="good-total"><span>{total}</span> ₽</td>
+            </tr>
+        </table>
+        {/set}
+        {set:bill}
+        {set:price}
+        <br>
+        {/set}
+        <h3>
+            Товары в заказ
+        </h3>
+        <table>
+            <tr>
+                <th>№</th>
+                <!--<th>Фото</th>-->
+                <th>Название и артикул</th>
+                <th>Срок поставки</th>
+                <th>Количество</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            {mask:bill}
+            <tr class="cart-list-line">
+                <td>{_rank}</td>
+                <!--<td>-->
+                <!--<div class="detal-photo" {set:img}data-url="/files/0/{img}"{/}></div>-->
+                <!--</td>-->
+                <td>
+                    <div class="cart-list-title">
+                        <!--<a href="/{url}{set:bid}_aview_b{bid}/{/}"></a>-->
+                        {name}
+                        {art}
+                    </div>
+                </td>
+                <td>{time}</td>
+                <td>
+                    {set:count}
+                    <div class="good-quant">
+                        <div class="good-quant__minus" data-id="{id}">-</div>
+                        <input type="text" value="{count}" class="good-quant__input" name='goood[{id}]'>
+                        <div class="good-quant__plus" data-id="{id}">+</div>
+                    </div>
+                    {/}
+                </td>
+                <td>
+
+                </td>
+                <td>
+
+                </td>
+                <td>
+                    <div class="good-remove" id="{id}"></div>
+                </td>
+            </tr>
+            {/}
+            <tr class="cart-list-bottom">
+
+            </tr>
+        </table>
+        {/set}
+    </div>
+
+
+    <div class="content-form">
+        <div class="content-form__title">Оформление заказа</div>
+        <div class="inline-form">
+            <label for="">Организация:</label>
+            <input type="text" name="company" value="{user/organization}">
+        </div>
+        <div class="inline-form">
+            <label for="">Имя<span>*</span>:</label>
+            <input type="text" name="name" value="{user/name}">
+        </div>
+        <div class="inline-form">
+            <label for="">ИНН:</label>
+            <input type="text" name="inn" value="{user/inn}">
+        </div>
+        <div class="inline-form">
+            <label for="">КПП:</label>
+            <input type="text" name="kpp" value="{user/kpp}">
+        </div>
+        <div class="inline-form">
+            <label for="">Адрес:</label>
+            <input type="text" name="address" value="{user/address}">
+        </div>
+        <div class="inline-form">
+            <label for="">Номер телефона<span>*</span>:</label>
+            <input type="text" name="phone" value="{user/phone}">
+        </div>
+        <div class="inline-form">
+            <label for="">E-mail<span>*</span>:</label>
+            <input type="text" name="email" value="{user/email}">
+        </div>
+        <div class="inline-form">
+            <label for="">Примечания к заказу:</label>
+            <textarea name="comment"></textarea>
+        </div>
+        <div class="form-line">
+            <input type="checkbox" id="personal" name="personal" checked="checked">
+            <label for="personal"><i></i>Нажимая «Отправить заказ» я даю согласие на обработку моих персональных данных
+                и соглашаюсь <a href="/policy/">с правилами</a> работы с ними».</label>
+        </div>
+        <div class="form-line">
+            <button class="form-send cart-send" type="submit">Отправить заказ</button>
+        </div>
+        <input type="hidden" name="cart" value="cart">
+    </div>
+</form>
+{/}
+{/mask}

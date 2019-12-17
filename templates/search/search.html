@@ -1,0 +1,33 @@
+{reduce:space}
+{mask:main}
+{set:items}
+<div class="search-top">
+    <div class="search-request">
+        Вы искали: <strong>{word}</strong>
+    </div>
+    <div class="search-result">
+        Найдено результатов: <strong>{count}</strong>
+    </div>
+</div>
+
+<ol class="search-results">
+    {mask:items}
+    <li>
+        <div class="search-results__title">{name_rus}</div>
+        {html}<a href="{url}">{parents}</a>
+    </li>
+    {/}
+</ol>
+{/}
+{set:pagination}
+<div class="pagination">
+    <a href="#" class="pagination__prev"></a>
+    <a href="#" class="curr">1</a>
+    <a href="#">2</a>
+    <a href="#">3</a>
+    <a href="#">4</a>
+    <a href="#">5</a>
+    <a href="#" class="pagination__next"></a>
+</div>
+{/}
+{/}

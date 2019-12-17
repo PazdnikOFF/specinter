@@ -1,0 +1,42 @@
+{reduce:nothing}
+{mask:main}
+
+        <div class="wrap">
+        	<div class="header-inn">
+    	    	<a href="/" class="header-logo">
+    	       		<img src="/img/newlogo.jpg" alt="Specinter.ru" style="width: 113px">
+    	       		<span>Запчасти для спецтехники</span>
+    	    	</a>
+
+    	    	<div class="header-centr">
+    	    		<div class="header__phone">
+    	       			{code} {phone}
+    	    		</div>
+    	    		<a href="#order" class="open-modal header__call">
+    	       			Заказать звонок
+    	    		</a>
+    	    	</div>
+
+    	    	<div class="header-right">
+    	    		<div class="header-personal">
+						{mis:login}
+    	       			<a href="#login" class="open-modal">Вход</a>  |  <a href="/profile/">Регистрация</a>
+						{/}
+						{set:login}
+						<a href="/profile/">{login}</a>  |  <a class="logout" href="#logout">Выйти</a>
+						{/}
+    	    		</div>
+
+    	    		<a href="/cart" class="header-cart">
+    	    			<div class="header-cart__title">
+    	       				Корзина:
+    	    			</div>
+    	    			<div class="header-cart__qunt">
+    	    				<span>{cart}</span> товаров
+    	    			</div>
+    	    		</a>
+
+    	    	</div>
+        	</div>
+        </div>
+{/mask}

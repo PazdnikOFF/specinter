@@ -1,0 +1,16 @@
+{reduce:nothing}
+{mask:main}
+            <div class="catalog">
+			{html_top}
+			{mask:items}
+				<a class="catalog-one" href="{url}">
+					{set:img}
+                    <img src="/files/1/{img}" alt="">
+					{/}
+                    <div class="catalog-one__title">{page_name}</div>
+                </a>
+			{/mask}	                
+			{html_bot}
+            </div>    
+		
+{/mask}

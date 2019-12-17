@@ -1,0 +1,169 @@
+{reduce:nothing}
+{mask:main}
+<div class="b-container-content">
+	<div class="b-title b-title_tdLeft">
+		<h1 class="title title_red">{name}</h1>
+
+		<div class="b-path">
+			<a href="/">Главная страница</a> /
+			<a href="/catalog/">Каталог</a>
+		</div>
+	</div>
+
+	<div class="tdLeft">
+		<ul class="product-menu">
+			{mask:item}
+			{if:{active}}
+			<li class="on">
+				<a href="{url}">{name}</a>
+				{set:item}
+				<ul>
+					{mask:item}
+					{if:!{active}}
+					<li><a href="{url}">{name}</a></li>
+					{/if}
+					{if:{active}}
+					<li class="on">
+						<a href="{url}">{name}</a>
+						{set:item}
+							<ul>
+								{mask:item}
+									{if:!{active}}
+									<li><a href="{url}">{name}</a></li>
+									{/if}
+									{if:{active}}
+									<li class="on">
+										<a href="{url}">{name}</a>
+									</li>
+									{/if}
+								{/mask}
+							</ul>
+						{/set}
+					</li>
+					{/if}
+					{/mask}
+				</ul>
+				{/set}
+			</li>
+			{/if}
+			{/mask}
+
+			{mask:item}
+			{if:!{active}}
+			<li class="{set:url:'/catalog/_asale'}on{/}"><a href="{url}">{name}</a></li>
+			{/if}
+			{/mask}
+		</ul>
+	</div>
+
+
+
+	<div class="content">
+		<div class="number-of-records">
+			<span>Показать товаров на странице: </span>
+			<ul class="number-of-records__list js-number-of-records__list">
+				<li{if:{limit}=="1"} class="on"{/if}><a href="{limit1Url}">15</a></li>
+				<li{if:{limit}=="2"} class="on"{/if}><a href="{limit2Url}">30</a></li>
+				<li{if:{limit}=="3"} class="on"{/if}><a href="{limit3Url}">100</a></li>
+				<li{if:{limit}=="all"} class="on"{/if}><a href="{noLimitUrl}">ВСЕ</a></li>
+			</ul>
+		</div>
+
+
+		<!--CATALOG-->
+		<div class="b-catalog">
+			<ul class="prod-list">
+				{mask:catitem}
+				<li class="prod-list__item">
+					<div class="prod-list__item-box {if:({ballanceIsset} or {//auth_user}) and !{count_variants}}prod-list__item-box_hover{/if}">
+						<div class="carousel-item__container {if:{delayed}}in_delayed{/if} {if:{select_cart}}in_cart{/if}">
+							<a href="{url}" class="prod-link"></a>
+							<a href="/cart/" class="prod-link-cart cart-info i-white i-cart cartYet" data-id="{id}"></a>
+							<div class="carousel-item__top">
+								<div class="carousel-item__title">
+									<div class="name catalog-name" title="{php}htmlspecialchars({name}){/php}">{name}</div>
+								</div>
+							</div>
+							<div class="carousel-item__center">
+								{set:mainimage}
+									{mask:mainimage}
+									<img src="/files/1/{image}" alt="{php}htmlspecialchars({../name}){/php}">
+									{/mask}
+								{/set}
+
+								{mis:mainimage}
+									{if:!{image}}
+									<img src="/img/no-photo-300.png" alt="{php}htmlspecialchars({name}){/php}">
+									{/if}
+
+									{mask:image}{if:{_first}}
+									<img src="/images/real/2/{image}" alt="{php}htmlspecialchars({name}){/php}">
+									{/if}{/mask}
+								{/mis}
+								<div class="carousel-item__button">
+									{if:{ballanceIsset}}
+										{choose}
+											{when:{select_cart}}
+												<div class="field"><a href="/cart/" class="btn btn_white btn_small cartYet"
+																	  data-id="{id}">Оформить заказ</a></div>
+											{/when}
+											{else}
+												<div class="field"><a href="javascript:void(0);"
+																	  class="btn btn_white btn_small toCart"
+																	  data-id="{id}">Купить</a></div>
+											{/else}
+										{/choose}
+									{/if}
+									{if:{//auth_user}}
+										{choose}
+											{when:{delayed}}
+											<div class="field">
+												<a href="javascript:void(0);" class="btn btn_white btn_small delDelayed"
+												   data-id="{id}">Не хочу</a>
+											</div>
+											{/when}
+											{else}
+											<div class="field">
+												<a href="javascript:void(0);"
+												   class="btn btn_white btn_small addDelayed" data-id="{id}">Хочу</a>
+											</div>
+											{/else}
+										{/choose}
+									{/if}
+								</div>
+							</div>
+							<div class="carousel-item__bottom">
+								{choose}
+								{when:{count_variants}}
+									<a href="{url}"
+									   class="btn btn_green btn_small" >{count_variants}</a>
+								{/when}
+								{else}
+									{if:!{ballanceIsset}}<span class="status status_under-the-order">Под заказ</span>{/if}
+									{if:{ballanceIsset}}
+									<div class="price">
+										{if:{floatPrice}}
+										<span class="price__summ">{price_format}.<sup
+												class="price__penny">{floatPrice}</sup></span> Р
+										{/if}
+										{if:!{floatPrice}}
+										<span class="price__summ">{price_format}</span> Р
+										{/if}
+									</div>
+									{/if}
+								{/else}
+								{/choose}
+							</div>
+						</div>
+					</div>
+				</li>
+				{/mask}
+			</ul>
+
+			{pages_down}
+
+		</div>
+		<!--/CATALOG-->
+	</div>
+</div>
+{/mask}

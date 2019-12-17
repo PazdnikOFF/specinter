@@ -1,0 +1,25 @@
+.bg-home-wrapp {
+	background: url('@{img_bg}bg-home-1.png') no-repeat right 1195px;
+}
+
+.b-seotext {
+	padding-bottom: @footer-height;
+	background: url('@{img_bg}bg-seo.jpg');
+	-webkit-background-size: cover;
+	background-size: cover;
+	.clearfix;
+	&__title {
+		color: @coltxt2;
+		margin: 40px 0;
+	}
+	.b-container-content {
+		padding-top: 10px; padding-bottom: 10px;
+	}
+}
+
+/*==================== 960px ==============================*/
+@media only screen and (max-width: 960px) {
+	.bg-home-wrapp {
+		background: none;
+	}
+}

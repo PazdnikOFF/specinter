@@ -1,0 +1,53 @@
+{reduce:nothing}
+{mask:main}
+	<div class="b-about">
+		<div class="b-about__bg"></div>
+		<div class="b-container-content">
+			<h1 class="b-about__title">О компании</h1>
+
+			<div class="b-about__text">
+				{text}
+			</div>
+			<div class="b-about__img">
+				{if:{image1} != ""}
+				<img src="/files/0/{image1}" alt="" width="220">
+				{/if}
+				{if:{image2} != ""}
+				<img src="/files/0/{image2}" alt="" width="220">
+				{/if}
+			</div>
+			<div class="clearfix"></div>
+			<div class="b-about__doc">
+				<div class="row">
+					<div class="col col_left">
+						<div class="about-doc__title"><span class="i-title-doc-1 i-gray">Документы</span></div>
+						<ul>
+							{mask:document}
+							<li><span><a href="/files/0/{file}" target="_blank">{name}</a></span></li>
+							{/mask}
+						</ul>
+					</div>
+					<div class="col col_right">
+						<div class="about-doc__title"><span class="i-title-doc-2 i-gray">Сертификаты и лицензии:</span></div>
+						<ul>
+							{mask:sertificate}
+							<li><a href="/files/0/{file}" target="_blank">{name}</a></li>
+							{/mask}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="b-container-content">
+		<div class="b-img-list">
+			<ul class="list lightGallery">
+				{mask:photo}
+				{mask:image}{if:{_first}}
+				<li data-src="/files/0/{image}"><img src="/files/1/{image}" alt="" width="343" height="229"></li>
+				{/if}{/mask}
+				{/mask}
+			</ul>
+		</div>
+	</div>
+{/mask}

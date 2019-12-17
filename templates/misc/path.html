@@ -1,0 +1,13 @@
+
+{reduce:nothing}
+{mask:main}
+<div class="breadcrumbs">
+    <a href="/">Главная</a>
+    {mask:items}
+        {if:{_last}}/ <span>{name}</span>{/}
+        {if:!{_last}}
+        / <a href="{url}">{name}</a>
+        {/}
+    {/}
+</div>
+{/mask}

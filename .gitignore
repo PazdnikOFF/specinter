@@ -1,0 +1,10 @@
+# vscode workspace settings
+.vscode
+
+# user files
+/files
+/ufiles
+
+# cache
+/_cache
+/_tmp

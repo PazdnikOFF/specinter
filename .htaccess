@@ -1,0 +1,10 @@
+#Action application/x-httpd-php "/cgi-wrapper/php5.3"
+AddDefaultCharset UTF-8
+AddDefaultCharset utf-8
+
+RewriteEngine on
+
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ inner.php

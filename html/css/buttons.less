@@ -1,0 +1,197 @@
+/* ==========================================================================
+    Buttons  Кнопки
+    =========================================================================*/
+// ЦВЕТОВЫЕ СХЕМЫ КНОПОК 
+	.btn_gray {
+		background-image: url('@{img_bg}btn-gray.png'); color: @col1;
+		&:hover {
+			color: #fff;
+		}
+	}
+	.btn_green {
+		background-image: url('@{img_bg}btn-green.png'); color: @col2;
+		&:hover {
+			color: #fff;
+		}
+	}
+	.btn_red {
+		background-image: url('@{img_bg}btn-red.png'); color: @col3;
+		&:hover {
+			color: #fff;
+		}
+	}
+	.btn_white {
+		background-image: url('@{img_bg}btn-white.png'); color: #fff;
+		&:hover {
+			color: #4f4d54;
+			[class*="i-"] {
+				.i-dark;
+			}
+		}
+	}
+
+//КНОПКА
+.btn {
+    border: none;
+    .rounded(0);
+    outline: none;
+    color: #fff;
+    .inblock(middle);
+    text-align: center;
+    text-align: center;
+    line-height: normal;
+    text-decoration: none !important;
+    text-transform: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 14px;
+	line-height: 27px;
+    padding: 12px 12px 14px;
+	&:before {
+		content:'';
+		height: 26px;
+		.inblock(middle);
+		margin-left: -4px;
+	}
+	&_circle {
+		.inblock(middle);
+		background-image: url('@{img_bg}s-circle-btn.png');
+		width: 42px; height: 43px;
+		&:hover {
+			background-position: 100% 0;
+		}
+	}
+	// ЦВЕТОВЫЕ СХЕМЫ КНОПОК 
+	&_gray {
+		background-image: url('@{img_bg}btn-gray.png'); color: @col1;
+		&:hover {
+			color: #fff;
+		}
+	}
+	&_green {
+		background-image: url('@{img_bg}btn-green.png'); color: @col2;
+		&:hover {
+			color: #fff;
+		}
+	}
+	&_red {
+		background-image: url('@{img_bg}btn-red.png'); color: @col3;
+		&:hover {
+			color: #fff;
+		}
+	}
+	&_white {
+		background-image: url('@{img_bg}btn-white.png'); color: #fff;
+		&:hover {
+			color: #4f4d54;
+			[class*="i-"] {
+				.i-dark;
+			}
+		}
+	}
+	
+	
+
+	&_more {
+		background-image: url('@{img_bg}btn-red.png');
+		background-position: 0 -534px;
+		width: 153px; height: 56px;
+		color: #fff;
+		&:hover {
+			background-image: url('@{img_bg}btn-green.png');
+			color: #fff;
+		}
+		.i-arrow {
+			position: relative;
+			left: 15px;
+		}
+	}
+	
+	&_in {
+		color: #fff;
+		&.btn_big {
+			background-position: 0 -107px;
+			&:hover {
+				background-position: 0 0;
+			}
+		}
+		&.btn_mid {
+			background-position: 0 -321px;
+			&:hover {
+				background-position: 0 -214px;
+			}
+		}
+		&.btn_small {
+			background-position: 0 -534px;
+			&:hover {
+				background-position: 0 -428px;
+			}
+		}
+		
+		&.btn_gray:hover {color: @col1;}
+		&.btn_green:hover {color: @col2;}
+		&.btn_red:hover {color: @col3;}
+		&.btn_white {
+			color: #4f4d54;
+				[class*="i-"] {
+					.i-dark;
+				}
+			&:hover {
+				color: #fff;
+			}
+		}
+	}
+}
+
+
+//	РАЗМЕРЫ КНОПОК 
+	.btn_big {
+		width: 269px; height: 57px; background-position: 0 0; 
+		&:hover {
+			background-position: 0 -107px;
+		}
+		&.btn_in {
+			background-position: 0 -107px;
+			&:hover {
+				background-position: 0 0;
+			}
+		}
+	}
+	.btn_mid {
+		width: 190px; height: 57px; background-position: 0 -214px;
+		&:hover {
+			background-position: 0 -321px;
+		}
+		&.btn_in {
+			background-position: 0 -321px;
+			&:hover {
+				background-position: 0 -214px;
+			}
+		}
+	}
+	.btn_small {
+		width: 153px; height: 56px; background-position: 0 -428px;
+		&:hover {
+			background-position: 0 -534px;
+		}
+		&.btn_in {
+			background-position: 0 -534px;
+			&:hover {
+				background-position: 0 -428px;
+			}
+		}
+	}
+.bth:disabled, .btn[disabled="disabled"], .btn[disabled], .btn.disabled {
+    cursor: default !important;
+   .i-gray;
+	
+} 
+
+//Медиазапросы
+@media only screen and (max-width: 960px) {
+	.btn_big {
+		.btn_small;
+	}
+}

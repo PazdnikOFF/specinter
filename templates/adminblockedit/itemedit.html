@@ -1,0 +1,140 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - **</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/calendar.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<script src="/admin/scripts/calendar.js"></script>
+	<script src="/admin/scripts/calendar-ru.js"></script>
+	<script src="/admin/scripts/calendar-setup.js"></script>
+
+	<!--chosen-->
+	<link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+	<script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+	<!--iCheck-->
+	<link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+	<script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+
+	<!--CROPPER-->
+	<script src="/admin/scripts/jcrop/js/jquery.color.js"></script>
+	<script src="/admin/scripts/jcrop/js/jquery.Jcrop.min.js"></script>
+	<link rel="stylesheet" href="/admin/scripts/jcrop/css/jquery.Jcrop.css">
+
+	<script>
+		$(document).ready(function() {
+			$(".ch").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+			$(".select-styled").chosen();
+            $('[data-name="art"]').focus();
+		});
+	</script>
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main no-bg">
+
+		<!--CONTENT-->
+		<h1>{set:add}Добавление{/set}{mis:add}Редактирование{/mis} блока</h1>
+
+		{set:add}
+		<form action="/manage/blockedit/_aitemadd/" method="post" enctype="multipart/form-data" name="form1" {if:{template} == 'aarts'}class="form_{template}"{/}>
+		{/set}
+		{mis:add}
+		<form action="/manage/blockedit/_aitemedit/" method="post" enctype="multipart/form-data" name="form1">
+		{/mis}
+			{if:{template} == 'aarts'}
+				<input type="hidden" id="aarts_art" name="art" value="1">
+				<input type="hidden" id="aarts_name" name="name" value="2">
+			{/}
+			<input type="hidden" name="template" value="{template}"/>
+			<input type="hidden" name="blockparent" value="{blockparent}"/>
+			<input type="hidden" name="parent" value="{parent}"/>
+			{mis:add}
+			<input type="hidden" name="blockid" value="{blockid}"/>
+			{/mis}
+
+
+			{mask:tabs}
+			{set:fields}
+			<div class="block">
+				<h2>Параметры блока</h2>
+				{mask:fields}
+					<div class="stroke clearline">
+						<div class="name">
+							<p>{name}</p>
+							{if:{//super}}
+								<span>{key}</span>
+							{/if}
+						</div>
+						<div class="value {if:{//template} == 'aarts'}aarts_get_fields{/}" {if:{//template} == 'aarts'}data-table="catitem" data-field="{key}"{/}>
+						<p>{value}</p>
+							<input type="hidden" name="dat[]" value="{key}">
+							<input type="hidden" name="dkey[]" value="{datatkey}">
+						</div>
+					</div>
+				{/mask}
+
+			{if:{//template} == 'aarts'}
+			<div class="result hidden">
+
+			</div>
+			{/}
+			</div>
+			{/set}
+			{/mask}
+
+			{set:addFields}
+			<div class="block">
+				<h2>SEO поля</h2>
+				{mask:addFields}
+					<div class="stroke clearline">
+						<div class="name">
+							<p>{name}</p>
+						</div>
+						<div class="value">
+							<input class="text form-control" name="{key}" type="text" value="{value}">
+						</div>
+					</div>
+				{/mask}
+			</div>
+			{/set}
+
+
+			<div class="buttons">
+				<input type="submit" class="btn btn-success" name="add" value="{set:add}Добавить{/set}{mis:add}Сохранить{/mis}">
+				<input type="button" class="btn btn-danger" value="Отмена" onclick="javascript:location.href='/manage/blockedit/_aitemlist_parent{parent}_template{template}_id{blockparent}/'; return false;">
+			</div>
+
+		</form>
+
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

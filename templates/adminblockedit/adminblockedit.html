@@ -1,0 +1,366 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Блоки*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js?v1"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--bootstrap js-->
+	<script src="/admin/decor/bootstrap/js/bootstrap.min.js"></script>
+
+	<!--right click and table sorter-->
+	<script src="/admin/scripts/jquery.jscontext-1.0.js"></script>
+	<script src="/admin/scripts/jquery.tablesorter.min.js"></script>
+	<script src="/admin/scripts/jquery.touchSwipe.js"></script>
+
+	<!--chosen-->
+	<link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+	<script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+	<!--iCheck-->
+	<link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+	<link href="/admin/scripts/iCheck/skins/minimal/minimal.css" rel="stylesheet">
+	<script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+	<script>
+		$(document).ready(function() {
+
+			$(".ch").iCheck({
+				checkboxClass: 'icheckbox_flat-blue',
+				radioClass: 'iradio_flat-blue'
+			});
+			$(".group-checkbox").iCheck({
+				checkboxClass: 'icheckbox_minimal',
+				radioClass: 'iradio_minimal'
+			});
+
+			$(".select-styled").chosen();
+		});
+	</script>
+
+
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Содержимое страницы "{name}"</h1>
+			<input type="hidden" id="hide-blockid" name="hide-blockid" value="0">
+			<input type="hidden" id="hide-parent" name="hide-parent" value="{parent}">
+			<input type="hidden" id="hide-query-string" name="hide-parent" value="{queryString}">
+			<input type="hidden" id="hide-template" name="hide-template" value="{template}">
+			<input type="hidden" id="hide-page" name="hide-page" value="{lpage}">
+
+			<div class="block">
+				<h2>Блоки "{templname}"</h2>
+
+				{mis:super}
+					{set:blocktypes}
+						<div class="block-chooser">
+							<p>Эта папка содержит блоки разных типов</p>
+							<span>Выводить: </span>
+							<select name="btypes" id="btypes" class="select-styled" style="width: 200px;">
+								{mask:blocktypes}
+								<option value="{key}"{if:{key}=={//template}} selected="selected"{/if}>{name}</option>
+								{/mask}
+							</select>
+						</div>
+					{/set}
+				{/mis}
+
+				{set:super}
+					<div class="block-chooser">
+						<span>Выводить: </span>
+						<select name="btypes" id="btypes" class="select-styled" style="width: 200px;">
+							{set:blocktypes}
+							<optgroup label="Выбранные блоки" class="chbl">
+								{mask:blocktypes}
+								<option value="{key}"{if:{key}=={//template}} selected="selected"{/if}>{name}</option>
+								{/mask}
+							</optgroup>
+							{/set}
+							<optgroup label="Все блоки" class="allbl">
+								{mask:sblocktypes}
+									<option value="{key}"{if:{key}=={//template}} selected="selected"{/if}>{name}</option>
+								{/mask}
+							</optgroup>
+						</select>
+					</div>
+				{/set}
+
+				{set:item}
+
+				<div class="search">
+					{getSearch}
+					<input type="text" class="form-control" id="search-blocks-text" value="{getSearch}" placeholder="Поиск по блокам">
+				</div>
+                
+                {set:filteritem}
+                <br />
+                <div class="block-chooser">
+                    <span>Тип информации: </span>
+                    <select name="filter" id="filter" class="select-styled" style="width: 200px;">
+                        <option value="">---</option>
+                        {mask:filteritem}
+                        <option value="{value}"{if:{value}=={//filter}} selected="selected"{/if}>{value}</option>
+                        {/mask}
+                    </select>
+                </div>
+                {/}
+
+				{set:page}
+				<ul class="pagination pagination-sm" style="{set:hidePagination}display:none;{/set}">
+					{mask:page}
+						{if:!{active}}
+						<li><a href="{url}">{title}</a></li>
+						{/if}
+						{if:{active}}
+						<li class="active"><span>{title}</span></li>
+						{/if}
+					{/mask}
+				</ul>
+				{/set}
+
+
+				<table cellspacing="1" cellpadding="0" border="0" id="tree" class="blocks">
+					<thead>
+						<tr>
+							<th class="none"></th>
+							<th class="center"><button class="checkAll btn btn-small">☑</button></th>
+							<th>№</th>
+							<th data-key="id" class="header {idSort}">ID</th>
+							<th data-key="modified" class="header {modSort}">Изм.</th>
+							{mask:fields}
+								<th data-key="{key}" class="{sorting} header">{name}</th>
+							{/mask}
+						</tr>
+					</thead>
+
+					<tbody>
+					<!--AJAX-->
+						{mask:item}
+						<tr class="trtree" id="block_{id}" style="cursor: pointer;" onclick="$('#hide-blockid').val('{id}');editBlock(); return false;">
+							<td class="none">
+								{set:visible:0}
+									<i class="glyphicon glyphicon-eye-close not-visible"></i>
+								{/set}
+								{set:visible:1}
+									<i class="glyphicon glyphicon-eye-open"></i>
+								{/set}
+							</td>
+							<td class="center"><input type="checkbox" class="group-checkbox" data-id="{id}"></td>
+							<td>{php}{_rank} + {../istart}{/php}</td>
+							<td>{id}</td>
+							<td>{modified}</td>
+							{mask:fields}
+								<td{if:{../visible}==0} class="hiddentext"{/if}>{val}</td>
+							{/mask}
+						</tr>
+						{/mask}
+						{if:{more}}
+						<tr id="serach_more" data-start="{more}">
+							<td colspan="9">
+								<div class="more" style="text-align: center">
+									Загрузить еще
+								</div>
+							</td>
+						</tr>
+
+						{/if}
+					<!--AJAX-->
+					</tbody>
+
+				</table>
+
+				{/set}
+				{if:{template} == 'ablock' || {template} == 'catitem'}
+				<div style="position: relative">
+				<table cellspacing="1" cellpadding="0" border="0"  class="blocks hidden add_fast">
+				<tr>
+					<td class="none">
+						<i class="glyphicon glyphicon-eye-open"></i>
+					</td>
+					<td class="center"></td>
+					<td>
+						<div class="hidden good_id">
+							Будет добавлен к элементу<br/>
+							<input  name="good_id" value="">
+						</div>
+						<input type="hidden" name="parent" value="{parent}">
+						{if:{template} == 'catitem'}
+						<input type="hidden" name="no_link" value="1">
+						{/}
+					</td>
+					<td>{modified}</td>
+					{mask:fields}
+					<td class="{sorting} header">{name}<br/><input {if:{_first}}autofocus="autofocus" {/} class="fast_add_input" name="{key}"></td>
+					{/mask}
+					<td><button class="btn-primary" id="SAVE_ADD_FAST">Сохранить</button></td>
+				</tr>
+				</table>
+
+
+				<button id="OPEN_FAST_ADD">Добавить блок</button>
+					<div class="result hidden">
+
+					</div>
+				</div>
+
+				{/if}
+				{set:page}
+				<ul class="pagination pagination-sm" style="{set:hidePagination}display:none;{/set}">
+					{mask:page}
+						{if:!{active}}
+						<li><a href="{url}">{title}</a></li>
+						{/if}
+						{if:{active}}
+						<li class="active"><span>{title}</span></li>
+						{/if}
+					{/mask}
+				</ul>
+				{/set}
+				{mis:item}
+					<p class="empty">Вложенных блоков "{templname}" нет</p>
+				{/mis}
+			</div>
+
+			<div class="buttons">
+				<input type="button" class="btn btn-primary" value="Создать блок" onclick="javascript:location.href='/manage/blockedit/_aadd_parent{parent}_template{template}_page{lpage}{queryString}/'; return false;">
+				<input type="button" class="btn btn-danger" value="Вернуться" onclick="javascript:location.href='/manage/'; return false;">
+			</div>
+
+
+			<div id="groupactions">
+				<p>С отмеченными:</p>
+				<div class="btn-group">
+					<button class="btn btn-danger" onclick="groupDel(); return false;"><i class="icon-trash"></i> Удалить</button>
+					<button class="btn btn-warning" onclick="groupHide(); return false;"><i class="icon-eye-close"></i> Скрыть</button>
+					<button class="btn btn-success" onclick="groupShow(); return false;"><i class="icon-eye-open"></i> Показать</button>
+				</div>
+
+				{set:moveTo}
+				<div class="dropdown" style="margin-top: 20px;">
+
+					<p>Переместить в</p>
+
+					<select id="moveToSelect" class="select-styled">
+						<option value="0" selected>Переместить в:</option>
+						{mask:moveTo}
+						<option data-id="{id}" value="1"{if:{disabled}} disabled{/if}>{levels}{name}</option>
+						{/mask}
+					</select>
+				</div>
+				{/set}
+			</div>
+		</div>
+
+		<!--/CONTENT-->
+
+		<!--POPUP-->
+		<div class="popup-index" id="popup-index">
+			<div class="popup-index">
+				<div class="top"><h1>Действие</h1></div>
+				<ul>
+
+					{mask:rights}
+
+						{if:{canedit}==1 || {super}}
+							<li><a href="#" rel="1" class="aEdit" id="aEdit" onclick="editBlock(); return false;"><i class="glyphicon glyphicon-pencil"></i>&nbsp;Редактировать</a></li>
+						{/if}
+
+						{if:{canmove}==1 || {super}}
+							<li><a href="#" rel="1" class="aMove" id="aMove" onclick="moveBlock(); return false;"><i class="glyphicon glyphicon-move"></i>&nbsp;Переместить</a></li>
+						{/if}
+
+						{if:{cancopy}==1 || {super}}
+							<li><a href="#" rel="1" class="aCopy" id="aCopy" onclick="copyBlock(); return false;"><i class="glyphicon glyphicon-edit"></i>&nbsp;Создать копию</a></li>
+						{/if}
+
+						{if:{canhide}==1 || {super}}
+							<li><a href="#" rel="1" class="aHide" id="aHide" onclick="showHideBlock(); return false;"><i class=" glyphicon glyphicon-eye-close"></i>&nbsp;Скрыть/показать</a></li>
+						{/if}
+
+						{if:{candel}==1 || {super}}
+							<li id="a"><a href="#" rel="1" class="aDel" id="aDel" onclick="delBlock(); return false;"><i class="glyphicon glyphicon-trash"></i>&nbsp;Удалить</a></li>
+						{/if}
+
+					{/mask}
+
+				</ul>
+			</div>
+		</div>
+		<!--/POPUP-->
+
+		<script>
+		{#
+			$(".trtree").jscontext({
+				html: $("#popup-index").html(),
+				closeOnMouseLeave : true,
+				bind: "right-click",
+				open : function() {
+					$("#hide-blockid").val(this.substr(6));
+				}
+			});
+
+			$(".checkAll").click(function() {
+				$(".group-checkbox").each(function() {
+					var prop = $(this).prop('checked');
+					if (prop === true) {
+						$(".group-checkbox").prop("checked", false);
+						return false;
+					}
+					else {
+						$(".group-checkbox").prop("checked", true);
+						return false;
+					}
+				})
+				.iCheck('update');
+			});
+		#}
+
+		$("#btypes").change(function() {
+			window.location.href = '/manage/blockedit/_alist_parent'+{parent}+'_template'+$("#btypes option:selected").val()+'/';
+		});
+
+		$("#filter").change(function() {
+			window.location.href = '/manage/blockedit/_alist_parent'+{parent}+'?filter='+$(this).val();
+		});
+
+
+	</script>
+
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

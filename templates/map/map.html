@@ -1,0 +1,35 @@
+{reduce:space}
+{mask:main}
+	<div class="name">
+		<h1>{name}</h1>
+	</div>
+	<div class="map">
+		{mask:item}
+
+			{set:item}
+				<ul class="level_{php}{level}+1{/php}">{item}</ul>
+			{/set}
+
+		{/mask}
+	</div>
+
+{/mask}
+
+{mask:item}
+	<li><a href="/{url}">{name}</a>
+		{set:item}
+			<ul class="level_{php}{level}+1{/php}">{item}</ul>
+		{/set}
+		{set:blocks}
+
+			{mask:blocks}
+				<ul>
+					{mask:item}
+						<li><a href="/{url}">{name}</a>
+					{/mask}
+				</ul>
+			{/mask}
+
+		{/set}
+	</li>
+{/mask}

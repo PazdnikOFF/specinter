@@ -1,0 +1,415 @@
+{reduce:space}
+
+{mask:main}
+
+<a class="content-back" href="{back_url}">Назад <span>к списку товаров</span></a>
+
+{set:art}
+
+<div class="card-artikul">Артикул: <b>{art}</b></div>
+
+{/}
+
+<div class="card-top">
+
+    <div class="card-left">
+
+        {set:img}
+
+        <a href="/files/0/{img}" class=""></a>
+
+            <img src="/files/0/{img}" alt="">
+
+        </a>
+        <div class="card-left__info">* Изображение представлено для ознакомления. Внешний вид товара может отличаться</div>
+        {/}
+
+        {mis:img}
+
+            <img style="width: 250px; height: 250px"  src="/img//placeholderbig.png" alt="">
+
+        {/}
+
+    </div>
+
+    {if: {has_image}}
+
+    <div class="card-right">
+
+        <div class="card-right-inn">
+
+            <div class="card-right-gallery">
+
+                <div class="swiper-wrapper">
+
+                    {mask:images}
+
+                    <a href="/files/0/{img}" class="swiper-slide"><img src="/files/0/{img}"></a>
+
+                    {/}
+
+                    {set:img_1}<a href="/files/0/{img_1}" class="swiper-slide"><img src="/files/0/{img_1}"></a>{/}
+
+                    {set:img_2}<a href="/files/0/{img_2}" class="swiper-slide"><img src="/files/0/{img_2}"></a>{/}
+
+                    {set:img_3}<a href="/files/0/{img_3}" class="swiper-slide"><img src="/files/0/{img_3}"></a>{/}
+
+                    {set:img_4}<a href="/files/0/{img_4}" class="swiper-slide"><img src="/files/0/{img_4}"></a>{/}
+
+                    {set:video}
+
+                    <a href="https://www.youtube.com/watch?v={video}" class="swiper-slide detal-one__video">
+
+                        <img src="https://img.youtube.com/vi/{video}/default.jpg" alt="">
+
+                    </a>
+
+                    {/}
+
+                </div>
+
+            </div>
+
+            <div class="card-button-prev"></div>
+
+            <div class="card-button-next"></div>
+
+        </div>
+
+        <div class="card-right__descr">
+
+            
+
+            {html}
+
+        </div>
+
+    </div>
+
+    {/}
+
+</div>
+
+
+
+<div class="detal-one-table" style="margin-bottom: 30px;">
+
+    <table>
+
+        <tr>
+
+            <th>№</th>
+
+            <th>Фото</th>
+
+            <th>Артикул</th>
+
+            <th>Название</th>
+            <th></th>
+            <th>Цена</th>
+
+            
+
+            <th></th>
+
+        </tr>
+
+        {mask:items}
+
+        <tr>
+
+            <td>{_rank}</td>
+
+            <td>
+
+                <div class="detal-photo {mis:img}disable{/}" {set:img}data-url="/files/0/{img}"{/}></div>
+
+            </td>
+
+            <td>{art}</td>
+
+            <td>{manufacture}</td>
+
+            <td>
+
+                <div class="good-quant">
+
+                    <div class="good-quant__minus">-</div>
+
+                    <input type="text" value="1" class="good-quant__input" id="good{id}">
+
+                    <div class="good-quant__plus">+</div>
+
+                </div>
+
+            </td>
+            <td>{if:{price}}{price} ₽{/}</td>
+
+            
+
+            <td>
+
+                <a href="#addToCart"
+
+                   class="to-cart open-modal ajax_add_cart"
+
+                   data-id="{id}"
+
+                   {set:img}data-img="/files/0/{img}"{/}
+
+                   {mis:img}data-img="/img/recom.jpg"{/}
+
+                   data-title="{../name_rus} {art}"
+
+                   data-art="{art}">{if:{price}}В счёт{/}{if:!{price}}В заказ{/}</a>
+
+            </td>
+
+        </tr>
+
+        {/}
+        
+    </table>
+    <div class="detal-one-table__after">
+            <p>
+                В связи с частым изменением цен на некоторые товары, информацию по их стоимости мы предлагаем узнать по факту оформления заказа в течение 30 минут или по телефону +79024444342. 
+            </p>
+            <p>
+                Закажите товар и получите предложение по лучшей цене в кратчайший срок. <a href="#fast-order" class="btn-fast-order open-modal">получить предложение</a>
+            </p>
+        </div>
+</div>
+
+
+
+
+
+<h4>Сопутствующие товары</h4>
+
+<div class="recomended">
+
+    <div class="recomended-inn">
+
+        <div class="swiper-wrapper recomended-list">
+
+            {mask:recomend_items}
+
+            <div class="recomended-one swiper-slide">
+
+                {set:img}
+
+                <a href="{url}"><img width="140" src="/files/0/{img}" alt=""></a>
+
+                {/}
+
+                {mis:img}
+
+                <a href="{url}">
+
+                    <img width="140" src="/img/recom.jpg" alt="">
+
+                </a>
+
+                {/}
+
+                <a href="{url}" class="recomended-one__title">
+
+                    {name_rus} {name} <br/>{art}
+
+                </a>
+
+                {set:price}
+
+                <div class="recomended-one__price">от {price} ₽</div>
+
+                {/}
+
+                {mis:price}
+
+                <div class="recomended-one__price">Уточните цену</div>
+
+                {/}
+
+                <input type="text" value="1" class="good-quant__input" id="{id}" style="display: none;">
+
+                <a href="{url}" class="recomended__to-cart" >Подробнее</a>
+
+            </div>
+
+            {/}
+
+            {mask:recomend_p_items_sort}
+
+            <div class="recomended-one swiper-slide">
+
+                {set:img}
+
+                <a href="/{url}"><img width="140" src="/files/0/{img}" alt=""></a>
+
+                {/}
+
+                {mis:img}
+
+                <a href="/{url}"><img width="140" src="/img/recom.jpg" alt=""></a>
+
+
+
+                {/}
+
+                <a href="/{url}" class="recomended-one__title">{name_rus} {set:name_rus}<br/>{/}{art}</a>
+
+                <div class="recomended-one__price">нет в наличии</div>
+
+                <a href="#addToCart" class="recomended__to-cart ajax_add_cart open-modal to-cart"
+
+                   {set:img}
+
+                   data-img="/files/0/{img}"
+
+                   {/}
+
+                data-title="{name_rus} {art}"
+
+                {mis:img}
+
+                data-img="/img/recom.jpg"
+
+                {/}
+
+                data-art="{art}"
+
+                data-id="P{id}"> Заказать</a>
+
+            </div>
+
+            {/}
+
+            {mask:recomend_items_sort}
+
+            <div class="recomended-one swiper-slide">
+
+                {set:img}
+
+                <a href="/{url}_aview_b{parent_id}"><img width="140" src="/files/0/{img}" alt=""></a>
+
+                {/}
+
+                {mis:img}
+
+                <a href="/{url}_aview_b{parent_id}">
+
+                <img width="140" src="/img/recom.jpg" alt="">
+
+                </a>
+
+                {/}
+
+                <a
+
+                        href="/{url}_aview_b{parent_id}"
+
+                        class="recomended-one__title"
+
+                >{name_rus} {name} <br/>{art}
+
+                </a>
+
+                <div class="recomended-one__price">{price} ₽</div>
+
+                <input type="text" value="1" class="good-quant__input" id="recomended{id}" style="display: none;">
+
+                <a href="#addToCart" class="recomended__to-cart ajax_add_cart open-modal to-cart" 
+
+                   data-id="{id}"
+
+
+
+                   {set:img}
+
+                        data-img="/files/0/{img}"
+
+                   {/}
+
+
+
+                   {mis:img}
+
+                        data-img="/img/recom.jpg"
+
+                   {/}
+
+
+
+                   data-title="{name_rus} {art}"
+
+                   data-art="{art}">в корзину</a>
+
+            </div>
+
+            {/}
+
+            {mask:recomend_p_items}
+
+            <div class="recomended-one swiper-slide">
+
+                {set:img}
+
+                <a href="/{url}"><img width="140" src="/files/0/{img}" alt=""></a>
+
+                {/}
+
+                {mis:img}
+
+                <a href="/{url}"><img width="140" src="/img/recom.jpg" alt=""></a>
+
+
+
+                {/}
+
+                <a href="/{url}" class="recomended-one__title">{name_rus} {set:name_rus}<br/>{/}{art}</a>
+
+                <div class="recomended-one__price">нет в наличии</div>
+
+                <a href="#addToCart" class="recomended__to-cart ajax_add_cart open-modal to-cart"
+
+                   {set:img}
+
+                   data-img="/files/0/{img}"
+
+                   {/}
+
+                data-title="{name_rus} {art}"
+
+                {mis:img}
+
+                data-img="/img/recom.jpg"
+
+                {/}
+
+                data-art="{art}"
+
+                   data-id="P{id}"> Заказать</a>
+
+            </div>
+
+            {/}
+
+        </div>
+
+    </div>
+
+    <div class="recomended-button-prev"></div>
+
+    <div class="recomended-button-next"></div>
+
+</div>
+
+
+
+<a class="content-back content-back--bottom" href="{back_url}">Назад <span>к списку товаров</span></a>
+
+
+
+{d_html}
+
+{/mask}

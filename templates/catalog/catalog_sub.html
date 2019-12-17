@@ -1,0 +1,17 @@
+{reduce:nothing}
+{mask:main}
+
+            {html_top}
+            <div class="catalog-list">
+                <div class="catalog-list__title">{name}</div>
+				{set:items}
+                <ul>
+					{mask:items}
+                    <li><a href="{url}">{page_name}</a></li>
+					{/}
+                </ul>
+                <span>СПИСОК ЗАПЧАСТЕЙ</span>
+				{/}
+            </div>    
+			{html_bot}
+{/mask}

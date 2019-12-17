@@ -1,0 +1,13 @@
+{reduce:space}
+{mask:main}
+ <h1 class="content__title">Каталог</h1>
+    
+            <div class="catalog">
+			{mask:item}
+                <a class="catalog-one" href="{url}">
+                    {set:img}<img src="/files/1/{img}" alt="">{/}
+                    <div class="catalog-one__title">{page_name}</div>
+                </a>
+			{/}
+            </div>  
+{/mask}

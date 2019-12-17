@@ -1,0 +1,115 @@
+{reduce:nothing}
+{mask:main}
+
+<table class="b-cart-table responsive">
+    <tr>
+        <th>Товар</th>
+        <th>Цена (руб.)</th>
+        <th>Кол.-во</th>
+        <th>Стоимость</th>
+
+        {if:0}
+        <th>Срок доставки</th>
+        {/if}
+    </tr>
+
+    {set:catitem}
+    {mask:catitem}
+    <tr>
+        <td><a href="{url}" class="b-cart-table__name">{name}</a></td>
+        <td>
+            <div class="b-cart-table__price">{price}</div>
+        </td>
+        <td>
+            <div class="b-decinc">
+                <p>{cnt_item}</p>
+            </div>
+        </td>
+        <td>
+            <div class="b-cart-table__price-summ">{final_price}</div>
+        </td>
+        {if:0}
+        <td><a href="javascript:void(0);" class="b-cart-table__date data-tooltip"
+               data-title="Вы можете ускорить срок доставки заменив товар на подобный"
+               onclick="$('#modal-replacement').arcticmodal();">18.11.2014</a></td>
+        {/if}
+    </tr>
+    {/mask}
+    {/set}
+    {set:variant}
+    {mask:variant}
+    <tr>
+        <td><a href="{parent_url}" class="b-cart-table__name">{parent_name}</a>
+
+            <p class="b-cart-table__col">Цвет: <b class="val">{name}</b></p>
+        </td>
+        <td>
+            <div class="b-cart-table__price">{price}</div>
+        </td>
+        <td>
+            <div class="b-decinc">
+                <p>{cnt_item}</p>
+            </div>
+        </td>
+        <td>
+            <div class="b-cart-table__price-summ">{final_price}</div>
+        </td>
+        {if:0}
+        <td><a href="javascript:void(0);" class="b-cart-table__date data-tooltip"
+               data-title="Вы можете ускорить срок доставки заменив товар на подобный">21.11.2014</a>
+        </td>
+        {/if}
+    </tr>
+    {/mask}
+    {/set}
+    <tr class="b-cart-table__result">
+        <td colspan="1">
+            {if:{delivery}}
+            <p class="b-cart-table__col">С доставкой {address_delivery}</p>
+            {/if}
+            {if:!{delivery}}
+            <p class="b-cart-table__col">Самовывоз {selfdelivery}</p>
+            {/if}
+        </td>
+        <td colspan="3" class="b-cart-table__result-summ">
+            Итого: <span class="val">{total_price}</span> р
+        </td>
+    </tr>
+    {set:percent}
+    <tr class="b-cart-table__result">
+        <td colspan="1">
+            <p class="b-cart-table__col">Скидка составляет:</p>
+        </td>
+        <td colspan="3" class="b-cart-table__result-summ">
+            <span class="val">{percent}%</span>
+        </td>
+    </tr>
+    {/set}
+    {set:price_with_disc}
+    <tr class="b-cart-table__result">
+        <td colspan="1">
+            <p class="b-cart-table__col">Со скидкой:</p>
+        </td>
+        <td colspan="3" class="b-cart-table__result-summ">
+            Итого: <span class="val">{price_with_disc}</span> р
+        </td>
+    </tr>
+    {/set}
+    {set:how_delivery}
+    <tr class="b-cart-table__result">
+        <td colspan="4">
+            <p class="b-cart-table__col">{how_delivery}</p>
+        </td>
+    </tr>
+    {/set}
+    {set:radiogrouppaymentOrder}
+    <tr class="b-cart-table__result">
+        <td colspan="4">
+            <p class="b-cart-table__col">Способ оплаты {radiogrouppaymentOrder}</p>
+        </td>
+    </tr>
+    {/set}
+</table>
+
+{pages_down}
+{/mask}

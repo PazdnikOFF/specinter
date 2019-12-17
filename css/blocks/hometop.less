@@ -1,0 +1,245 @@
+.b-hometop {
+	background: url('@{img_bg}bg-home-top.jpg');
+	-webkit-background-size: cover;
+	background-size: cover;
+	overflow: hidden;
+	margin-bottom: 45px;
+	.b-info-box {
+		margin: 98px 0;
+		float: left;
+	}
+	.b-right-col {
+		float: right;
+		padding-bottom: 10000px;
+		margin-bottom: -10000px;
+		position: relative;
+		overflow: hidden;
+	}
+}
+
+.b-info-box {
+	padding: 26px 50px;
+	background: #fff;
+	background: rgba(255,255,255,0.8);
+	position: relative;
+	max-width: 550px;
+	width: 50%;
+	color: #6d6a72;
+	.slider-box {
+		height: 324px !important;
+	}
+	&:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: -9000px;
+		width: 9000px;
+		background: #fff;
+		display: block;
+		height: 100%;
+		background: rgba(255,255,255,0.8);
+		//.hidden;
+	}
+	&__title {
+		//font-size: 42px;
+		font-size: 2.65em;
+		color: @coltxt3;
+		margin-bottom: 0;
+		line-height: 1.2em;
+	}
+	&__descr {
+		font-size: 18px;
+		.font1_b;
+		text-transform: uppercase;
+		margin: 8px 0px;
+	}
+	&__txt {
+		line-height: 1.2em;
+		font-size: 14px;
+	}
+	hr {
+		margin: 8px 0px;
+	}
+}
+
+.slider-box {
+	position: relative;
+	height: 413px !important;
+	overflow: hidden;
+	.btn_more {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		z-index: 20;
+	}
+}
+
+//Правая колонка
+.b-right-col {
+	background: #fff;
+	background: rgba(255,255,255,0.85);
+	max-width: 335px;
+	margin-right: -35px;
+	position: relative;
+
+	&__section {
+		border-top: 1px solid #fff;
+		padding: 20px 35px; min-height: 252px;
+		&_adress {
+			padding: 20px 35px;
+			background: #fff;
+			background: rgba(255,255,255,0.85);
+			color: #b1b1b1;
+			font-size: 14px;
+			min-height: 0;
+			&__txt {
+				.font1_b;
+				font-size: 16px;
+				display: block;
+			}
+		}
+		&_banner {
+			padding: 0;
+		}
+	}
+	&__bottom {
+		.b-right-col__section {
+			min-height: 0;
+		}
+	}
+}
+.form-search__title {
+	padding: 7px 0; padding-bottom: 16px;
+	margin: 1em 0; margin-bottom: 0;
+	min-height: 20px;
+	font-size: 24px;
+	color: #6f6d74;
+	text-transform: uppercase;
+	border-bottom: 1px solid #c3c2c6;
+	padding-left: 30px;
+	position: relative;
+	span {
+		&:before {
+			position: absolute;
+			left: 0px;
+			top: 10px;
+		}
+	}
+}
+.banner-box {
+	position: relative;
+	.clearfix;
+	a {
+		display: block;
+		padding: 34px 26px;
+		text-decoration: none;
+	}
+	&__img {
+		.rounded(50%);
+		.inblock(middle);
+		width: 80px;
+		height: 80px;
+		margin-right: 10px;
+		overflow: hidden;
+		img {
+			max-width: 100%;
+		}
+	}
+	&__txt {
+		overflow: hidden;
+		.inblock(middle);
+		.font2;
+		font-size: 24px;
+		font-weight: bold;
+		text-transform: uppercase;
+		color: @coltxt2;
+		max-width: 185px;
+	}
+	&:hover {
+		background-color: #9fca71;
+		.banner-box__img {
+			&:after {
+				content: '';
+				display: block;
+				.rounded(50%);
+				width: 100%; height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				background: #fff;
+				filter: alpha(opacity=60); /* IE 5.5+*/
+				-moz-opacity: 0.6; /* Mozilla 1.6 и ниже */
+				-khtml-opacity: 0.6; /* Konqueror 3.1+, Safari 1.1 */
+				opacity: 0.6; /* CSS3 - Mozilla 1.7b +, Firefox 0.9 +, Safari 1.2+, Opera 9 */
+			}
+		}
+		.banner-box__txt {
+			color: #fff;
+		}
+	}
+}
+/*===================== 1380px =====================================*/
+@media only screen and (min-width: 1368px) {
+	// .b-hometop {
+	// 	.b-info-box {
+	// 		&__title {
+	// 			font-size: 4em;
+	// 		}
+	// 	}
+	// }
+}
+/*===================== 960px =====================================*/
+@media only screen and (max-width: 960px) {
+	.b-hometop {
+		.b-info-box {
+			float: none;
+			max-width: none;
+			width: auto;
+			margin: 30px 0;
+			padding: 20px;
+			&__title {
+				font-size: 30px;
+			}
+		}
+		.b-right-col {
+			float: none;
+			margin-right: auto;
+		}
+	}
+}
+/*===================== 460px =====================================*/
+@media only screen and (max-width: 460px) {
+	.b-hometop {
+		.b-info-box {
+			float: none;
+			max-width: none;
+			width: auto;
+			margin: 30px 0;
+			padding: 20px;
+			&__title {
+				font-size: 23px;
+			}
+		}
+		.b-right-col {
+			float: none;
+			margin-right: auto;
+		}
+	}
+	.b-right-col {
+		&__section {
+			padding: 10px;
+		}
+		.btn_big {
+			.btn_small;
+		}
+	}
+	.banner-box {
+		a {
+			padding: 10px;
+			text-align: center;
+		}
+		&__txt {
+			text-align: left;
+		}
+	}
+}

@@ -1,0 +1,82 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Новый тип данных*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/calendar.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Добавление типа данных</h1>
+
+			<form action="/manage/admindatatypes/_aadd/" method="post" enctype="multipart/form-data" name="form1">
+
+				<div class="block">
+					<h2>Основные параметры</h2>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Название</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="name" value="" required>
+						</div>
+					</div>
+
+					<div class="stroke clearline">
+						<div class="name">
+							<p>Ключ</p>
+						</div>
+						<div class="value">
+							<input type="text" class="text form-control" name="key" value="" required>
+						</div>
+					</div>
+				</div>
+
+
+
+				<div class="buttons">
+					<input type="submit" class="btn btn-success" name="add" value="Сохранить">
+					<input type="button" class="btn btn-danger" value="Отмена" onclick="javascript:location.href='/manage/admindatatypes/'; return false;">
+				</div>
+
+			</form>
+		</div>
+		<!--/CONTENT-->
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

@@ -1,0 +1,137 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+	<title>{sitename} - *Пользователи*</title>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+	<link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+	<link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+	<!--admin scripts AND TinyMce-->
+	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+	<!--right click-->
+	<script src="/admin/scripts/jquery.jscontext-1.0.js"></script>
+
+</head>
+
+<body>
+
+	<!--MAIN-->
+	<div class="main">
+
+
+		<!--MENU-->
+		<div class="menu">
+			<div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+			{menu}
+		</div>
+		<!--/MENU-->
+
+		<!--CONTENT-->
+		<div class="content">
+			<h1>Пользователи системы управления сайтом</h1>
+			<input type="hidden" id="hide-parent" name="hide-parent" value="0">
+			<table width="100%" id="tree" class="itemtree">
+				{mask:user}
+					<tr class="trtree trtree-click" style="cursor: pointer;" id="tr{admin_id}">
+						<td class="none"><i class="glyphicon glyphicon-user"></i></td>
+						<td{if:{enabled}<1} class="hiddentext"{/if}>{admin_name} - ({type})</td>
+					</tr>
+				{/mask}
+			</table>
+
+			<div class="buttons">
+				<button class="btn btn-primary" onclick="javascript:location.href='/manage/users/_aadd/'; return false;" type="button">Добавить</button>
+			</div>
+		</div>
+		<!--/CONTENT-->
+
+		<!--POPUP-->
+		<div class="popup-index" id="popup-index">
+			<div class="popup-index">
+				<div class="top"><h1>Действие</h1></div>
+				<ul>
+					<li><a href="#" class="aEdit" id="aEdit" onclick="editUser(); return false;"><i class="glyphicon glyphicon-pencil"></i>&nbsp;Редактировать</a></li>
+
+					<li><a href="#" class="aHide" id="aHide" onclick="hideUser(); return false;"><i class="glyphicon glyphicon-off"></i>&nbsp;Включить/выключить</a></li>
+
+					<li><a href="#"  class="aDel" id="aDel" onclick="delUser(); return false;"><i class="glyphicon glyphicon-trash"></i>&nbsp;Удалить</a></li>
+				</ul>
+			</div>
+		</div>
+		<!--/POPUP-->
+
+		<script>
+		{#
+			$(".trtree-click").jscontext({
+				html: $("#popup-index").html(),
+				closeOnMouseLeave : true,
+				open : function() {
+					$("#hide-parent").val(this.substr(2));
+				}
+			});
+
+			function editUser() {
+				var parent = $("#hide-parent").val();
+				if (!parent) return false;
+				window.location.href = '/manage/users/_aedit_parent'+parent+'/';
+			}
+
+			function hideUser() {
+				var parent = $("#hide-parent").val();
+				if (!parent) return false;
+				window.location.href = '/manage/users/_ahide_parent'+parent+'/';
+			}
+
+			function delUser() {
+				var parent = $("#hide-parent").val();
+				if (!parent) return false;
+
+				if (confirm('Вы действительно хотите удалить пользователя?')) {
+					window.location.href = '/manage/users/_adel_id'+parent+'/';
+				}
+				else {
+					$(".trtree").removeClass("click");
+				}
+			}
+
+		#}
+		</script>
+
+		<!--/CONTENT-->
+
+		{set:error}
+		<script>
+			$(document).ready(function() {
+				if ({error}==1) {
+					alert("Нет прав");
+				}
+				if ({error}==2) {
+					alert("Пароли не совпадают");
+				}
+				if ({error}==3) {
+					alert("Логин занят");
+				}
+
+				window.location.href = '/manage/users/';
+			});
+		</script>
+		{/set}
+
+
+	</div>
+	<!--/MAIN-->
+
+
+
+
+</body>
+</html>
+{/mask}

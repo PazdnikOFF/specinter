@@ -1,0 +1,19 @@
+{reduce:nothing}
+{mask:main}
+				{mask:item}
+					<div class="stroke">
+						<div class="name">
+							<p>{name}</p>
+							{if:{//super}}
+								<span>{sname}</span>
+							{/if}
+						</div>
+						<div class="value">							
+							<input  class="text" name="{sname}_feat" id="{sname}_feattext" type="text" value="{value}">
+						</div>
+					</div>
+				{/mask}
+
+				<input type="hidden" name="dat[]" value="features"/> 
+				<input type="hidden" name="dkey[]" value="features"/> 
+{/mask}
