@@ -467,6 +467,18 @@ class catalog
         $control->titleSeo = $page->name_rus . ' ' . $page->art . ' для ' . all::get_name($control->parents[2]) . ' на specinter.ru';
         $control->descriptionSeo = $page->name_rus . ' ' . $page->art . ' купить на сайте specinter.ru | запчасти ' . all::get_name($control->parents[2]);
         $control->name = $page->name_rus;
+        
+        $page->duplicates = array(array('name' => 'foo'), array('name' => 'bar'));
+        
+     
+
+        # get duplicate items
+        $res = sql::query('select * from it_b_aarts where blockparent = '.(int)$page->id.' and visible = 1');
+        $page->duplicates = array();
+        while ($data = sql::fetch_object($res)) {
+            $page->duplicates[$data->id] = $data;
+        }
+  
 
         $page->back_url = $control->module_url;
         $this->html['text'] = sprintt($page, 'templates/catalog/catalog_good.html');
