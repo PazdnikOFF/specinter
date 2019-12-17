@@ -1,6 +1,9 @@
 # vscode workspace settings
 .vscode
 
+# unknown
+.hg
+
 # user files
 /files
 /ufiles
@@ -8,3 +11,4 @@
 # cache
 /_cache
 /_tmp
+/libs/cache/cache.storage
