@@ -83,91 +83,70 @@
 
 <div class="detal-one-table" style="margin-bottom: 30px;">
 
-    <table>
+    <table class="table-items table-items-common">
+        <thead>
+            <tr>
+                <th class="item-order -align-center">№</th>
+                <th class="item-image -align-center">Фото</th>
+                <th class="item-articul">Артикул</th>
+                <th class="item-name">Название</th>
+                <th class="item-quantity -align-right">Кол-во</th>
+                <th class="item-price -align-right">Цена</th>
+                <th class="item-action -align-right"></th>
+            </tr>
+        </thead>
 
-        <tr>
+        <tbody>
+            {mask:items}
+            <tr>
+                <td class="item-order  -align-center">{_rank}</td>
+                <td class="item-image  -align-center">
+                    <div class="detal-photo {mis:img}disable{/}" {set:img}data-url="/files/0/{img}" {/}></div>
+                </td>
+                <td class="item-articul">{art}</td>
+                <td class="item-name">{manufacture}</td>
+                <td class="item-quantity -align-right">
 
-            <th>№</th>
-
-            <th>Фото</th>
-
-            <th>Артикул</th>
-
-            <th>Название</th>
-            <th></th>
-            <th>Цена</th>
-
-
-
-            <th></th>
-
-        </tr>
-
-        {mask:items}
-
-        <tr>
-
-            <td>{_rank}</td>
-
-            <td>
-
-                <div class="detal-photo {mis:img}disable{/}" {set:img}data-url="/files/0/{img}" {/}></div>
-
-            </td>
-
-            <td>{art}</td>
-
-            <td>{manufacture}</td>
-
-            <td>
-
-                <div class="good-quant">
-
-                    <div class="good-quant__minus">-</div>
-
-                    <input type="text" value="1" class="good-quant__input" id="good{id}">
-
-                    <div class="good-quant__plus">+</div>
-
-                </div>
-
-            </td>
-            <td>{if:{price}}{price} ₽{/}</td>
-
-
-
-            <td>
-
-                <a href="#addToCart" class="to-cart open-modal ajax_add_cart" data-id="{id}" {set:img}data-img="/files/0/{img}" {/} {mis:img}data-img="/img/recom.jpg" {/} data-title="{../name_rus} {art}" data-art="{art}">{if:{price}}В счёт{/}{if:!{price}}В заказ{/}</a>
-
-            </td>
-
-        </tr>
-
-        {/}
-
+                    <div class="good-quant">
+                        <div class="good-quant__minus">-</div>
+                        <input type="text" value="1" class="good-quant__input" id="good{id}">
+                        <div class="good-quant__plus">+</div>
+                    </div>
+                </td>
+                <td class="item-price -align-right">{if:{price}}{price} ₽{/}</td>
+                <td class="item-action -align-right">
+                    <a href="#addToCart" class="to-cart open-modal ajax_add_cart" data-id="{id}" {set:img}data-img="/files/0/{img}" {/} {mis:img}data-img="/img/recom.jpg" {/} data-title="{../name_rus} {art}" data-art="{art}">{if:{price}}В счёт{/}{if:!{price}}В заказ{/}</a>
+                </td>
+            </tr>
+            {/}
+        </tbody>
     </table>
 
 
     <!-- Table with duplicate items -->
+    {if: {has_duplicates}}
     <div class="detal-one-table" style="margin-top:30px;margin-bottom: 30px;">
         <h4>Предложения по аналогам</h4>
-        <table>
+        <table class="table-items table-items-duplicates">
             <thead>
                 <tr>
-                    <th>№</th>
-                    <th>Артикул</th>
-                    <th>Название</th>
-                    <th></th>
+                    <th class="item-order -align-center">№</th>
+                    <th class="item-articul">Артикул</th>
+                    <th class="item-name">Название</th>
+                    <th class="item-action -align-right"></th>
                 </tr>
             </thead>
             <tbody>
                 {mask:duplicates}
                 <tr>
-                    <td>{_rank}</td>
-                    <td>{art}</td>
-                    <td>{name}</td>
-                    <td>
+                    <td class="item-order -align-center">{_rank}</td>
+                    <td class="item-articul">
+                        {if: {url}}
+                        <a href="{url}">{art}</a> {/} {if: {url} === null}
+                        <span>{art}</span> {/}
+                    </td>
+                    <td class="item-name">{name}</td>
+                    <td class="item-action -align-right">
                         <a href="#addToCart" class="to-cart open-modal ajax_add_cart" data-id="{id}" data-img="/img/recom.jpg" data-title="{../name} {art}" data-art="{art}">{if:{price}}В счёт{/}{if:!{price}}В заказ{/}</a>
                     </td>
                 </tr>
@@ -176,7 +155,7 @@
         </table>
     </div>
     <!-- END Table with duplicate items -->
-
+    {/}
 
     <div class="detal-one-table__after">
         <p>

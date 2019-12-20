@@ -131,19 +131,28 @@ class catalog
 
         $page = all::b_data_all($_data->good_id, 'catitem');
 
+
+        
+
         $list = new Listing("goodimage", "items", $_data->good_id);
         $list->getList();
         $list->getItem();
         $page->images = $list->item;
 
         $list = new Listing("variant", "items", $_data->good_id);
+
+        
         $list->getList();
         $list->getItem();
         $page->items = $list->item;
+        
+       
+
         if (is_null($page->items)) {
             $pItem = all::b_data_all($_data->good_id, 'catitem');
             $pItem->id = 'P' . $pItem->id;
             $page->items[] = $pItem;
+           
         }
         $list = new Listing("aarts", "items", $_data->good_id);
         $list->getList();
@@ -468,17 +477,35 @@ class catalog
         $control->descriptionSeo = $page->name_rus . ' ' . $page->art . ' купить на сайте specinter.ru | запчасти ' . all::get_name($control->parents[2]);
         $control->name = $page->name_rus;
         
-        $page->duplicates = array(array('name' => 'foo'), array('name' => 'bar'));
         
      
 
         # get duplicate items
         $res = sql::query('select * from it_b_aarts where blockparent = '.(int)$page->id.' and visible = 1');
         $page->duplicates = array();
+        $good_id_arts = array();
         while ($data = sql::fetch_object($res)) {
             $page->duplicates[$data->id] = $data;
+            if (!!$data->good_id_arts) {
+                $good_id_arts[] = $data->good_id_arts;
+            }
         }
-  
+
+
+        if (!empty($page->duplicates)) {
+            $page->has_duplicates = true;
+
+            $res = sql::query('select * from it_b_ablock where good_id IN ('.implode(', ', $good_id_arts).') and visible = 1');
+            while ($data = sql::fetch_object($res)) {
+                $data->url = all::getUrl($data->parent) . '_aview_b' . $data->id . '/';
+
+                foreach ($page->duplicates as $i => $duplicateItem) {
+                    if ((int)$duplicateItem->good_id_arts === (int)$data->good_id) {
+                        $page->duplicates[$i]->url = $data->url;
+                    }
+                }
+            }
+        }
 
         $page->back_url = $control->module_url;
         $this->html['text'] = sprintt($page, 'templates/catalog/catalog_good.html');

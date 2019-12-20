@@ -310,12 +310,18 @@ class Listing
 			}
 
 
+		
+
 			for ($ii = 0; $ii < count($ak); $ii++) {
 
 				if (!isset($this->fields[$ak[$ii]]))
 					$this->fields[$ak[$ii]]->datatkey = "";
 				if ($ak[$ii] == 'price' || $ak[$ii] == 'oldprice' && !empty($one_arr[$ak[$ii]])) {
-					$one_arr[$ak[$ii]] = ceil(str_replace(',', '.', $one_arr[$ak[$ii]]));
+					
+					
+					# Price value must be a float type. Not a string!
+					// $one_arr[$ak[$ii]] = ceil(str_replace(',', '.', $one_arr[$ak[$ii]]));
+					$one_arr[$ak[$ii]] = (float)str_replace(',', '.', $one_arr[$ak[$ii]]);
 				}
 
 				switch ($this->fields[$ak[$ii]]->datatkey) {
