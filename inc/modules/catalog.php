@@ -485,6 +485,7 @@ class catalog
         $page->duplicates = array();
         $good_id_arts = array();
         while ($data = sql::fetch_object($res)) {
+            $data->name_rus = $page->name_rus;
             $page->duplicates[$data->id] = $data;
             if (!!$data->good_id_arts) {
                 $good_id_arts[] = $data->good_id_arts;
@@ -495,17 +496,34 @@ class catalog
         if (!empty($page->duplicates)) {
             $page->has_duplicates = true;
 
-            $res = sql::query('select * from it_b_ablock where good_id IN ('.implode(', ', $good_id_arts).') and visible = 1');
-            while ($data = sql::fetch_object($res)) {
-                $data->url = all::getUrl($data->parent) . '_aview_b' . $data->id . '/';
+            if (!!$good_id_arts) {
+           
+                $res = sql::query('select * from it_b_ablock where good_id IN ('.implode(', ', $good_id_arts).') and visible = 1');
+                while ($data = sql::fetch_object($res)) {
+                    $data->url = all::getUrl($data->parent) . '_aview_b' . $data->id . '/';
 
-                foreach ($page->duplicates as $i => $duplicateItem) {
-                    if ((int)$duplicateItem->good_id_arts === (int)$data->good_id) {
-                        $page->duplicates[$i]->url = $data->url;
+                    foreach ($page->duplicates as $i => $duplicateItem) {
+                        if ((int)$duplicateItem->good_id_arts === (int)$data->good_id) {
+                            $page->duplicates[$i]->url = $data->url;
+                            $page->duplicates[$i]->_data = $data;
+                        }
                     }
                 }
             }
         }
+
+
+
+        # set item names
+        if (!empty($page->items)) {
+            foreach ($page->items as $i => $item) {
+                $page->items[$i]->name_rus = $page->name_rus;
+            }
+        }
+
+        // if (isset($_COOKIE['vas-vas'])) {
+        //     var_dump($page->name_rus);die();
+        // }
 
         $page->back_url = $control->module_url;
         $this->html['text'] = sprintt($page, 'templates/catalog/catalog_good.html');

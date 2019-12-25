@@ -92,7 +92,7 @@
                 <th class="item-name">Название</th>
                 <th class="item-quantity -align-right">Кол-во</th>
                 <th class="item-price -align-right">Цена</th>
-                <th class="item-action -align-right"></th>
+                <th class="item-action -align-right">Добавить:</th>
             </tr>
         </thead>
 
@@ -104,7 +104,7 @@
                     <div class="detal-photo {mis:img}disable{/}" {set:img}data-url="/files/0/{img}" {/}></div>
                 </td>
                 <td class="item-articul">{art}</td>
-                <td class="item-name">{manufacture}</td>
+                <td class="item-name">{name_rus}</td>
                 <td class="item-quantity -align-right">
 
                     <div class="good-quant">
@@ -131,21 +131,40 @@
             <thead>
                 <tr>
                     <th class="item-order -align-center">№</th>
+                    <th class="item-image -align-center">Фото</th>
                     <th class="item-articul">Артикул</th>
                     <th class="item-name">Название</th>
-                    <th class="item-action -align-right"></th>
+                    <th class="item-quantity -align-right">Кол-во</th>
+                    <th class="item-price -align-right">Цена</th>
+                    <th class="item-action -align-right">Добавить:</th>
                 </tr>
             </thead>
             <tbody>
                 {mask:duplicates}
                 <tr>
-                    <td class="item-order -align-center">{_rank}</td>
+                    <td class="item-order  -align-center">{_rank}</td>
+                    <td class="item-image  -align-center">
+                        <div class="detal-photo {mis:img}disable{/}" {set:img}data-url="/files/0/{img}" {/}></div>
+                    </td>
                     <td class="item-articul">
                         {if: {url}}
                         <a href="{url}">{art}</a> {/} {if: {url} === null}
                         <span>{art}</span> {/}
                     </td>
-                    <td class="item-name">{name}</td>
+                    <td class="item-name">{name_rus}</td>
+                    <td class="item-quantity -align-right">
+
+                        <div class="good-quant">
+                            <div class="good-quant__minus">-</div>
+                            <input type="text" value="1" class="good-quant__input" id="good{id}">
+                            <div class="good-quant__plus">+</div>
+                        </div>
+                    </td>
+                    <td class="item-price -align-right">{if:{price}}{price} ₽{/}</td>
+
+
+
+
                     <td class="item-action -align-right">
                         <a href="#addToCart" class="to-cart open-modal ajax_add_cart" data-id="{id}" data-img="/img/recom.jpg" data-title="{../name} {art}" data-art="{art}">{if:{price}}В счёт{/}{if:!{price}}В заказ{/}</a>
                     </td>
