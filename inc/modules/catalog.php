@@ -485,13 +485,11 @@ class catalog
         $page->duplicates = array();
         $good_id_arts = array();
         while ($data = sql::fetch_object($res)) {
-            $data->name_rus = $page->name_rus;
             $page->duplicates[$data->id] = $data;
             if (!!$data->good_id_arts) {
                 $good_id_arts[] = $data->good_id_arts;
             }
         }
-
 
         if (!empty($page->duplicates)) {
             $page->has_duplicates = true;
