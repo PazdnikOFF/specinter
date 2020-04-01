@@ -114,6 +114,7 @@
                     </div>
                 </td>
                 <td class="item-price -align-right">{if:{price}}{price} ₽{/}</td>
+
                 <td class="item-action -align-right">
                     <a href="#addToCart" class="to-cart open-modal ajax_add_cart" data-id="{id}" {set:img}data-img="/files/0/{img}" {/} {mis:img}data-img="/img/recom.jpg" {/} data-title="{../name_rus} {art}" data-art="{art}">{if:{price}}В счёт{/}{if:!{price}}В заказ{/}</a>
                 </td>
@@ -175,7 +176,7 @@
     </div>
     <!-- END Table with duplicate items -->
     {/}
-
+    {if: {needRow}}
     <div class="detal-one-table__after">
         <p>
             В связи с частым изменением цен на некоторые товары, информацию по их стоимости мы предлагаем узнать по факту оформления заказа в течение 30 минут или по телефону +79024444342.
@@ -184,6 +185,7 @@
             Закажите товар и получите предложение по лучшей цене в кратчайший срок. <a href="#fast-order" class="btn-fast-order open-modal">получить предложение</a>
         </p>
     </div>
+    {/}
 </div>
 
 

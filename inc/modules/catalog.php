@@ -513,16 +513,17 @@ class catalog
 
 
         # set item names
+        $page->needRow = true;
         if (!empty($page->items)) {
             foreach ($page->items as $i => $item) {
+                if($item->price){
+                    $page->needRow = false;
+                }
                 $page->items[$i]->name_rus = $page->name_rus;
             }
         }
 
-        // if (isset($_COOKIE['vas-vas'])) {
-        //     var_dump($page->name_rus);die();
-        // }
-
+        
         $page->back_url = $control->module_url;
         $this->html['text'] = sprintt($page, 'templates/catalog/catalog_good.html');
     }

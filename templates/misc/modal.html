@@ -3,71 +3,205 @@
 {mask:main}
 
 <div id="overlay">
-        <div class="modal" id="fast-order">
+    <div class="modal" id="fast-order">
 
-            <div class="modal__close"></div>
+        <div class="modal__close"></div>
 
-            <div class="order__inn">
+        <div class="order__inn">
 
-                <div class="order-title">Получите предложение</div>
-                <div class="order-text">
-                    Заполните форму и получите предложение
-                </div>
-                <div class="order-form">
+            <div class="order-title">Получите предложение</div>
+            <div class="order-text">
+                Заполните форму и получите предложение
+            </div>
+            <div class="order-form">
 
-                    <form id="fast-order-form" action="" method="post" >
-                        <input type="hidden" name="fast-order" value="1">
-                        <input type="hidden" name="page-title" value="">
-                        <input type="hidden" name="page-url" value="">
-                        <div class="form-line">
+                <form id="fast-order-form" action="" method="post">
+                    <input type="hidden" name="fast-order" value="1">
+                    <input type="hidden" name="page-title" value="">
+                    <input type="hidden" name="page-url" value="">
+                    <div class="form-line">
 
-                            <label for="">Имя<span class="req">*</span>:</label>
+                        <label for="">Имя<span class="req">*</span>:</label>
 
-                            <input type="text" name="name">
+                        <input type="text" name="name">
+
+                    </div>
+
+                    <div class="form-line">
+
+                        <label for="">Телефон<span class="req">*</span>:</label>
+
+                        <input type="text" name="phone">
+
+                    </div>
+
+                    <div class="form-line">
+
+                        <label for="">E-mail<span class="req">*</span>:</label>
+
+                        <input type="text" name="email">
+
+                    </div>
+
+                    <div class="form-line">
+
+                        <label for="">Комментарий</label>
+
+                        <textarea name="comment"></textarea>
+
+                    </div>
+                    <div class="g-recaptcha" data-sitekey="6LehYeQUAAAAADtiwGsUuqRGVc2979RYHafnVRCA"></div>
+
+                    <div class="form-line">
+
+                        <input type="checkbox" id="personal" name="personal" checked="checked">
+
+                        <label for="personal"><i></i>Нажимая «Отправить» я даю согласие на обработку моих персональных
+                            данных и соглашаюсь с правилами работы с ними».</label>
+
+                    </div>
+
+                    <div class="form-line" style="text-align: center;">
+
+                        <label for=""></label>
+
+                        <button class="form-send">Отправить</button>
+
+                    </div>
+                    <div class="result"></div>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal" id="order">
+
+        <div class="modal__close"></div>
+
+        <div class="order__inn">
+
+            <div class="order-title">Заказать обратный звонок</div>
+
+            <div class="order-form">
+
+                <form id="order-form" action="" method="post">
+
+                    <div class="form-line">
+
+                        <label for="">Имя:</label>
+
+                        <input type="text" name="name">
+
+                    </div>
+
+                    <div class="form-line">
+
+                        <label for="">Номер телефона:</label>
+
+                        <input type="text" name="phone">
+
+                    </div>
+                    <div class="g-recaptcha" data-sitekey="6LehYeQUAAAAADtiwGsUuqRGVc2979RYHafnVRCA"></div>
+
+                    <div class="form-line">
+
+                        <input type="checkbox" id="personal" name="personal" checked="checked">
+
+                        <label for="personal"><i></i>Нажимая «Заказать звонок» я даю согласие на обработку моих
+                            персональных данных и соглашаюсь с правилами работы с ними».</label>
+
+                    </div>
+
+                    <div class="form-line">
+
+                        <label for=""></label>
+
+                        <button class="form-send">Заказать звонок</button>
+
+                    </div>
+                    <div class="result"></div>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal" id="login">
+
+        <div class="modal__close"></div>
+
+        <div class="order__inn">
+
+            <div class="order-title">Вход</div>
+
+            <div class="order-form">
+
+                <form id="login_in" action="" method="post">
+
+                    {auth_field}
+
+                    <div class="form-line">
+
+                        <label for="">E-mail:</label>
+
+                        <input type="text" name="login">
+
+                    </div>
+
+                    <div class="form-line">
+
+                        <label for="">Пароль:</label>
+
+                        <input type="password" name="password">
+
+                    </div>
+
+
+                    <div class="form-line">
+
+                        <label for=""></label>
+
+                        <button class="form-send">Вход</button>
+
+
+                        <div class="login-link">
+
+                            <a href="/profile/_recovery/">Забыли пароль?</a>
+
+                            <a href="/profile/">Регистрация</a>
 
                         </div>
 
-                        <div class="form-line">
+                    </div>
 
-                            <label for="">Телефон<span class="req">*</span>:</label>
+                    <div class="error"></div>
 
-                            <input type="text" name="phone">
+                </form>
 
-                        </div>
+            </div>
 
-                        <div class="form-line">
+        </div>
 
-                            <label for="">E-mail<span class="req">*</span>:</label>
+    </div>
+    <div class="modal" id="thank">
 
-                            <input type="text" name="email">
+        <div class="modal__close"></div>
 
-                        </div>
+        <div class="order__inn">
 
-                        <div class="form-line">
+            <div class="order-title">Благодарим за регистрацию!</div>
 
-                            <label for="">Комментарий</label>
+            <div class="order-form">
 
-                            <textarea name="comment"></textarea>
+                <p>На вашу электронную почту отправлено письмо со ссылкой для подтверждения аккаунта.</p>
 
-                        </div>
 
-                        <div class="form-line">
+                <div class="button-line">
 
-                            <input type="checkbox" id="personal" name="personal" checked="checked">
-
-                            <label for="personal"><i></i>Нажимая «Отправить» я даю согласие на обработку моих персональных данных и соглашаюсь с правилами работы с ними».</label>
-
-                        </div>
-
-                        <div class="form-line" style="text-align: center;">
-
-                            <label for=""></label>
-
-                            <button class="form-send">Отправить</button>
-
-                        </div>
-
-                    </form>
+                    <div class="button-one modal-close">Закрыть</div>
 
                 </div>
 
@@ -75,188 +209,45 @@
 
         </div>
 
-    	<div class="modal" id="order">
+    </div>
+    <div class="modal modal--cart" id="addToCart">
 
-    		<div class="modal__close"></div>
+        <div class="modal__close"></div>
 
-    		<div class="order__inn">
+        <div class="order__inn">
 
-    			<div class="order-title">Заказать обратный звонок</div>
+            <div class="order-title">Вы добавили в корзину:</div>
 
-    			<div class="order-form">
+            <div class="order-form">
 
-    				<form id="order-form" action="" method="post" >
+                <div class="good-item clearfix">
 
-    					<div class="form-line">
+                    <div class="good-img">
 
-    						<label for="">Имя:</label>
+                        <img src="/tmp/photo.png" alt="">
 
-    						<input type="text" name="name">
+                    </div>
 
-    					</div>
+                    <div class="good-title">Pipe / Трубка</div>
 
-    					<div class="form-line">
+                    <div class="good-art">004904001A0001090</div>
 
-    						<label for="">Номер телефона:</label>
+                </div>
 
-    						<input type="text" name="phone">
+                <div class="button-line">
 
-    					</div>
+                    <div class="button-one modal-close">Продолжить покупки</div>
 
-    					<div class="form-line">
+                    <a href="/cart" class="button-one">Перейти в корзину</a>
 
-    						<input type="checkbox" id="personal" name="personal" checked="checked">
+                </div>
 
-    						<label for="personal"><i></i>Нажимая «Заказать звонок» я даю согласие на обработку моих персональных данных и соглашаюсь с правилами работы с ними».</label>
+            </div>
 
-    					</div>
-
-    					<div class="form-line">
-
-    						<label for=""></label>
-
-    						<button class="form-send">Заказать звонок</button>
-
-    					</div>
-
-    				</form>
-
-    			</div>
-
-    		</div>
-
-    	</div>
-
-
-
-    	<div class="modal" id="login">
-
-    		<div class="modal__close"></div>
-
-    		<div class="order__inn">
-
-    			<div class="order-title">Вход</div>
-
-    			<div class="order-form">
-
-    				<form id="login_in" action="" method="post" >
-
-						{auth_field}
-
-    					<div class="form-line">
-
-    						<label for="">E-mail:</label>
-
-    						<input type="text" name="login">
-
-    					</div>
-
-    					<div class="form-line">
-
-    						<label for="">Пароль:</label>
-
-    						<input type="password" name="password">
-
-    					</div>
-
-
-
-    					<div class="form-line">
-
-    						<label for=""></label>
-
-    						<button class="form-send">Вход</button>
-
-
-
-    						<div class="login-link">
-
-    							<a href="/profile/_recovery/">Забыли пароль?</a>
-
-    							<a href="/profile/">Регистрация</a>
-
-    						</div>
-
-    					</div>
-
-						<div class="error"></div>
-
-    				</form>
-
-    			</div>
-
-    		</div>
-
-    	</div>
-
-
-
-    	<div class="modal" id="thank">
-
-    		<div class="modal__close"></div>
-
-    		<div class="order__inn">
-
-    			<div class="order-title">Благодарим за регистрацию!</div>
-
-    			<div class="order-form">
-
-    				<p>На вашу электронную почту отправлено письмо со ссылкой для подтверждения аккаунта.</p>
-
-
-
-    				<div class="button-line">
-
-    					<div class="button-one modal-close">Закрыть</div>
-
-    				</div>
-
-    			</div>
-
-    		</div>
-
-    	</div>
-
-
-
-    	<div class="modal modal--cart" id="addToCart">
-
-    		<div class="modal__close"></div>
-
-    		<div class="order__inn">
-
-    			<div class="order-title">Вы добавили в корзину:</div>
-
-    			<div class="order-form">
-
-    				<div class="good-item clearfix">
-
-    					<div class="good-img">
-
-    						<img src="/tmp/photo.png" alt="">
-
-    					</div>
-
-    					<div class="good-title">Pipe / Трубка</div>
-
-    					<div class="good-art">004904001A0001090</div>
-
-    				</div>
-
-    				<div class="button-line">
-
-    					<div class="button-one modal-close">Продолжить покупки</div>
-
-    					<a href="/cart" class="button-one">Перейти в корзину</a>
-
-    				</div>
-
-    			</div>
-
-    		</div>
-
-    	</div>
+        </div>
 
     </div>
+
+</div>
 
 {/mask}

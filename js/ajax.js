@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-
     if ($('.detal-img img').length && $('.detal-list').height() > $('.detal-img').height()) {
 
         var max = $('.detal-list').offset().top;
@@ -468,10 +467,10 @@ $(document).ready(function () {
     $('.cart-send').on('click', function (e) {
         if ($('#cart-order').valid()) {
             $('#cart-order').submit(function (e) {
-                if($('#cart-order').attr('data-send') == 1){
+                if ($('#cart-order').attr('data-send') == 1) {
                     return;
                 }
-                $('#cart-order').attr('data-send',1);
+                $('#cart-order').attr('data-send', 1);
                 form = $(this);
                 //e.preventDefault();
                 data = form.serialize();
@@ -487,7 +486,7 @@ $(document).ready(function () {
 
                     success: function (data) {
 
-                        $('#cart-order').html(data);
+                        $('#cart-order').after(data);
                         var scrollTop = $('.content__title').offset().top;
                         $(document).scrollTop(scrollTop);
 
@@ -885,7 +884,7 @@ $(document).ready(function () {
 
                 success: function (data) {
 
-                    form.html(data);
+                    form.find('.result').html(data);
 
                 }
 
@@ -907,25 +906,27 @@ $(document).ready(function () {
         form.find('input[name="page-url"]').val(window.location.href);
 
         if (form.valid()) {
+            var dataGoods = {},
+                result = [],
+                data = form.serializeArray();
 
-            data = form.serialize();
+            $.each($('.table-items .good-quant__input'), function (key, value) {
+                dataGoods[$(this).attr('id')] = $(this).val();
+            });
+            console.log(dataGoods);
+
+            dataGoods = JSON.stringify(dataGoods)
+
+            data.push({name: "items", value: dataGoods});
 
             $.ajax({
-
                 url: '/',
-
                 type: "POST",
-
                 dataType: "html",
-
                 data: data,
-
                 success: function (data) {
-                   
-                    form.html(data);
-
+                    form.find('.result').html(data);
                 }
-
             });
 
         }

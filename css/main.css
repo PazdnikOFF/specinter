@@ -1468,7 +1468,7 @@ body {
     vertical-align: middle;
 }
 
-.header__call {
+.header__call,.header__contanct {
     display: inline-block;
     font-size: 14px;
     color: #23a2cb;
@@ -1480,9 +1480,10 @@ body {
     vertical-align: middle;
     -webkit-transition: all 0.2s;
     transition: all 0.2s;
+    display: block;
 }
 
-.header__call:hover {
+.header__call:hover,.header__contanct:hover {
     color: #fff;
     background: #23a2cb;
 }
@@ -3030,7 +3031,7 @@ body {
     margin-top: 0;
 }
 
-.header-centr .header__call {
+.header-centr .header__call,.header__contanct {
     margin-left: 50px;
 }
 

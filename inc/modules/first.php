@@ -266,6 +266,9 @@ class first
             if (!isset($data['personal'])) {
                 $error[] = 'Ошибка не все поля заполнены ';
             }
+            if(empty($data['g-recaptcha-response']) || all::googleReCaptcha() == false){
+                $error[] = 'Подтвердите, что вы не робот';
+            }
 
             if (empty($error)) {
                 $data['date'] = date("Y-m-d");
@@ -365,6 +368,54 @@ class first
             die();
         }
         else if($_POST['fast-order'] && !$_REQUEST['edit_profile'] && !$_REQUEST['cart']){
+            if(!empty($_POST['items'])){
+                $_POST['items'] = json_decode($_POST['items'],1);
+                foreach ($_POST['items'] as $k => $v){
+                    unset($_POST['items'][$k]);
+
+                    $k = str_replace('good','',$k);
+                    $_POST['items'][$k] = $v;
+                }
+                $ids = array_keys($_POST['items']);
+                foreach ($ids as $key => $id) {
+                    if ($id[0] == 'P') {
+                        $parents[] = str_replace('P', '', $id);
+                        unset($ids[$key]);
+                    }
+                }
+                if (!empty($ids) && empty($parents)) {
+                    $ids = implode(',', $ids);
+                    $res = sql::query("SELECT v.id,v.parent,v.blockparent,v.img,v.price,v.time,v.art, c.name_rus as name FROM it_b_variant v inner join it_b_catitem c on c.id = v.blockparent WHERE v.id IN ($ids)");
+                } elseif (!empty($ids) && !empty($parents)) {
+                    $ids = implode(',', $ids);
+                    $parents = implode(',', $parents);
+                    $res = sql::query("(SELECT v.id,c.name_rus as name,v.price,v.art FROM it_b_variant v inner join it_b_catitem c on c.id = v.blockparent WHERE v.id IN ({$ids})) UNION (SELECT id,name_rus name,0,art FROM it_b_catitem WHERE id IN ({$parents}))");
+
+                } elseif (empty($ids) && !empty($parents)) {
+                    $parents = implode(',', $parents);
+                    $res = sql::query("SELECT id,name_rus name,0,art FROM `prname_b_catitem` WHERE id IN ({$parents})");
+                }
+                while ($row = sql::fetch_assoc($res)) {
+                    if (!empty($good[$row['id']])) {
+                        $count = (int)mysql_escape_string($_POST['items'][$row['id']]);
+                    } else {
+                        $count = (int)mysql_escape_string($_POST['items']['P' . $row['id']]);
+                    }
+
+                    $pdfGoods[] = array(
+                        'name' => $row['name'] . ' ' . $row['art'],
+                        'count' => $count,
+                        'unit' => 'шт',
+                        'price' => $row['price'],
+                        'nds' => 20,
+                        'art' => $row['art'],
+                        'data_name' => $row['name'],
+                    );
+
+                }
+
+
+            }
             foreach ($_POST as $key => $val) {
                 $data[$key] = mysql_escape_string($val);
             }
@@ -372,10 +423,18 @@ class first
             if (!isset($data['personal'])) {
                 $error[] = 'Ошибка не все поля заполнены ';
             }
+            if(empty($data['g-recaptcha-response']) || all::googleReCaptcha() == false){
+                $error[] = 'Подтвердите, что вы не робот';
+            }
 
             if (empty($error)) {
                 $data['date'] = date("Y-m-d");
-                all::insert_block('call', 48, $data, 0);
+                if($_POST['fast-order']){
+                    $tpl = 'fast';
+                }else{
+                    $tpl = 'call';
+                }
+                $id = all::insert_block($tpl, 48, $data, 0);
                 $mailpage->text = "Быстрый заказ товара на сайте specinter.ru  <br/> Имя: {$data['name']}<br/> Телефон: {$data['phone']}<br/> E-mail: {$data['email']}<br/> Комментарий: {$data['comment']}<br/> Название товара: {$data['page-title']} <br/> Ссылка на страницу: {$data['page-url']}";
                 if (strlen($data['$comment']))
                     $mailpage->text .= "<br/>Сообщение: " . $data['$comment'];
@@ -383,6 +442,57 @@ class first
                 $msg = sprintt($mailpage, "mailtemplates/toadmin/call.html");
                 all::send_mail($control->settings->email, 'Быстрый заказ товара на сайте', $msg, false, false, $control->settings->sitename);
                 $msg = "Сообщение отправлено, с Вами свяжется менеджер";
+
+                if (!empty($pdfGoods)) {
+                    $from2 = array(
+                        'inn' => '6670454561',
+                        'kpp' => '667001001',
+                        'ogrn' => '1176658053153',
+                        'address' => '620137 Екатеринбург, пер. Шоферов дом №11 оф. №4',
+                        'phone_1' => '8 (343) 454-77-88',
+                        'phone_2' => '+7 (902) 4444-342',
+                        'email' => '79024444342@yandex.ru',
+                        'user_1' => 'Машкина Марина Юрьевна',
+                        'company' => 'ООО «СПЕЦИНТЕР»',
+                        'schet_2' => '40702810900280029804',
+                        'bank' => 'БАНК «НЕЙВА» ООО',
+                        'bik' => '046577774',
+                        'schet' => '30101810400000000774',
+                    );
+
+                    if(!empty($userDataForPdf['organization'])){
+                        $from2['user_name'] = $userDataForPdf['organization'];
+                    }else if(!empty($_REQUEST['company'])){
+                        $from2['user_name'] = $_REQUEST['company'];
+                    }else if(!empty($_REQUEST['email'])){
+                        $from2['user_name'] = $_REQUEST['email'];
+                    }else{
+                        $from2['user_name'] = str_repeat('_',20);
+                    }
+
+                    $html2 = htmlForPdfBill($pdfGoods, $from2);
+                    $dompdf = new Dompdf();
+                    $dompdf->loadHtml($html2, 'UTF-8');
+                    $dompdf->setPaper('A4', 'portrait');
+                    $dompdf->render();
+
+                    $pdf = $dompdf->output();
+                    $pdfPath2 = '/files/pdf/' . $id . time() . '_bill.pdf';
+                    file_put_contents('/home/u67887/u67887.netangels.ru/www' . $pdfPath2, $pdf);
+                    if ($pdfGoods) {
+                        $bills['items'][] = '/home/u67887/u67887.netangels.ru/www' . $pdfPath2;
+                        $bills['data'][] = 'bill_' . $id . '_b.pdf';
+                    }
+
+                    all::send_mail(
+                        $_POST['email'],
+                        'Счет на оплату ' . $id,
+                        $msg,
+                        $bills['items'],
+                        $bills['data'],
+                        $control->settings->sitename
+                    );
+                }
             } else {
                 $msg = implode("<br/>", $error);
             }

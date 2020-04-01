@@ -39,6 +39,26 @@ class All {
         global $sql;
         return $sql->fetch_row($sql->query("select name from prname_tree where `id`='$cid'"), 0, 1);
     }
+
+    public static function googleReCaptcha()
+    {
+        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $data = array(
+            'secret' => '6LehYeQUAAAAAME41f1RZV7yk9JlGsr7Bf2UCP88',
+            'response' => $_POST["g-recaptcha-response"]
+        );
+        $options = array(
+            'http' => array(
+                'method' => 'POST',
+                'content' => http_build_query($data)
+            )
+        );
+        $context = stream_context_create($options);
+        $verify = file_get_contents($url, false, $context);
+        $captcha_success = json_decode($verify);
+        return $captcha_success->success == true ? true : false;
+    }
+
 	function getDate($date, $type = 1) {
 		global $ar_mon;
 

@@ -241,7 +241,7 @@ function htmlForPdf($from, $to, $items)
     $total = $nds = 0;
     foreach ($items as $i => $row) {
         $total += $row['price'] * $row['count'];
-        $nds += ($row['price'] * $row['nds'] / 100) * $row['count'];
+        //$nds += ($row['price'] * $row['nds'] / 100) * $row['count'];
 
         $html .= '
     <tr>
@@ -263,7 +263,7 @@ function htmlForPdf($from, $to, $items)
     </tr>
     <tr>
         <th colspan="5">В том числе НДС 20%:</th>
-        <th>' . ((empty($nds)) ? '-' : format_price($nds)) . '</th>
+        <th>' . ((empty($total)) ? '-' : format_price($total / 1.2 * 0.2)) . '</th>
     </tr>
     <tr>
         <th colspan="5">Всего к оплате:</th>
