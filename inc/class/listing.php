@@ -210,7 +210,10 @@ class Listing
 			$q = "SELECT count(id) FROM prname_b_$this->template WHERE $this->parent $this->critery $this->on";
 			$sql = "select * from prname_b_$this->template where $this->parent $this->critery $this->on $this->groupBy " . "order by " . ($this->sortfield && $this->sortfield !== 'sort' ? ($this->sortfield) : 'sort') . " $this->sortby" . "" . ($this->limit ? ' limit ' . ($this->start ? $this->start : '0') . ', ' . $this->limit : '') . "";
 
+			
 			$this->items = sql::query($sql);
+		
+			
 			// if (isset($_COOKIE['vas-vas'])) {
 			// 	var_dump(	$this->items);
 			// }
@@ -223,7 +226,7 @@ class Listing
 			$q = "SELECT count(id) FROM prname_categories WHERE $this->parent $this->on AND template = '$this->template' ";
 
 			$sql = "select p1.*,p2.name as page_name from prname_c_$this->template p1, prname_tree p2 where p2.parent='$this->cid' and $this->critery  p2.visible = '1' and p1.parent=p2.id   " . ($this->sortfield ? 'order by p1.' . $this->sortfield . ' ' . $this->sortby : ' order by p2.sort') . " " . ($this->limit ? ' limit ' . ($this->start ? $this->start : '0') . ', ' . $this->limit : '') . "";
-
+		
 
 			$this->items = sql::query($sql);
 		}

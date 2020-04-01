@@ -28,6 +28,8 @@ class catalog
 
     private function _showList()
     {
+
+       
         global $control;
         $page = all::c_data_all($control->cid, 'catalog');
         $page->name = $control->name;
@@ -56,7 +58,7 @@ class catalog
 
     private function _showOne()
     {
-
+        
         global $control;
         $page = all::c_data_all($control->cid, 'catalog');
         $page->name = $control->name;
@@ -74,10 +76,18 @@ class catalog
             $arSort[$aitem->good_id][] = $aitem->sort;
             $sort[$aitem->good_id] = $aitem->sort;
         }
-
+       
 
         if (!empty($good_ids)) {
+
+            $maxLimit = 100;
+
+            if (count($good_ids) > $maxLimit + 1) {
+                $good_ids = array_slice($good_ids, 0, $maxLimit);
+            }
+
             $list = new Listing("catitem", "blocks", '245', ' id in( ' . implode(',', $good_ids) . ' ) and ');
+            
             $list->getList();
             $list->getItem();
             $items = $list->item;

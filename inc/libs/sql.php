@@ -19,6 +19,12 @@ class Sql {
 		global $prname;
 		$q = str_replace('prname', $prname, $q);
 //		echo $q."\r\n";
+
+
+// if (isset($_COOKIE['vas-vas'])) {
+// 	var_dump($q);
+// }
+
 		$res = mysql_query($q) OR die(mysql_error());
 //		echo "complete query\r\n";
 		return $res;

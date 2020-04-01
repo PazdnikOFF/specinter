@@ -34,6 +34,11 @@ phpFastCache::cleanup();
 
 	}
 
+	// if (isset($_COOKIE['vas-vas'])) {
+	// 	ini_set('display_errors', 'On');
+	// 	error_reporting(E_ALL | E_STRICT);
+	// }
+
 	if (isset($control->error)) {
 		$control = new Controller("/".$control->error);
 	}
