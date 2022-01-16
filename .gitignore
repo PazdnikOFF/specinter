@@ -6,5 +6,6 @@
 /_cache
 /_tmp
 /libs/cache/
-/backend/libs/cache/
+/backend/libs/cache/cache.storage/files/
+/backend/libs/cache/cache.storage/*.ini
 images
