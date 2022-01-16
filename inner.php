@@ -17,8 +17,8 @@ if (isset($_SERVER['SERVER_SOFTWARE']) && stripos($_SERVER['SERVER_SOFTWARE'], '
         exit();
     }
 }
-//ob_start();
-ini_set("display_errors", 1);
+ob_start();
+ini_set("display_errors", 0);
 mb_internal_encoding("UTF-8");
 session_start();
 
