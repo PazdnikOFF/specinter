@@ -1,9 +1,6 @@
 # vscode workspace settings
 .vscode
 
-# unknown
-.hg
-
 # user files
 /files
 /ufiles
@@ -12,35 +9,4 @@
 /_cache
 /_tmp
 /libs/cache/
--
-asot
-count
-good_id
-good_id_arts
-good_id]
-good_id][]
-id
-id]
 images
-item
-items
-items[]
-name
-num
-recomend_items
-recomend_items_sort[]
-recomend_items[]
-recomend_p_items
-recomend_p_items_sort[]
-recomend_p_items[]
-sort
-url
-recomend_items_sort[]
-good_id][]
-items[]
-good_id][]
-items[]
-recomend_items_sort[]
-recomend_items[]
-recomend_p_items_sort[]
-recomend_p_items[]
