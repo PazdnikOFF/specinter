@@ -1,5 +1,5 @@
 <?php
-require_once(DOC_ROOT."/inc/modules/call.php");
+require_once(BACKEND_ROOT."/inc/modules/call.php");
 class phoneblock {
 
 	function Make($wrapper) {

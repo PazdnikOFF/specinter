@@ -1,15 +1,26 @@
 <?php
-ob_start();
-ini_set("display_errors", "1");
+if (isset($_SERVER['SERVER_SOFTWARE']) && stripos($_SERVER['SERVER_SOFTWARE'], 'Development Server') !== false) {
+    $file_path = __DIR__ . '/' . ltrim($_SERVER['SCRIPT_NAME'], '/');
+    if (is_file($file_path)) {
+        switch (pathinfo($file_path, PATHINFO_EXTENSION)) {
+            case 'css':
+                $content_type = 'text/css';
+                break;
+            case 'js':
+                $content_type = 'text/js';
+                break;
+            default:
+                $content_type = mime_content_type($file_path);
+        }
+        header('Content-Type: ' . $content_type);
+        echo file_get_contents($file_path);
+        exit();
+    }
+}
+//ob_start();
+ini_set("display_errors", 1);
 mb_internal_encoding("UTF-8");
 session_start();
-
-
-if (isset($_COOKIE['vas-vas'])) {
-	# enabled all error reporting and stricts
-ini_set('display_errors', 'On');
-error_reporting(E_ALL | E_STRICT);
-}
 
 define("CMS_VERSION", 0.9);
 
@@ -18,33 +29,26 @@ $url = $_SERVER['REQUEST_URI'];
 $lastS = substr($url, -1, 1);
 
 if ($lastS != "/" && empty($_REQUEST['search-request'])) {
-	$url .= "/";
-	header("Location: $url", true, 301);
+    $url .= "/";
+    header("Location: $url", true, 301);
 }
 
-include "includes.php";
-require_once 'libs/cache/php_fast_cache.php';
+include "backend/includes.php";
+require_once 'backend/libs/cache/php_fast_cache.php';
 phpFastCache::cleanup();
 
-	$sql = new Sql();
-	$sql->connect();
-	$control = new Controller($url);
+$sql = new Sql();
+$sql->connect();
+$control = new Controller($url);
 
-	if (defined('ENVIRONMENT') && ENVIRONMENT == 'development') {
+if (defined('ENVIRONMENT') && ENVIRONMENT == 'development') {
 
-	}
+}
 
-	// if (isset($_COOKIE['vas-vas'])) {
-	// 	ini_set('display_errors', 'On');
-	// 	error_reporting(E_ALL | E_STRICT);
-	// }
+if (isset($control->error)) {
+    $control = new Controller("/" . $control->error);
+}
+$control->make();
+$sql->close();
 
-	if (isset($control->error)) {
-		$control = new Controller("/".$control->error);
-	}
-	$control->make();
-	$sql->close();
-
-ob_get_contents();
-
-?>
+ob_end_flush();

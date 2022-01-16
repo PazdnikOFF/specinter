@@ -322,7 +322,7 @@ class Controller {
 
 		$this->getSeoFields();
 
-		$path_to_file =str_replace("//", "/",  DOC_ROOT."/inc/modules/".$this->module.".php");
+		$path_to_file =str_replace("//", "/",  BACKEND_ROOT."/inc/modules/".$this->module.".php");
 		if (is_file($path_to_file)) {
 			require_once($path_to_file);
 		}
@@ -333,7 +333,7 @@ class Controller {
 
 
 
-		$this->html = $this->all->read_file(DOC_ROOT."/templates/".$this->wrapper);
+		$this->html = $this->all->read_file(BACKEND_ROOT."/templates/".$this->wrapper);
 		$this->html = $this->html ? $this->html : 'Отсутствие файла '.$this->wrapper;
 
 
@@ -354,15 +354,15 @@ class Controller {
 			foreach ($arr_modules[1] as $one_arr) {
 
 				if (!strstr($one_arr, 'control')) {
-					if (!is_file("inc/misc/".$one_arr.".php")) {
-						$tmp_file_body = $this->all->read_file("inc/misc/_default_.php");
+					if (!is_file(BACKEND_ROOT .  "/inc/misc/".$one_arr.".php")) {
+						$tmp_file_body = $this->all->read_file(BACKEND_ROOT . "/inc/misc/_default_.php");
 						$tmp_file_body = str_replace('<!--name//-->', $one_arr, $tmp_file_body);
-						if ($fp = @fopen("inc/misc/".$one_arr.".php", 'w+')) {
+						if ($fp = @fopen(BACKEND_ROOT . "/inc/misc/".$one_arr.".php", 'w+')) {
 							fputs($fp, $tmp_file_body);
 							fclose($fp);
 						}
 					}
-					include_once (DOC_ROOT."/inc/misc/".$one_arr.".php");
+					include_once (BACKEND_ROOT."/inc/misc/".$one_arr.".php");
 
 					${"tmp_print".$one_arr} = new $one_arr();
 					$miskhtml = ${"tmp_print".$one_arr}->Make($one_arr.".html");

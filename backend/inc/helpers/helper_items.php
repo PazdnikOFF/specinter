@@ -1,5 +1,5 @@
 <?php
-require_once(DOC_ROOT."/inc/helpers/helper_images.php");
+require_once(BACKEND_ROOT."/inc/helpers/helper_images.php");
 class helper_items {
 
 	private static $stocks = array();

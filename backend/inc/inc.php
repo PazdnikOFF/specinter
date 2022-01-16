@@ -1,5 +1,5 @@
 <?php
-include_once('libs/images.php');
+include_once('backend/libs/images.php');
 foreach($_REQUEST as $k=>$v)$$k=$v;
 foreach($_GET as $k=>$v)$$k=$v;
 foreach($_POST as $k=>$v)$$k=$v;
@@ -23,7 +23,7 @@ function debug2($var) {
 
 //Проверяет наличие файлов модуля
 function module_prapare($module, $key) {
-	if (!is_file('inc/modules/'.$module.'.php') || !is_file('templates/'.$key.'/'.$key.'.html'))
+	if (!is_file(BACKEND_ROOT . '/inc/modules/'.$module.'.php') || !is_file(BACKEND_ROOT . '/templates/'.$key.'/'.$key.'.html'))
 		generate_module($module, $key);
 	return true;
 }
@@ -31,36 +31,36 @@ function module_prapare($module, $key) {
 //Создает файлы модуля
 function generate_module($module, $key) {
 	if ($module != 'temp1' && $module != 'temp2' && $module != 'temp3' && $module != 'temp4') {
-		$dirName = 'inc/modules/';
-		$content = str_replace('temp2', $key, file_get_contents("inc/modules/temp2.php"));
+		$dirName = BACKEND_ROOT . '/inc/modules/';
+		$content = str_replace('temp2', $key, file_get_contents(BACKEND_ROOT . "/inc/modules/temp2.php"));
 		file::createFile($module.'.php', $dirName, $content);
 	}
 
 	$dirName = 'templates/'.$key.'/';
 	switch ($module) {
 		case 'temp1':
-			$content = str_replace('{module}', $key, file_get_contents("templates/temps/list.html"));
+			$content = str_replace('{module}', $key, file_get_contents(BACKEND_ROOT . "/templates/temps/list.html"));
 			file::createFile($key.'.html', $dirName, $content);
 			break;
 
 		case 'temp2':
-			$content = str_replace('{module}', $key, file_get_contents("templates/temps/list.html"));
+			$content = str_replace('{module}', $key, file_get_contents(BACKEND_ROOT . "/templates/temps/list.html"));
 			file::createFile($key.'.html', $dirName, $content);
 
-			$content2 = str_replace('{module}', $key, file_get_contents("templates/temps/one.html"));
+			$content2 = str_replace('{module}', $key, file_get_contents(BACKEND_ROOT . "/templates/temps/one.html"));
 			file::createFile($key.'_one.html', $dirName, $content2);
 			break;
 
 		case 'temp3':
-			$content = str_replace('{module}', $key, file_get_contents("templates/temps/list.html"));
+			$content = str_replace('{module}', $key, file_get_contents(BACKEND_ROOT . "/templates/temps/list.html"));
 			file::createFile($key.'.html', $dirName, $content);
 			break;
 
 		default:
-			$content = str_replace('{module}', $key, file_get_contents("templates/temps/list.html"));
+			$content = str_replace('{module}', $key, file_get_contents(BACKEND_ROOT . "/templates/temps/list.html"));
 			file::createFile($key.'.html', $dirName, $content);
 
-			$content2 = str_replace('{module}', $key, file_get_contents("templates/temps/one.html"));
+			$content2 = str_replace('{module}', $key, file_get_contents(BACKEND_ROOT . "/templates/temps/one.html"));
 			file::createFile($key.'_one.html', $dirName, $content2);
 			break;
 	}
@@ -355,10 +355,10 @@ function ctemplate_num_fields($s) {
 //Автолоад
 function __autoload($className) {
 	if (substr($className, 0, 5) == 'type_') {
-		require_once("datatypes/".substr($className, 5).".php");
+		require_once(BACKEND_ROOT . "/datatypes/".substr($className, 5).".php");
 	}
-	if (file_exists("inc/modules/".$className.".php")) {
-		require_once("inc/modules/".$className.".php");
+	if (file_exists(BACKEND_ROOT . "/inc/modules/".$className.".php")) {
+		require_once(BACKEND_ROOT . "/inc/modules/".$className.".php");
 	}
 	else return false;
 }

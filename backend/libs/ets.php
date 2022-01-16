@@ -2188,15 +2188,15 @@ function _printts($id)
 function sprintt($datatree, $containers, $entry = 'main', $hsr = _ETS_SOURCE_READ, $hcr = _ETS_CACHE_READ, $hcw = _ETS_CACHE_WRITE)
 {
 	//vasiliy@softmajor
-	if (!@is_file($containers))	{
-		if ($fp = @fopen($containers, 'w+'))	{
-			fputs($fp, '{reduce:space}
-{mask:main}
-
-{/mask}');
-			fclose($fp);
-		}
-	}
+//	if (!@is_file($containers))	{
+//		if ($fp = @fopen($containers, 'w+'))	{
+//			fputs($fp, '{reduce:space}
+//{mask:main}
+//
+//{/mask}');
+//			fclose($fp);
+//		}
+//	}
 	$ets = new _ets($containers, $hsr, $hcr, $hcw);
 	return $ets->build_all($datatree, $entry);
 }

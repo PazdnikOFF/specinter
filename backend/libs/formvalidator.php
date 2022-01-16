@@ -61,8 +61,8 @@ class captcha {
 
 	}
 	public static function getCaptcha($salt) {
-		self::$imagePath = DOC_ROOT."/libs/imgcode/";
-		self::$fontPath = DOC_ROOT."/libs/fonts/";
+		self::$imagePath = BACKEND_ROOT."/libs/imgcode/";
+		self::$fontPath = BACKEND_ROOT."/libs/fonts/";
 
 		$x_img = 120; $y_img = 29; //ширина и высота
 		$numsymb_img=5; //кол-во символов

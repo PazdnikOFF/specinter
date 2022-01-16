@@ -3,12 +3,12 @@ class Sql {
 	function connect() {
 		global $config;
 		global $texts;
-		if (!$aaa = @mysql_connect($config['dbhost'], $config['dbuser'], $config['dbpass'])) {
+		if (!$aaa = mysql_connect($config['dbhost'], $config['dbuser'], $config['dbpass'])) {
 			echo $texts['sql_connection_error'];
 			exit;
 		}
 
-		if (!$aaa = @mysql_select_db($config['dbname'])) {
+		if (!$aaa = mysql_select_db($config['dbname'])) {
 			echo $texts['sql_db_selection_error'];
 			exit;
 		}

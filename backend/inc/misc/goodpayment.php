@@ -1,5 +1,5 @@
 <?php
-require_once(DOC_ROOT."/inc/modules/call.php");
+require_once(BACKEND_ROOT."/inc/modules/call.php");
 class goodpayment {
 
 	function Make($wrapper){
@@ -22,7 +22,7 @@ class goodpayment {
 
 			$text = sprintt($page, 'templates/misc/'.$wrapper);
 
-			// Кешируем на 24 часа
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 24 пїЅпїЅпїЅпїЅ
 			// phpFastCache::set($sign, $text, 86400);
 		}else {
 			$text = $content;

@@ -1,5 +1,5 @@
 <?php
-require_once(DOC_ROOT."/inc/modules/users.php");
+require_once(BACKEND_ROOT."/inc/modules/users.php");
 class authblock {
 
 	function Make($wrapper) {
