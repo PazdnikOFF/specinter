@@ -6,4 +6,5 @@
 /_cache
 /_tmp
 /libs/cache/
+/backend/libs/cache/
 images
