@@ -363,9 +363,9 @@ class adminblockedit extends manage
                     $_GET[$dr['key']] = $_GET[$dr['key']] == "desc" ? "desc" : "asc";
 
                     if ($dr['key'] == 'price') {
-                        $orderSql = "CAST(`{$dr['key']}` AS DECIMAL) {$_GET[$dr['key']]} ";
+                        $orderSql = "CAST(prname_b_$currentTemplate.`{$dr['key']}` AS DECIMAL) {$_GET[$dr['key']]} ";
                     } else {
-                        $orderSql = "`{$dr['key']}` {$_GET[$dr['key']]} ";
+                        $orderSql = "prname_b_$currentTemplate.`{$dr['key']}` {$_GET[$dr['key']]} ";
                     }
                 }
 
@@ -374,7 +374,7 @@ class adminblockedit extends manage
             // Добавление поля id и modified в сорировку SQL
             if (!empty($_GET['id'])) {
                 $_GET['id'] = $_GET['id'] == "desc" ? "desc" : "asc";
-                $orderSql = "CAST(`id` AS UNSIGNED) {$_GET['id']} ";
+                $orderSql = "CAST(prname_b_$currentTemplate.`id` AS UNSIGNED) {$_GET['id']} ";
                 $page->idSort = $_GET['id'] == "asc" ? "headerSortDown" : "headerSortUp";
             }
 
@@ -385,12 +385,12 @@ class adminblockedit extends manage
 
             if (!empty($_GET['modified'])) {
                 $_GET['modified'] = $_GET['modified'] == "desc" ? "desc" : "asc";
-                $orderSql = "`modified` {$_GET['modified']} ";
+                $orderSql = "prname_b_$currentTemplate.`modified` {$_GET['modified']} ";
                 $page->modSort = $_GET['modified'] == "asc" ? "headerSortDown" : "headerSortUp";
             }
 
             if (!$orderSql) {
-                $orderSql = " `sort` ASC";
+                $orderSql = " prname_b_$currentTemplate.`sort` ASC";
             }
             if ($currentTemplate == 'orderinfo') {
                 $orderSql = 'id DESC';
@@ -400,7 +400,7 @@ class adminblockedit extends manage
             if ($isSearch) {
                 $searchSql = $isSearch ? " AND CONCAT(" . implode(",", $searchSqlArr) . ") LIKE '%{$searchText}%' " : "";
                 $searchSql = "";
-                $searchSql = " AND `name` LIKE '%{$searchText}%'";
+                $searchSql = " AND prname_b_$currentTemplate.`name` LIKE '%{$searchText}%'";
             }
             $res_fields = sql::query("SHOW COLUMNS FROM prname_b_" . $currentTemplate . "");
             while ($field_row = sql::fetch_assoc($res_fields)) {
@@ -412,7 +412,7 @@ class adminblockedit extends manage
                 $searchArr = array();
                 foreach ($fields as $field) {
                     if (in_array($field, array('name', 'name_rus', 'art'))) {
-                        $searchArr[] = " `{$field}` LIKE '%{$searchText}%'";
+                        $searchArr[] = " prname_b_$currentTemplate.`{$field}` LIKE '%{$searchText}%'";
                     }
                 }
                 $searchSql .= implode(' or ', $searchArr);
@@ -434,14 +434,41 @@ class adminblockedit extends manage
                 }
 
                 if (($_GET['filter'] = rtrim($_GET['filter'], "/")) && !empty($_GET['filter'])) {
-                    $filterSql = sprintf(" AND `type` = '%s' ", sql::escape_string($_GET['filter']));
+                    $filterSql = sprintf(" AND prname_b_$currentTemplate.`type` = '%s' ", sql::escape_string($_GET['filter']));
                     $page->filter = htmlspecialchars($_GET['filter']);
                 }
             }
 
+            $page->name = sql::one_record("SELECT name FROM prname_tree WHERE id=" . $parent);
+            $addJoin = '';
+            $addFilter = '';
+            $pageradd = '';
+            if ($currentTemplate === 'catitem' && strpos($control->urlparams, 'fcatitem1') !== false) {
+                $keys = sql::fetch_assoc(sql::query('select left_key, right_key from prname_tree where id = 40'));
+                $addJoin .= sprintf('left join prname_b_ablock ab on ab.good_id = prname_b_catitem.id and exists(select 1 from prname_tree t where t.left_key >= %d and t.right_key <= %d and t.id = ab.parent)',
+                    $keys['left_key'], $keys['right_key']
+                );
+                $addFilter .= ' and ab.id is null ';
+                $pageradd .= '_fcatitem1';
+                $page->name = 'Товары, для которых не созданы связи в каталоге';
+            } elseif ($currentTemplate === 'catitem' && strpos($control->urlparams, 'fcatitem2') !== false) {
+                $keys1 = sql::fetch_assoc(sql::query('select left_key, right_key from prname_tree where id = 40'));
+                $keys2 = sql::fetch_assoc(sql::query('select left_key, right_key from prname_tree where id = 451'));
+                $addJoin .= sprintf('
+                    left join prname_b_ablock ab1 on ab1.good_id = prname_b_catitem.id
+                    and exists(select 1 from prname_tree t where t.left_key >= %d and t.right_key <= %d and t.id = ab1.parent)
+                    left join prname_b_ablock ab2 on ab2.good_id = prname_b_catitem.id
+                    and exists(select 1 from prname_tree t where t.left_key >= %d and t.right_key <= %d and t.id = ab2.parent)',
+                    $keys1['left_key'], $keys1['right_key'],
+                    $keys2['left_key'], $keys2['right_key']
+                );
+                $addFilter .= ' and ab1.id is not null and ab2.id is not null';
+                $pageradd .= '_fcatitem2';
+                $page->name = 'Товары одновременно и в каталоге и в запчастях';
+            }
 
             // Узнаем кол-во блоков текущего шаблона
-            $totalcount = sql::one_record("SELECT count(id) FROM prname_b_" . $currentTemplate . " WHERE parent=" . $parent . $filterSql);
+            $totalcount = sql::one_record("SELECT count(prname_b_$currentTemplate.id) FROM prname_b_" . $currentTemplate . " $addJoin WHERE prname_b_$currentTemplate.parent=" . $parent . $filterSql . $addFilter);
 
             $tempUrl = $control->module_url;
 
@@ -459,7 +486,7 @@ class adminblockedit extends manage
                 $pagecount = ceil($totalcount / $limit);
                 for ($i = 0; $i < $pagecount; $i++) {
                     $page->page[$i]->title = $i + 1;
-                    $page->page[$i]->url = $tempUrl . "_alist_parent" . $parent . "_page" . $i . $queryString . "/";
+                    $page->page[$i]->url = $tempUrl . "_alist_parent" . $parent . "_page" . $i . $pageradd . $queryString . "/";
                     $page->page[$i]->active = $i == $lpage ? true : false;
                 }
             }
@@ -468,10 +495,10 @@ class adminblockedit extends manage
             //var_dump("SELECT *, UNIX_TIMESTAMP(modified) as modified FROM prname_b_".$currentTemplate." WHERE parent=".$parent." {$searchSql} {$filterSql} ORDER by {$orderSql}  LIMIT $start, $limit");
             //die();
             //Выборка блоков текущего шаблона
-            $result = sql::query("SELECT *, UNIX_TIMESTAMP(modified) as modified FROM prname_b_" . $currentTemplate . " WHERE parent=" . $parent . " {$searchSql} {$filterSql} ORDER by {$orderSql}  LIMIT $start, $limit");
+            $result = sql::query("SELECT prname_b_$currentTemplate.*, UNIX_TIMESTAMP(prname_b_$currentTemplate.modified) as modified FROM prname_b_" . $currentTemplate . " $addJoin WHERE prname_b_$currentTemplate.parent=" . $parent . " {$searchSql} {$filterSql} $addFilter ORDER by {$orderSql}  LIMIT $start, $limit");
 
             if ($_POST['search']) {
-                $countRows = sql::num_rows(sql::query("SELECT *, UNIX_TIMESTAMP(modified) as modified FROM prname_b_" . $currentTemplate . " WHERE parent=" . $parent . " {$searchSql} {$filterSql} ORDER by {$orderSql} "));
+                $countRows = sql::num_rows(sql::query("SELECT prname_b_$currentTemplate.*, UNIX_TIMESTAMP(prname_b_$currentTemplate.modified) as modified FROM prname_b_" . $currentTemplate . " $addJoin WHERE prname_b_$currentTemplate.parent=" . $parent . " {$searchSql} {$filterSql} $addFilter ORDER by {$orderSql} "));
             }
 
             if (($start + $limit) < $countRows && $_POST['search']) {
@@ -545,7 +572,6 @@ class adminblockedit extends manage
 
 
         $page->menu = $this->menu;
-        $page->name = sql::one_record("SELECT name FROM prname_tree WHERE id=" . $parent);
         if ($_REQUEST['start']) {
             list(, $ajaxHtml) = explode('<!--AJAX-->', sprintt($page, 'templates/' . $control->template . '/' . $control->template . '.html'));
             echo $ajaxHtml;

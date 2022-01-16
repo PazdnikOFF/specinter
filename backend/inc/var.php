@@ -55,7 +55,7 @@ $config['dbhost'] = 'localhost';
 //$config['dbpass'] = 'HaWpoXujponiy12';
 $config['site_name'] = '';
 $config['md5'] = 'siteactiv';
-$config['server_url'] = 'http://' . $_SERVER['SERVER_NAME'] . '/';
+$config['server_url'] = 'http://' . $_SERVER['SERVER_NAME'] . ($_SERVER['SERVER_PORT'] === '80' ? '' : ':'. $_SERVER['SERVER_PORT']) . '/';
 $texts['sql_connection_error'] = 'Невозможно подключиться к серверу баз данных.';
 $texts['sql_db_selection_error'] = 'Невозможно выбрать базу данных.';
 $docroot = $_SERVER['DOCUMENT_ROOT'];

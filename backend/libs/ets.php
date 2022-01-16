@@ -1389,8 +1389,8 @@ class _ets
 			return $fct($this->container);
 		} else {
 			$content = FALSE;
-			if ($handle = @fopen($this->container, 'rb')) {
-				$size = @filesize($this->container);
+			if ($handle = @fopen(BACKEND_ROOT . '/' . $this->container, 'rb')) {
+				$size = @filesize(BACKEND_ROOT . '/' . $this->container);
 				$content = @fread($handle, $size);
 				fclose($handle);
 			}
