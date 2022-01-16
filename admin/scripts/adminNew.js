@@ -483,7 +483,7 @@ $(document).ready(function() {
     var searchVal = $("#search-blocks-text").val(),
       searchGet = "";
     if (searchVal.length) {
-      searchGet = "&getsearch=" + searchVal;
+      searchGet = "&getsearch=" + encodeURIComponent(searchVal);
     }
 
     var filterVal = $("#filter").val(),
@@ -769,15 +769,15 @@ function editBlock() {
   if (/getsearch=[^\&]*\&/g.test(querystring)) {
     querystring = querystring.replace(
       /getsearch=[^\&]*\&/g,
-      searchVal ? "getsearch=" + searchVal + "&" : "&"
+      searchVal ? "getsearch=" + encodeURIComponent(searchVal) + "&" : "&"
     );
   } else if (/&sort$/g.test(querystring)) {
     querystring = querystring.replace(
       /&sort$/g,
-      searchVal ? "&getsearch=" + searchVal + "&sort" : "&sort"
+      searchVal ? "&getsearch=" + encodeURIComponent(searchVal) + "&sort" : "&sort"
     );
   } else {
-    querystring = "?getsearch=" + searchVal + "&sort";
+    querystring = "?getsearch=" + encodeURIComponent(searchVal) + "&sort";
   }
 
   if (!querystring.length) querystring += "?";

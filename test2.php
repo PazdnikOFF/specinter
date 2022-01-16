@@ -1,8 +1,8 @@
 <?php
 var_dump(date("n"));die();
-require_once ('/home/u67887/u67887.netangels.ru/www/libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
+require_once ('/home/c26864/specinter.ru/www/libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
 
-$xls = PHPExcel_IOFactory::load('/home/u67887/u67887.netangels.ru/www/mailtemplates/pdf/bill.xlsx');
+$xls = PHPExcel_IOFactory::load('/home/c26864/specinter.ru/www/mailtemplates/pdf/bill.xlsx');
 $xls->setActiveSheetIndex(0);
 $sheet = $xls->getActiveSheet();
 

@@ -31,7 +31,7 @@ class cart_2
     {
 
         global $control;
-        if(!empty($_REQUEST['id'])){
+        if (!empty($_REQUEST['id'])) {
             $_SESSION['cart'][$_REQUEST['id']] += $_REQUEST['count'];
         }
 
@@ -45,7 +45,7 @@ class cart_2
         $count = 0;
         foreach ($_SESSION['cart'] as $key => $item) {
 
-            if(!empty($key)){
+            if (!empty($key)) {
                 $count += $item;
             }
 
@@ -56,40 +56,90 @@ class cart_2
     private function _cart_print()
     {
         global $control;
-        foreach ($_SESSION['cart'] as $key => $value){
-            if(!$key){
+
+        foreach ($_SESSION['cart'] as $key => $value) {
+            if (!$key) {
                 unset($_SESSION['cart'][$key]);
             }
         }
-        if (empty($_SESSION['cart'])) {
+        if ($id = (int)$_REQUEST['order_id']) {
+            $ids = array_map(function ($data) {
+                return (int)$data;
+            }, explode('|', $_REQUEST['id']));
+
+            $result = sql::fetch_array(sql::query("SELECT * FROM `it_b_orderinfo` WHERE id = " . $id));
+            $goods = unserialize($result['order_json']);
+
+            $_SESSION['cart'] = array();
+            foreach ($goods['goods'] as $id => $ct) {
+                if (in_array($id, $ids) || in_array(str_replace('P','',$id), $ids)) {
+                    $_SESSION['cart'][$id] = $ct;
+                }
+
+
+            }
+
+            header('Location: /cart/');
+
+            exit();
+
+        } else if (empty($_SESSION['cart'])) {
             $this->html['text'] = "<h3>Корзина пуста</h3>";
             return;
         }
+
         $data = array_keys($_SESSION['cart']);
-        $data = array_diff($data,array('',null));
+        $data = array_diff($data, array('', null));
+
         foreach ($data as $key => $item) {
 
             if ($item[0] == 'P') {
                 $parents[] = str_replace('P', '', $item);
                 unset($data[$key]);
+            }elseif($item[0] == 'C'){
+                $cItems[] =  str_replace('C', '', $item);
+                unset($data[$key]);
+            }elseif($item[0] == 'С'){
+                $cItems[] =  str_replace('С', '', $item);
+                unset($data[$key]);
             }
         }
 
-        $ids = implode(',', $data);
-
-        $p_ids = implode(',', $parents);
+        $ids = implode(',', array_filter(array_merge([0], $data), 'is_numeric'));
+        $p_ids = implode(',', array_filter(array_merge([0], $parents), 'is_numeric'));
+        $c_ids = implode(',', array_filter(array_merge([0], $cItems), 'is_numeric'));
 
         if ($ids) {
             $d = sql::query("
-              SELECT v.id,v.parent,v.blockparent,v.img,v.price,v.time,v.art, c.name_rus as name, t.url,c.id as bid 
+              SELECT v.id,v.parent,v.blockparent,v.img,v.price,v.time,v.art, c.name_rus as name, t.url,c.id as bid , c.name_eng as name_eng 
               FROM it_b_variant v 
               inner join it_b_catitem c on c.id = v.blockparent
               inner join it_tree t on c.parent = t.id
             
-              WHERE v.id IN ($ids)");
+              WHERE v.id IN ($ids) or c.id IN ($ids)");
+
             $page = new stdClass();
             while ($obj = sql::fetch_object($d)) {
                 $obj->class = 'variant';
+                $obj->count = (int)$_SESSION['cart'][$obj->id];
+                $obj->calc = $obj->count * $obj->price;
+                $page->total += $obj->calc;
+                $arr[] = $obj;
+            }
+        }
+        if(!empty($cItems)){
+            $d = sql::query("
+              SELECT v.id,v.parent,v.blockparent,v.img, 0 as price,v.time,v.art, c.name_rus as name, t.url,c.id as bid , c.name_eng as name_eng 
+              FROM it_b_catitem c 
+              inner join it_b_variant v on c.id = v.blockparent
+              inner join it_tree t on c.parent = t.id
+            
+              WHERE c.id IN ($c_ids)");
+
+            $page = new stdClass();
+            while ($obj = sql::fetch_object($d)) {
+                $obj->class = 'variant';
+                $obj->id = 'C' . $obj->bid;
                 $obj->count = (int)$_SESSION['cart'][$obj->id];
                 $obj->calc = $obj->count * $obj->price;
                 $page->total += $obj->calc;
@@ -112,17 +162,17 @@ class cart_2
             }
         }
         $price = $bill = array();
-        foreach ($arr as $cart){
-            if($cart->price > 0){
-                $price[] =$cart;
-            }else{
-                $bill[] =$cart;
+        foreach ($arr as $cart) {
+            if ($cart->price > 0) {
+                $price[] = $cart;
+            } else {
+                $bill[] = $cart;
             }
         }
-        if($login = $_SESSION['login']){
-            $page->user = sql::fetch_object(sql::query("SELECT * FROM prname_b_user3 WHERE email = '".$login."'"));
+        if ($login = $_SESSION['login']) {
+            $page->user = sql::fetch_object(sql::query("SELECT * FROM prname_b_user3 WHERE email = '" . $login . "'"));
         }
-        
+
         $page->items = $arr;
         $page->price = $price;
         $page->bill = $bill;

@@ -134,7 +134,7 @@ class All {
 			$mailer->AddAddress($email);
 		}
 
-		$mailer->From = 'noreply@'.$_SERVER['HTTP_HOST'];
+		$mailer->From = 'info@'.$_SERVER['HTTP_HOST'];
 		if ($fromName !== 0)
 			$mailer->FromName = $fromName;
 		else
@@ -198,9 +198,9 @@ class All {
 	function addUrl($page = '', $oper = '', $id = '', $sort = '', $sortv = '') {
 		$text = '';
 
-		if ($page != '') {
+		//if ($page != '') {
 			$text .= '_p'.$page;
-		}
+		//}
 		if ($oper != '') {
 			$text .= '_a'.$oper;
 		}
@@ -231,7 +231,7 @@ class All {
 			$fields[$arr['key']]->datatkey = $arr['datatkey'];
 			$fields[$arr['key']]->comment = $arr['comment'];
 		}
-
+		
 		$q = sql::query("SELECT * FROM prname_b_$template WHERE id = '$catid'");
 		while ($arr = sql::fetch_assoc($q)) {
 

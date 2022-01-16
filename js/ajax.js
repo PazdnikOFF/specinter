@@ -1,5 +1,22 @@
 $(document).ready(function () {
 
+
+    if (location.hash) {
+        setTimeout(function () {
+            for (i = 0; i < 5; i++) {
+                test();
+            }
+        }, 1500)
+
+        //$(location.hash).addClass('select_item');
+    }
+
+    function test() {
+        
+        $('[data-item="' + location.hash + '"]').toggleClass('select_item', 500);
+    }
+
+
     if ($('.detal-img img').length && $('.detal-list').height() > $('.detal-img').height()) {
 
         var max = $('.detal-list').offset().top;
@@ -8,8 +25,6 @@ $(document).ready(function () {
 
 
         $(window).scroll(function (e) {
-
-            console.log(max, boot);
 
             if (window.pageYOffset > max && (window.pageYOffset < (max + boot))) {
 
@@ -252,7 +267,8 @@ $(document).ready(function () {
 
             email: {
 
-                required: true
+                required: true,
+                email: true,
 
             },
 
@@ -282,6 +298,7 @@ $(document).ready(function () {
             email: {
 
                 required: "Поле обязательное для заполнения",
+                email: "Проверьте корреткность введенного Email",
 
             },
 
@@ -314,7 +331,8 @@ $(document).ready(function () {
 
             email: {
 
-                required: true
+                required: true,
+                email: true,
 
             },
 
@@ -344,6 +362,7 @@ $(document).ready(function () {
             email: {
 
                 required: "Поле обязательное для заполнения",
+                email: "Проверьте корреткность введенного Email",
 
             },
 
@@ -397,7 +416,7 @@ $(document).ready(function () {
 
             },
 
-            login: {
+            password: {
 
                 required: "Введите ваш пароль",
 
@@ -485,8 +504,10 @@ $(document).ready(function () {
                     data: data,
 
                     success: function (data) {
+                       
 
                         $('#cart-order').after(data);
+                        $('#cart-order').hide();
                         var scrollTop = $('.content__title').offset().top;
                         $(document).scrollTop(scrollTop);
 
@@ -566,38 +587,115 @@ $(document).ready(function () {
 
     });
 
-
-    $('#personal-reg').submit(function (e) {
-
-        form = $(this);
-
-        e.preventDefault();
-
-        data = form.serialize();
-
-
-        console.log(data);
-
-        $.ajax({
-
-            url: '/profile/',
-
-            type: "POST",
-
-            dataType: "json",
-
-            data: data,
-
-            success: function (data) {
-
-                if (data.register)
-
-                    form.html(data.register);
-
-            }
-
+    onloadCallback = function() {
+        widgetId1 = grecaptcha.render('personal-reg-captcha', {
+            'sitekey' : '6LezROsZAAAAACskK-40_i7m_l5KSSvv8NoTSYNn',
+            'tabindex' : 100,
+            'callback' : verifyCallback,
+            'expired-callback' : expiredCallback,
+            'error-callback' : errorCallback,
         });
+        widgetId2 = grecaptcha.render('ul-reg-captcha', {
+            'sitekey' : '6LezROsZAAAAACskK-40_i7m_l5KSSvv8NoTSYNn',
+            'tabindex' : 200,
+            'callback' : verifyCallback,
+            'expired-callback' : expiredCallback,
+            'error-callback' : errorCallback,
+        });
+    };
 
+    function verifyCallback(verifyCallback){
+        console.log(verifyCallback);
+    }
+    function expiredCallback(expiredCallback){
+
+        console.log(expiredCallback);
+
+    }
+    function errorCallback(errorCallback){
+        console.log(errorCallback);
+    }
+    $('#personal-reg,#ul-reg').submit(function (e) {
+        e.preventDefault();
+        form = $(this);
+        data = form.serialize();
+        console.log(data);
+       
+        if(form.attr('id') == 'personal-reg'){
+            widget = widgetId1;
+            captcha = grecaptcha.getResponse(widget);
+        }
+        else {
+            widget = widgetId2;
+            captcha = grecaptcha.getResponse(widget);
+        }
+        console.log(widget);
+        console.log(captcha);
+        if (!captcha.length) {
+          // Выводим сообщение об ошибке
+          form.find('.recaptcha-error').text('* Вы не прошли проверку "Я не робот"');
+          return false;
+        } else {
+          // получаем элемент, содержащий капчу
+          form.find('.recaptcha-error').text('');
+        }
+        
+
+        
+
+       
+        //data += '&g-recaptcha-response='+captcha;
+       
+        if (captcha.length) {
+
+            $.ajax({
+
+                url: '/profile/',
+
+                type: "POST",
+
+                //cache: false,
+                //dataType: 'json',
+                data: data,
+
+                success: function (data) {
+                    console.log(data);
+                    data = jQuery.parseJSON(data);
+                   
+                    if(data.error){
+                        alert(data.error[0]);
+                        
+                        console.log(widget);
+                        grecaptcha.reset(widget);
+                       
+
+                       
+                    }
+                   
+                  
+                    if (data.register){
+                        //grecaptcha.reset();
+                        form.html(data.register);
+                    }
+                        
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  console.log(jqXHR);
+                  console.log(textStatus);
+                  console.log(errorThrown);
+                }
+
+            });
+         
+          
+        } 
+        else {
+            //grecaptcha.reset(widget);
+        } 
+
+        
+       return false;
     });
 
 
@@ -650,7 +748,8 @@ $(document).ready(function () {
 
             email: {
 
-                required: true
+                required: true,
+                email: true,
 
             }
 
@@ -680,6 +779,7 @@ $(document).ready(function () {
             email: {
 
                 required: "Поле обязательное для заполнения",
+                email: "Проверьте корреткность введенного Email",
 
             }
 
@@ -913,7 +1013,7 @@ $(document).ready(function () {
             $.each($('.table-items .good-quant__input'), function (key, value) {
                 dataGoods[$(this).attr('id')] = $(this).val();
             });
-            console.log(dataGoods);
+           
 
             dataGoods = JSON.stringify(dataGoods)
 

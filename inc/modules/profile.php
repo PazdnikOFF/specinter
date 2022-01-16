@@ -87,12 +87,12 @@ class profile
         if ($page->user_id) {
             $page->send = true;
             $page->code = md5($page->user_id . $page->email . time());
-			
+
             sql::query("UPDATE  `prname_b_user3` SET  `code` =  '{$page->code}' WHERE `id` = {$page->user_id}");
-			
+
             $page->text = "Перейдите по <a href='{$control->module_url}_recovery={$page->code}&{$page->email}'>ссылке</a> для восстановление пароля";
             $msg = sprintt($page, "mailtemplates/toadmin/call.html");
-			
+
             all::send_mail($page->email, 'Востановление пароля', $msg, false, false, $control->settings->sitename);
         }
 
@@ -125,50 +125,84 @@ class profile
 
     private function _reg()
     {
+        // ваш секретный ключ
+        $secret = '6LezROsZAAAAAEVi82VPsxlEjIhBdG9LLVCDF-ro';
+        // однократноecho 'test';
+        require_once ('recaptcha/autoload.php');
+       
+        // если в массиве $_POST существует ключ g-recaptcha-response, то...
+        if (isset($_POST['g-recaptcha-response'])) {
+            // создать экземпляр службы recaptcha, используя секретный ключ
+            $recaptcha = new \ReCaptcha\ReCaptcha($secret);
+            // получить результат проверки кода recaptcha
+            $resp = $recaptcha->verify($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
+            // если результат положительный, то...
+            if ($resp->isSuccess()){
 
-        foreach ($_POST as $k => $v) {
-            if (strlen($v))
-                $data[$k] = mysql_escape_string($v);
+                foreach ($_POST as $k => $v) {
+                    if (strlen($v))
+                        $data[$k] = mysql_escape_string($v);
+                }
+                if (!strlen($data['password'])) {
+                    $return['error'][] = 'Не знаполнен пароль';
+                }
+                if (!strlen($data['email'])) {
+                    $return['error'][] = 'Не знаполнен email';
+                }
+                if ($data['password'] != $data['password2']) {
+                    $return['error'][] = 'Пароли не совпали';
+                }
+                if (empty($return['error'])) {
+                    $result = sql::one_record("SELECT id FROM `prname_b_user3` WHERE email = '" . $data['email'] . "'");
+                    unset($data['politic']);
+                    unset($data['politic2']);
+                    unset($data['g-recaptcha-response']);
+                    if ($result) {
+                        $return['error'][] = "Данный адрес уже используется";
+                    }
+                    if (empty($return['error'])) {
+
+                        $data['code'] = md5(time() . $data['email']);
+                        $data['password'] = md5($data['password']);
+                        $data['parent'] = 80;
+                        $data['visible'] = 0;
+
+                        unset($data['password2']);
+
+                        $keys = implode(',', array_keys($data));
+                        $val = "'" . implode("','", $data) . "'";
+
+                        sql::query("INSERT INTO prname_b_user3 ({$keys}) VALUES ({$val})");
+
+                        $mailpage = new stdClass();
+                        $mailpage->text = "Ссылка активанции пользователя <a href='http://{$_SERVER['SERVER_NAME']}/profile/?act={$data['code']}'>Активировать</a>";
+                        $msg = sprintt($mailpage, "mailtemplates/toadmin/call.html");
+                        all::send_mail($data['email'], 'Активация пользователя', $msg, false, false, "$sitename");
+                        $return['register'] = "Вы зарегестрированы, активируйте акаунт. Письмо Вам отправлено.";
+                    }
+                    echo json_encode($return);
+                   
+                }
+                else {
+                    $return['error'][] = 'Что-то пошло не так';
+                    echo json_encode($return);
+                }
+            } else {
+            // иначе передать ошибку
+            $errors = $resp->getErrorCodes();
+            $data['error-captcha']=$errors;
+            $data['msg']='Код капчи не прошёл проверку на сервере';
+            $data['result']='error';
+            echo json_encode($errors);
+          }
+
+        } else {
+          //ошибка, не существует ассоциативный массив $_POST["send-message"]
+          $data['result']='error';
+          echo 'ошибка, не существует ассоциативный массив';
         }
-        if (!strlen($data['password'])) {
-            $return['error'][] = 'Не знаполнен пароль';
-        }
-        if (!strlen($data['email'])) {
-            $return['error'][] = 'Не знаполнен email';
 
-        }
-        if ($data['password'] != $data['password2']) {
-            $return['error'][] = 'Пароли не совпали';
-        }
-        if (empty($return['error'])) {
-            $result = sql::one_record("SELECT id FROM `prname_b_user3` WHERE email = '" . $data['email'] . "'");
-            unset($data['politic']);
-            if ($result) {
-                $return['error'][] = "Данный адрес уже используется";
-            }
-            if (empty($return['error'])) {
-
-                $data['code'] = md5(time() . $data['email']);
-                $data['password'] = md5($data['password']);
-                $data['parent'] = 80;
-                $data['visible'] = 0;
-
-                unset($data['password2']);
-
-                $keys = implode(',', array_keys($data));
-                $val = "'" . implode("','", $data) . "'";
-
-                sql::query("INSERT INTO prname_b_user3 ({$keys}) VALUES ({$val})");
-
-                $mailpage = new stdClass();
-                $mailpage->text = "Ссылка активанции пользователя <a href='http://{$_SERVER['SERVER_NAME']}/profile/?act={$data['code']}'>Активировать</a>";
-                $msg = sprintt($mailpage, "mailtemplates/toadmin/call.html");
-                all::send_mail($data['email'], 'Активация пользователя', $msg, false, false, "$sitename");
-                $return['register'] = "Вы зарегестрированы, активируйте акаунт. Письмо Вам отправлено.";
-            }
-            echo json_encode($return);
-            die();
-        }
+        
         die();
     }
 
@@ -178,12 +212,134 @@ class profile
         $result = sql::fetch_array(sql::query("SELECT * FROM `prname_b_user3` WHERE email = '" . $_SESSION['login'] . "' and  password = '" . $_SESSION['password'] . "'"));
 
 
-        $page = all::c_data_all($control->cid,'profile');
+        $page = all::c_data_all($control->cid, 'profile');
 
         $list = new Listing("garage", "items", $result["id"]);
         $list->getList();
         $list->getItem();
         $page->garage = $list->item;
+
+
+        $list = new Listing("orderinfo", "blocks", 'all', ' user_id=' . $result['id'] . ' and ');
+        $list->on = 'false';
+        $list->sortby = "DESC";
+        $list->getList();
+        $list->getItem();
+        $page->orders = $list->item;
+
+        foreach ($page->orders as $order) {
+            $json = unserialize($order->order_json);
+            $order->goods = $json['goods'];
+            foreach ($json['rows'] as &$row) {
+                $row = (object)$row;
+            }
+
+            $data = array_keys($order->goods);
+            $data = array_diff($data, array('', null));
+            foreach ($data as $key => $item) {
+                if ($item[0] == 'P') {
+                    $parents[] = str_replace('P', '', $item);
+                    unset($data[$key]);
+                }
+            }
+            if (!empty($data)) {
+                $d = sql::query("
+              SELECT v.id,v.parent,v.blockparent,v.img,v.price,v.time,v.art, c.name_rus as name, t.url,c.id as bid 
+              FROM it_b_variant v 
+              inner join it_b_catitem c on c.id = v.blockparent
+              inner join it_tree t on c.parent = t.id
+            
+              WHERE v.id IN (" . implode(',', $data) . ")");
+                while ($obj = sql::fetch_object($d)) {
+                    $listItems[$obj->id] = $obj;
+                }
+            }
+
+            if ($parents) {
+                $d = sql::query("
+              SELECT c.id,c.name_rus,t.url,c.art FROM prname_b_catitem c
+              inner join it_tree t on c.parent = t.id
+              WHERE c.id IN (" . implode(',', $parents) . ")
+              
+              ");
+                while ($obj = sql::fetch_object($d)) {
+                    $listItems['P' . $obj->id] = $obj;
+
+                }
+            }
+
+            $order->rows = $json['rows'];
+
+            foreach ($order->rows as $row) {
+                $item = false;
+
+                if ($row->id && $listItems[$row->id]) {
+                    if ($listItems[$row->id]->img) {
+                        $row->img = $listItems[$row->id]->img;
+                    }
+                    $item = sql::fetch_array(sql::query("SELECT * FROM `it_b_variant` WHERE id=" . $row->id));
+                    if ($item) {
+                        $item = sql::fetch_array(sql::query("SELECT * FROM `it_b_ablock` WHERE good_id=" . $item['blockparent']));
+                    }
+
+                    $list = new Listing("ablock", "blocks", 'all', ' id=' . $item['id'] . ' and ');
+                    $list->on = 'false';
+                    $list->sortby = "DESC";
+                    $list->getList();
+                    $list->getItem();
+                    if (!empty($list->item)) {
+                        $row->url = end($list->item)->url;
+                    } else {
+                        $row->url = $item == false ? false : all::getUrl($item['parent']);
+                    }
+
+                }
+                if ($row->id && $listItems['P' . $row->id]) {
+                    $list = new Listing("ablock", "blocks", 'all', ' art="' . $row->art . '" and ');
+                    $list->on = 'false';
+                    $list->sortby = "DESC";
+                    $list->getList();
+                    $list->getItem();
+                    if ($list->item) {
+                        $row->url = end($list->item)->url;
+                    }
+                }
+            }
+
+            foreach ($order->rows as $_row) {
+                if ($_row->price > 0) {
+                    $order->orderitemids[] = $_row->id;
+                    $order->orderitem[] = $_row;
+                    $order->total += $_row->price * $_row->count;
+                } else {
+                    $order->orderbillids[] = $_row->id;
+                    $order->orderbill[] = $_row;
+                }
+            }
+            $order->total = round($order->total, 2);
+            $order->orderitemids = implode('|', $order->orderitemids);
+            $order->orderbillids = implode('|', $order->orderbillids);
+
+            $order->bill = !empty($order->orderbill);
+            $order->hasrows = !empty($order->orderitem);
+
+            $list = new Listing("orderitem", "items", $order->id);
+            $list->getList();
+            $list->getItem();
+            $order->items = $list->item;
+
+            $path = '/files/pdf/' . $order->id . '.pdf';
+            $file = $_SERVER['DOCUMENT_ROOT'] . $path;
+
+
+            $pathbill = '/files/pdf/' . $order->id . '_bill.pdf';
+            $filebill = $_SERVER['DOCUMENT_ROOT'] . $pathbill;
+
+            $order->file = file_exists($file) ? $path : false;
+            $order->filebill = file_exists($filebill) ? $pathbill : false;
+
+        }
+
 
         $list = new Listing("catalog", "cats", 40);
         $list->getList();
@@ -191,7 +347,7 @@ class profile
 
         $page->items = $list->item;
         $id = $result["id"];
-        $list = new Listing("user3", "blocks", 'all',' id= '.$id.' and ');
+        $list = new Listing("user3", "blocks", 'all', ' id= ' . $id . ' and ');
         $list->getList();
         $list->getItem();
         $page->user = $list->item;
@@ -203,7 +359,7 @@ class profile
     {
         global $control;
         $control->name = 'Регистрация';
-        $page = all::c_data_all($control->cid,'profile');
+        $page = all::c_data_all($control->cid, 'profile');
         $this->html['text'] = sprintt($page, 'templates/cabinet/register.html');
     }
 

@@ -28,8 +28,6 @@ class catalog
 
     private function _showList()
     {
-
-       
         global $control;
         $page = all::c_data_all($control->cid, 'catalog');
         $page->name = $control->name;
@@ -38,6 +36,16 @@ class catalog
         $list->getList();
         $list->getItem();
         $page->items = $list->item;
+
+//        if ($page->special_list == 1 || $_COOKIE['dev'] == "Y") {
+//
+//            $arts = new Listing("ablock", "blocks", $control->cid);
+//            $arts->getList();
+//            $arts->getItem();
+//            $page->items = $arts->item;
+//            //var_dump($page);
+//            $this->html['text'] = sprintt($page, 'templates/catalog/special_list.html');
+//        } else {
 
         if (!count($page->items)) {
             return $this->_showOne();
@@ -54,13 +62,17 @@ class catalog
             }
 
         }
+
+        // }
+
     }
 
     private function _showOne()
     {
-        
+
         global $control;
         $page = all::c_data_all($control->cid, 'catalog');
+
         $page->name = $control->name;
         $arts = new Listing("ablock", "blocks", $control->cid);
         $arts->getList();
@@ -69,6 +81,7 @@ class catalog
         $arSort = $arNums = $good_ids = $urls = $nums = array();
 
         foreach ($arts->item as $aitem) {
+
             $good_ids[] = $aitem->good_id;
             $urls[$aitem->good_id] = $aitem->url;
             $nums[$aitem->good_id] = $aitem->num;
@@ -76,27 +89,102 @@ class catalog
             $arSort[$aitem->good_id][] = $aitem->sort;
             $sort[$aitem->good_id] = $aitem->sort;
         }
-       
+
 
         if (!empty($good_ids)) {
 
+            # via-profit
+            # Setting a fuse for an SQL query that contained more than 2000 IN (...)
             $maxLimit = 100;
-
+            $new = array();
+            foreach ($good_ids as $key => $good_id) {
+                $new[$good_id] = (int)$good_id;
+            }
             if (count($good_ids) > $maxLimit + 1) {
-                $good_ids = array_slice($good_ids, 0, $maxLimit);
+//                $good_ids = array_slice($good_ids, 0, $maxLimit);
             }
 
-            $list = new Listing("catitem", "blocks", '245', ' id in( ' . implode(',', $good_ids) . ' ) and ');
-            
+            $list = new Listing("catitem", "blocks", '245', ' id in( ' . implode(',', $new) . ' ) and ');
+
+            if ($page->special_list == 1) {
+                $list->limit = 96;
+                $list->page = $control->page;
+            }
             $list->getList();
+            if ($page->special_list == 1) {
+                $url = all::getUrl($control->cid);
+                $list->getPage();
+
+                $navigation = new stdClass();
+
+                $navigation->next = $url . $list->next;
+                $navigation->url_last = $url . $list->url_last;
+                $navigation->last_page = $url . $list->last_page;
+                $navigation->url_next = $url . $list->url_next;
+                $navigation->first_page = $url . $list->first_page;
+                $navigation->url_n = $url . $list->url_n;
+                $page->navigation = $navigation;
+                $page->navigation_list = $list->navigation;
+
+
+                if (count($page->navigation_list) > 9) {
+                    $firstPage = $page->navigation_list[0];
+                    $dataItem = new stdClass();
+                    $dataItem->title = '...';
+                    $dataItem->url = false;
+                    $dataItem->active = 1;
+                    $endPage = $page->navigation_list[count($page->navigation_list) - 1];
+                    $needEnd = true;
+                    if (count($page->navigation_list) - 5 < $control->page) {
+                        $needEnd = false;
+                    }
+                    $offset = $control->page - 3;
+
+                    $length = 7;
+                    if ($offset < 0) {
+                        $offset = 0;
+
+                    }
+
+                    $page->navigation_list = array_slice($page->navigation_list, $offset, $length);
+                    if ($offset > 0) {
+                        array_unshift($page->navigation_list, $dataItem);
+                        array_unshift($page->navigation_list, $firstPage);
+                    }
+                    if ($needEnd) {
+                        array_push($page->navigation_list, $dataItem);
+                        array_push($page->navigation_list, $endPage);
+                    }
+
+
+                }
+
+                foreach ($page->navigation_list as &$pagerItem) {
+
+                    if ($pagerItem->num == $control->page) {
+                        $pagerItem->active = 1;
+                    } else {
+                        $pagerItem->active = 0;
+                    }
+                    if ($pagerItem->url != false) {
+                        $pagerItem->url = $url . $pagerItem->url;
+                    }
+                }
+
+
+            }
+
             $list->getItem();
+
             $items = $list->item;
 
-            foreach ($items as $key => $real_item) {
 
+            foreach ($items as $key => &$real_item) {
+                $items[$key]->real_num = $real_item->num;
                 $items[$key]->url = $urls[$real_item->id];
-                $real_item->num = $nums[$real_item->id];
+                $items[$key]->num = $nums[$real_item->id];
             }
+            
 
             $_items = array();
             foreach ($items as $item) {
@@ -108,6 +196,7 @@ class catalog
                     $page->items[] = $tmp;
                 }
             }
+
             foreach ($page->items as $key => &$value) {
                 $value->nnum = end($arNums[$value->id]);
                 unset($arNums[$value->id][count($arNums[$value->id]) - 1]);
@@ -123,7 +212,12 @@ class catalog
 
         }
 
-        $this->html['text'] = sprintt($page, 'templates/catalog/catalog_one.html');
+        if ($page->special_list == 1) {
+            $this->html['text'] = sprintt($page, 'templates/catalog/special_list.html');
+        } else {
+            $this->html['text'] = sprintt($page, 'templates/catalog/catalog_one.html');
+        }
+
 
     }
 
@@ -135,14 +229,22 @@ class catalog
 
     private function _showGood()
     {
+
         global $control;
 
         $_data = all::b_data_all($control->bid, 'ablock');
-
+        $catalog =  all::c_data_all(40, 'catalog');;
         $page = all::b_data_all($_data->good_id, 'catitem');
-
-
-        
+        $ppage = all::c_data_all($control->cid, 'catalog');
+        $page->catalog_img = $ppage->img;
+        $page->num = $_data->num;
+        $page->all_good = $catalog->all_good;
+        $arts = new Listing("ablock", "blocks", 'all', ' good_id =' . (int)$page->id . ' and ');
+        $arts->getList();
+        $arts->getItem();
+        if (!empty($arts->item)) {
+//            $page->num = end($arts->item)->num;
+        }
 
         $list = new Listing("goodimage", "items", $_data->good_id);
         $list->getList();
@@ -151,19 +253,20 @@ class catalog
 
         $list = new Listing("variant", "items", $_data->good_id);
 
-        
+
         $list->getList();
         $list->getItem();
         $page->items = $list->item;
-        
-       
+
+
 
         if (is_null($page->items)) {
             $pItem = all::b_data_all($_data->good_id, 'catitem');
             $pItem->id = 'P' . $pItem->id;
             $page->items[] = $pItem;
-           
         }
+
+
         $list = new Listing("aarts", "items", $_data->good_id);
         $list->getList();
         $list->getItem();
@@ -177,9 +280,24 @@ class catalog
 
         $aarts = array_diff($aarts, array('', null, 0));
 
+        $list = new Listing("aarts2", "items", $_data->good_id);
+        $list->getList();
+        $list->getItem();
 
-        if (!empty($aarts)) {
-            $list = new Listing("variant", "items", 'all', ' blockparent in(' . implode(',', $aarts) . ') and        ');
+
+        $aarts2 = array_map(function ($obg) {
+            if ($obg->good_id_arts) {
+                return $obg->good_id_arts;
+            }
+
+        }, $list->item);
+
+
+        $aarts2 = array_diff($aarts2, array('', null, 0));
+
+
+        if (!empty($aarts) && empty($page->items)) {
+            $list = new Listing("variant", "items", 'all', ' blockparent in(' . implode(',', $aarts) . ') and ');
             $list->getList();
             $list->getItem();
 
@@ -189,6 +307,7 @@ class catalog
             if (is_null($list->item)) {
                 $list->item = array();
             }
+
             $tmp = array($page->items, $list->item);
             $page->items = array();
             foreach ($tmp as $_tmp) {
@@ -200,186 +319,36 @@ class catalog
 
         }
 
+        if (!empty($aarts2)) {
+
+            $list = new Listing("variant", "items", 'all', ' blockparent in(' . implode(',', $aarts2) . ') and ');
+            $list->getList();
+            $list->getItem();
+
+            if (is_null($page->items2)) {
+                $page->items2 = array();
+            }
+
+            if (is_null($list->item)) {
+                $list->item = array();
+            }
+
+
+            $tmp = array($page->items2, $list->item);
+            $page->items2 = array();
+            foreach ($tmp as $_tmp) {
+                foreach ($_tmp as $item) {
+                    $page->items2 [] = $item;
+                }
+            }
+
+
+        }
+
         $count = 0;
 
 
-//        if (strlen($page->recomend)) {
-//            $recomend = explode(',', $page->recomend);
-//            $arSorting = array('parents' => array(), 'items' => array());
-//            foreach ($recomend as $key => &$item) {
-//                $count++;
-//                if ($count > 8) break;
-//                if ($item[0] == 'P') {
-//                    $arSorting['parents'][] = (int)str_replace('P', '', $item);
-//                    $catitems[] = (int)str_replace('P', '', $item);
-//                    unset($recomend[$key]);
-//                } else {
-//                    $arSorting['items'][] = $item;
-//                }
-//                $item = (int)$item;
-//            }
-//        }
-//        if ($count < 8) {
-//            $_res = sql::query('select id from prname_b_aarts where blockparent = ' . $_data->good_id);
-//            $_parents = array();
-//
-//            while ($data = sql::fetch_object($_res)) {
-//                $_parents[] = $data->id;
-//            }
-//            $ids = '';
-//            if (count($recomend)) {
-//                $ids = ' and id not in(' . implode(',', $recomend) . ') ';
-//            }
-//
-//            if (!empty($_parents)) {
-//                $__res = sql::query('select id from prname_b_variant where blockparent IN( ' . implode(',', $_parents) . ') and id != ' . $_data->good_id . ' ' . $ids . ' limit 0,' . (8 - $count));
-//
-//                while ($data = sql::fetch_object($__res)) {
-//                    $count++;
-//                    $recomend[] = $data->id;
-//                }
-//
-//                if ($control < 8) {
-//                    foreach ($_parents as $__parent) {
-//                        $parents[] = $__parent;
-//                        $count++;
-//                        if ($count >= 8) {
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//
-//        }
-//        if ($count < 8) {
-//            $ids = '';
-//            $res = sql::query('select id from prname_b_catitem where parent = ' . $control->cid . ' and id  != ' . $_data->good_id);
-//
-//            while ($data = sql::fetch_object($res)) {
-//                $parents[] = $data->id;
-//            }
-//
-//            if (count($recomend)) {
-//                $ids = ' and id not in(' . implode(',', $recomend) . ') ';
-//            }
-//
-//            if ($parents) {
-//                $res = sql::query('select id from prname_b_variant where blockparent IN( ' . implode(',', $parents) . ') and id != ' . $_data->good_id . ' ' . $ids . ' limit 0,' . (8 - $count));
-//                while ($data = sql::fetch_object($res)) {
-//                    $count++;
-//                    $recomend[] = $data->id;
-//                }
-//            }
-//
-//
-//            if ($count < 8) {
-//                foreach ($parents as $parent) {
-//                    if ($count >= 8)
-//                        break;
-//                    $catitems[] = $parent;
-//                    $count++;
-//                }
-//            }
-//            if ($count < 8) {
-//
-//                if ($ids) {
-//                    $res = sql::query('select id from prname_b_variant where 1=1 ' . $ids . ' limit 0,' . (8 - $count));
-//                    while ($data = sql::fetch_object($res)) {
-//                        $count++;
-//                        $recomend[] = $data->id;
-//                    }
-//                }
-//            }
-//        }
-//        if ($count < 8) {
-//
-//            if ($ids) {
-//                $res = sql::query('select id from prname_b_variant where 1=1 ' . $ids . ' limit 0,' . (8 - $count) . ' ');
-//            } else {
-//                $res = sql::query('select id from prname_b_variant limit 0,' . (8 - $count));
-//            }
-//
-//            while ($data = sql::fetch_object($res)) {
-//                $count++;
-//                $recomend[] = $data->id;
-//            }
-//        }
-//        if (!empty($recomend)) {
-//            $res = sql::query('
-//        select v.*,c.name_rus,t.url,ab.id as parent_id
-//from it_b_variant v
-//inner join it_b_catitem c on c.id = v.blockparent
-//inner join it_b_ablock ab on ab.good_id = c.id
-//inner join it_tree t on t.id = ab.parent
-//        where v.id in( ' . implode(',', $recomend) . ')');
-//            while ($data = sql::fetch_object($res)) {
-//                $arRecommendSorting[$data->id] = $data;
-//                $page->recomend_items[] = $data;
-//            }
-//        }
-//        if (!empty($catitems)) {
-//
-//            $list = new Listing("ablock", "blocks", 'all', ' good_id in (' . implode(', ', $catitems) . ') and ');
-//            /*
-//            $list = new Listing("ablock", "block", 'all' , ' id in ('. implode(', ', $catitems).') and ');
-//            */
-//            $list->getList();
-//            $list->getItem();
-//            $page->recomend_p_items = $list->item;
-//
-//            foreach ($list->item as $item) {
-//                $arRecommendParentSorting[$item->good_id] = $item;
-//            }
-//            /*
-//            $res = sql::query('select c.*,t.url from it_b_catitem c inner join it_tree t on t.id = c.parent where c.id in(' . implode(',', $catitems) . ')');
-//            while ($data = sql::fetch_object($res)) {
-//                $page->recomend_p_items[] = $data;
-//            }
-//            */
-//        }
-//        if (!empty($arSorting['parents'])) {
-//
-//            $tmp = $page->recomend_p_items;
-//            $page->recomend_p_items = $page->recomend_p_items_sort = array();
-//            foreach ($arSorting['parents'] as $item) {
-//                if(!empty($arRecommendParentSorting[$item])){
-//                    $page->recomend_p_items_sort[] = $arRecommendParentSorting[$item];
-//                }
-//            }
-//
-//            foreach ($tmp as $add){
-//                $_add = true;
-//                foreach ($page->recomend_p_items_sort as $item){
-//                    if($item->id == $add->id){
-//                        $_add = false;
-//                    }
-//                }
-//                if($_add){
-//                    $page->recomend_p_items[] = $add;
-//                }
-//            }
-//        }
-//        if (!empty($arSorting['items'])) {
-//            $tmp = $page->recomend_items;
-//            $page->recomend_items = $page->recomend_items_sort = array();
-//            foreach ($arSorting['items'] as $item) {
-//                if(!empty($arRecommendSorting[$item])){
-//                    $page->recomend_items_sort[] = $arRecommendSorting[$item];
-//                }
-//            }
-//
-//            foreach ($tmp as $add){
-//                $_add = true;
-//                foreach ($page->recomend_items_sort as $item){
-//                    if($item->id == $add->id){
-//                        $_add = false;
-//                    }
-//                }
-//                if($_add){
-//                    $page->recomend_items[] = $add;
-//                }
-//            }
-//        }
+
         $page->recomend = str_replace('P', '', $page->recomend);
         $_recommendGoods = explode(',', $page->recomend);
 
@@ -481,17 +450,17 @@ class catalog
             || !empty($page->img_2)
             || !empty($page->img_3)
             || !empty($page->img_4)
-            || !empty($page->video);
+            || !empty($page->video) || !empty($page->catalog_img);
         $page->recomend_items = $tmp;
         $control->titleSeo = $page->name_rus . ' ' . $page->art . ' для ' . all::get_name($control->parents[2]) . ' на specinter.ru';
         $control->descriptionSeo = $page->name_rus . ' ' . $page->art . ' купить на сайте specinter.ru | запчасти ' . all::get_name($control->parents[2]);
         $control->name = $page->name_rus;
-        
-        
-     
+
 
         # get duplicate items
-        $res = sql::query('select * from it_b_aarts where blockparent = '.(int)$page->id.' and visible = 1');
+        $res = sql::query('select dub.id, dub.blockparent, dub.good_id_arts, good.art, good.name_rus name from it_b_aarts dub
+                            join it_b_catitem good on good.id = dub.good_id_arts
+                            where dub.blockparent = ' . (int)$page->id . ' and dub.visible = 1');
         $page->duplicates = array();
         $good_id_arts = array();
         while ($data = sql::fetch_object($res)) {
@@ -501,20 +470,64 @@ class catalog
             }
         }
 
+
         if (!empty($page->duplicates)) {
             $page->has_duplicates = true;
 
             if (!!$good_id_arts) {
-           
-                $res = sql::query('select * from it_b_ablock where good_id IN ('.implode(', ', $good_id_arts).') and visible = 1');
+
+                $res = sql::query('select * from it_b_ablock where good_id IN (' . implode(', ', $good_id_arts) . ') and visible = 1');
                 while ($data = sql::fetch_object($res)) {
                     $data->url = all::getUrl($data->parent) . '_aview_b' . $data->id . '/';
 
+                    $itemsDataBlock = all::b_data_all($data->good_id, 'catitem');
                     foreach ($page->duplicates as $i => $duplicateItem) {
+
                         if ((int)$duplicateItem->good_id_arts === (int)$data->good_id) {
                             $page->duplicates[$i]->url = $data->url;
+                            $page->duplicates[$i]->name_eng = $data->name_eng;
+                            $page->duplicates[$i]->img = $itemsDataBlock->img;
                             $page->duplicates[$i]->_data = $data;
                         }
+                    }
+                }
+            }
+        }
+
+
+        $res = sql::query('select dub.id, dub.blockparent, dub.good_id_arts, good.art, good.name_rus name from it_b_aarts2 dub
+                            join it_b_catitem good on good.id = dub.good_id_arts
+                            where dub.blockparent = ' . (int)$page->id . ' and dub.visible = 1');
+        $page->duplicates2 = array();
+        $good_id_arts2 = array();
+        while ($data = sql::fetch_object($res)) {
+            $page->duplicates2[$data->id] = $data;
+            if (!!$data->good_id_arts) {
+                $good_id_arts2[] = $data->good_id_arts;
+            }
+        }
+
+
+        if (!empty($page->duplicates2)) {
+            $page->has_duplicates2 = true;
+
+            if (!!$good_id_arts2) {
+
+                $res = sql::query('select * from it_b_ablock where good_id IN (' . implode(', ', $good_id_arts2) . ') and visible = 1');
+                while ($data = sql::fetch_object($res)) {
+                    $data->url = all::getUrl($data->parent) . '_aview_b' . $data->id . '/';
+                    $itemsDataBlock = all::b_data_all($data->good_id, 'catitem');
+                    foreach ($page->duplicates2 as $i => $duplicateItem) {
+
+                        if ((int)$duplicateItem->good_id_arts === (int)$data->good_id) {
+                            $page->duplicates2[$i]->url = $data->url;
+                            $page->duplicates2[$i]->name_eng = $data->name_eng;
+                            $page->duplicates2[$i]->img = $itemsDataBlock->img;
+                            $page->duplicates2[$i]->_data = $data;
+                        }
+                    }
+                    if (!$page->duplicates2[$i]->price) {
+                        $page->duplicates2[$i]->price = false;
                     }
                 }
             }
@@ -524,16 +537,26 @@ class catalog
 
         # set item names
         $page->needRow = true;
+
+
         if (!empty($page->items)) {
             foreach ($page->items as $i => $item) {
-                if($item->price){
+                if ($item->price) {
                     $page->needRow = false;
                 }
                 $page->items[$i]->name_rus = $page->name_rus;
+                if (empty($item->img)) {
+                    $item->img = $page->img;
+                }
+
+                if ($item->art && strlen($item->art) > 15 && (strripos($item->art, '/') !== false || strripos($item->art, '+') !== false)) {
+                    $item->art = str_replace('/', '/<br>', $item->art);
+                    $item->art = str_replace('+', '+<br>', $item->art);
+                }
+                
             }
         }
 
-        
         $page->back_url = $control->module_url;
         $this->html['text'] = sprintt($page, 'templates/catalog/catalog_good.html');
     }
@@ -541,9 +564,9 @@ class catalog
 
     private function __showMethodNameForAdmin($methodName)
     {
-        if ($_REQUEST['admin'] == "Y" || $_COOKIE['admin'] == "Y") {
-            echo $methodName;
-        }
+//        if ($_REQUEST['admin'] == "Y" || $_COOKIE['admin'] == "Y") {
+//            echo $methodName;
+//        }
     }
 }
 

@@ -6,11 +6,134 @@
 <div class="lk">
     <div class="lk-tabs">
         <div class="tab-menu">
-            <div class="tab-menu-one active">Профиль</div>
+            <div class="tab-menu-one active">Заказы</div>
+            <div class="tab-menu-one ">Профиль</div>
             <div class="tab-menu-one">Гараж</div>
         </div>
         <div class="tab-list">
             <div class="tab-list-one" style="display: block;">
+                <ul class="order-list">
+                    {mask:orders}
+                        {if:{hasrows}}
+                            {set:orderitem}
+                            <li class="order-item order-item-product order-hide">
+                                <div class="order-item-title">
+                                    <div class="order-item-title-td">
+                                        <span class="order-date">{date}</span>
+                                        <h5 class="order-number">Счет №{id}</h5>
+                                    </div>
+                                    {set:total}
+                                    <div class="order-item-title-td order-item-title-td--total">
+                                        <b class="order-bill-amount">Сумма:</b>
+                                        <span class="order-bill-total">{total} ₽</span>
+                                    </div>
+                                    {/}
+                                </div>
+                                <div class="order-item-wrap">
+                                    <div class="order-item-table">
+                                        <table>
+                                            <thead>
+                                            <tr>
+                                                <th class="order-table-number">№</th>
+                                                <th class="order-table-photo">Фото</th>
+                                                <th class="order-table-article">Название и артикул</th>
+                                                <th class="order-table-price">Цена</th>
+                                                <th class="order-table-quintity">Количество</th>
+                                                <th class="order-table-total">Сумма</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {mask:orderitem}
+                                            <tr>
+                                                <td class="order-table-number">{_rank}</td>
+                                                <td class="order-table-photo">
+                                                    {set:img}
+                                                    <div class="detal-photo " data-url="/files/0/{img}"></div>
+                                                    {/}
+
+                                                    {mis:img}
+                                                    <div class="detal-photo disable"></div>
+                                                    {/}
+
+                                                </td>
+                                                <td class="order-table-article">{set:url}<a href="{url}">{name} {art}</a>{/}{mis:url}{name}
+                                                    {art}{/}
+                                                </td>
+                                                <td class="order-table-price">{set:price}{price}{/}{mis:price}0{/}₽</td>
+                                                <td class="order-table-quintity">{count}</td>
+                                                <td class="order-table-total">{set:price}{total}{/}{mis:price}0{/}₽</td>
+                                            </tr>
+                                            {/}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="order-btn-wrap">
+                                        <a class="btn-reorder order-btn" href="/cart/?order_id={id}&id={orderitemids}">Повторить заказ</a>
+                                        {set:file}
+                                        <a class="btn-print order-btn" target="_blank" href="{file}">Распечатать</a>
+                                        {/}
+                                    </div>
+                                </div>
+                            </li>
+                            {/}
+                        {/}
+                    {if:{bill}}
+                    <li class="order-item order-item-product order-hide">
+                        <div class="order-item-title">
+                            <div class="order-item-title-td">
+                                <span class="order-date">{date}</span>
+                                <h5 class="order-number">Заказ №{id}</h5>
+                            </div>
+                        </div>
+                        <div class="order-item-wrap">
+                            <div class="order-item-table">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th class="order-table-number">№</th>
+                                        <th class="order-table-photo">Фото</th>
+                                        <th class="order-table-article">Название и артикул</th>
+                                        <th class="order-table-quintity">Количество</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {mask:orderbill}
+                                    <tr>
+                                        <td class="order-table-number">{_rank}</td>
+                                        <td class="order-table-photo">
+                                            {set:img}
+                                            <div class="detal-photo " data-url="/files/0/{img}"></div>
+                                            {/}
+
+                                            {mis:img}
+                                            <div class="detal-photo disable"></div>
+                                            {/}
+
+                                        </td>
+                                        <td class="order-table-article">{set:url}<a href="{url}">{name} {art}</a>{/}{mis:url}{name}
+                                            {art}{/}
+                                        </td>
+                                        <td class="order-table-quintity">{count}</td>
+                                    </tr>
+                                    {/}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="order-btn-wrap">
+                                <a class="btn-reorder order-btn" href="/cart/?order_id={id}&id={orderbillids}">Повторить заказ</a>
+                                {set:filebill}
+                                <a class="btn-print order-btn" target="_blank" href="{filebill}">Распечатать</a>
+                                {/}
+                            </div>
+                        </div>
+                    </li>
+                    {/}
+                    {/}
+                </ul>
+            </div>
+            <div class="tab-list-one">
                 <div class="lk-cols clearfix">
                     <div class="lk-col">
                         <div class="lk-col__title">Личные данные</div>
@@ -38,9 +161,10 @@
                             <div class="lk-col__title">Данные организации</div>
                             <div class="form-line">
                                 <label for="">Название организации:</label>
-                                <input value="{organization}" placeholder="Введите название организации" type="text" name="organization">
+                                <input value="{organization}" placeholder="Введите название организации" type="text"
+                                       name="organization">
                             </div>
-                            
+
                             <div class="form-line">
                                 <label for="">ИНН:</label>
                                 <input value="{inn}" placeholder="Введите ИНН" type="text" name="inn">
@@ -51,7 +175,8 @@
                             </div>
                             <div class="form-line">
                                 <label for="">Юридический адрес:</label>
-                                <input value="{uladress}" placeholder="Введите  юридический адрес" type="text" name="uladress">
+                                <input value="{uladress}" placeholder="Введите  юридический адрес" type="text"
+                                       name="uladress">
                             </div>
                             <div class="form-line">
                                 <label for="">Наименование банка:</label>
@@ -65,7 +190,7 @@
                                 <label for="">Расчетный счет:</label>
                                 <input value="{rschet}" placeholder="Введите расчетный счет" type="text" name="rschet">
                             </div>
-                            
+
 
                             <div class="form-line">
                                 <button class="form-send personal-edit">Сохранить</button>
@@ -162,4 +287,20 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    let orderItem = document.querySelectorAll('.order-item');
+    for (let i = 0; i < orderItem.length; i++) {
+        accordeonOrder(orderItem[i]);
+    }
+
+    function accordeonOrder(item) {
+        let itemTitle = item.querySelector(".order-item-title");
+        itemTitle.addEventListener('click', function () {
+            item.classList.toggle('order-hide');
+        })
+    }
+</script>
 {/mask}
+

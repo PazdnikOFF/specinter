@@ -15,17 +15,31 @@ class Sql {
 		mysql_query("SET NAMES 'utf8'");
 	}
 
+
+	public static function log($logString) {
+		$handle = fopen($_SERVER['DOCUMENT_ROOT'] . '/log/sql-' . date('Y-m-d') . '.log', 'a+');
+		$logString = "[" . date("Y-m-d H:i:s") . "] " . $logString . "\n";
+		fwrite($handle, $logString);
+		fclose($handle);
+	}
+
 	function query($q) {
 		global $prname;
 		$q = str_replace('prname', $prname, $q);
 //		echo $q."\r\n";
 
+		if (isset($_COOKIE['vas-vas'])) {
+			Sql::log($q);
+		}
 
-// if (isset($_COOKIE['vas-vas'])) {
-// 	var_dump($q);
-// }
-
-		$res = mysql_query($q) OR die(mysql_error());
+		$res = mysql_query($q);
+        if (!$res) {
+//            echo '<!-- error dump: ';
+//            var_dump(mysql_error());
+//            var_dump(debug_backtrace());
+//            echo '-->';
+            die(mysql_error());
+        }
 //		echo "complete query\r\n";
 		return $res;
 	}

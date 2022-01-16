@@ -1,5 +1,5 @@
 <?
-require_once('/home/u67887/u67887.netangels.ru/www/libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
+require_once('/home/c26864/specinter.ru/www/libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
 
 function format_price($value)
 {
@@ -281,9 +281,9 @@ function htmlForPdf($from, $to, $items)
         $html .= '<p class="header">' . $from['header'] . '</p>';
     }
     $html .= '<div class="sign">
-    <img class="sign-1" src="/home/u67887/u67887.netangels.ru/www/img/podps.png" width="150px">
-    <img class="sign-2" src="/home/u67887/u67887.netangels.ru/www/img/podps.png" width="150px">
-    <img class="printing" src="/home/u67887/u67887.netangels.ru/www/img/pechat.png" width="150px">
+    <img class="sign-1" src="/home/c26864/specinter.ru/www/img/podps.png" width="150px">
+    <img class="sign-2" src="/home/c26864/specinter.ru/www/img/podps.png" width="150px">
+    <img class="printing" src="/home/c26864/specinter.ru/www/img/pechat.png" width="150px">
 
     <table>
         <tbody>
@@ -306,7 +306,7 @@ function saveXls($from, $to, $items, $id)
 {
     //error_reporting( E_ALL );
     global $ar_mon;
-    $xls = PHPExcel_IOFactory::load('/home/u67887/u67887.netangels.ru/www/mailtemplates/pdf/bill.xlsx');
+    $xls = PHPExcel_IOFactory::load('/home/c26864/specinter.ru/www/mailtemplates/pdf/bill.xlsx');
     $xls->setActiveSheetIndex(0);
     $sheet = $xls->getActiveSheet();
 
@@ -349,6 +349,6 @@ function saveXls($from, $to, $items, $id)
     $sheet->setCellValueByColumnAndRow(37, 26 + $count, ((empty($nds)) ? '-' : format_price($nds)));
     $sheet->setCellValueByColumnAndRow(1, 29 + $count, str_price($total));
     $objWriter = new PHPExcel_Writer_Excel5($xls);
-    $objWriter->save('/home/u67887/u67887.netangels.ru/www/files/pdf/bill_' . $id . '.xls');
-    return '/home/u67887/u67887.netangels.ru/www/files/pdf/bill_' . $id . '.xls';
+    $objWriter->save('/home/c26864/specinter.ru/www/files/pdf/bill_' . $id . '.xls');
+    return '/home/c26864/specinter.ru/www/files/pdf/bill_' . $id . '.xls';
 }

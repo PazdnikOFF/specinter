@@ -1,9 +1,9 @@
 
 <?
 die('Ooops');
-$link = mysql_connect('localhost', 'u67887', 'Awmn3a4HzCbVwuC');
+$link = mysql_connect('localhost', 'c26864_specinter_ru', 'HaWpoXujponiy12');
 mysql_set_charset('utf8');
-mysql_select_db("u67887", $link);
+mysql_select_db("c26864_specinter_ru", $link);
 
 $sql = "
   select

@@ -22,7 +22,6 @@ class adminblockedit extends manage
         $this->page = $control->page;
 
 
-
         if ($control->oper == 'add') {
             if (isset($_POST['parent']))
                 return $this->add();
@@ -187,30 +186,34 @@ class adminblockedit extends manage
 
 
         if (empty($_POST['good_id'])) {
+
+            // if (in_array((int)$_REQUEST['parent'], array(451))) {
+
             $_POST['good_id'] = All::insert_block('catitem', 245, $_POST);
 
             # assign new item to special 451 category
             All::insert_block('ablock', 451, $_POST);
-            
+            // }
 
-        }else {
+
+        } else {
 
             # drop item from special 451 category
-            sql::query("DELETE FROM `it_b_ablock` WHERE `good_id` = ".(int)$_POST['good_id']." AND `parent` = 451");
+            sql::query("DELETE FROM `it_b_ablock` WHERE `good_id` = " . (int)$_POST['good_id'] . " AND `parent` = 451");
         }
 
         if (!$nolik) {
             All::insert_block('ablock', $parent, $_POST);
         }
-        if(!empty($_REQUEST["good_id"])){
+        if (!empty($_REQUEST["good_id"])) {
             $update = array();
-            global  $sql;
+            global $sql;
 
-            foreach (array('art','name_rus','name_eng') as $value){
-                $update[] = $value .  ' = "' . $_REQUEST[$value] .'"';
+            foreach (array('art', 'name_rus', 'name_eng') as $value) {
+                $update[] = $value . ' = "' . $_REQUEST[$value] . '"';
             }
 
-            $sql->query("update it_b_catitem set ".implode(', ',$update)." where id = ". $_REQUEST['good_id']);
+            $sql->query("update it_b_catitem set " . implode(', ', $update) . " where id = " . $_REQUEST['good_id']);
 
         }
         echo json_encode(array('success' => $_POST['good_id']));
@@ -225,7 +228,7 @@ class adminblockedit extends manage
         // Поиск
         $_GET['getsearch'] = isset($_POST['search']) ? "" : $_GET['getsearch'];
 
-        $searchText = $_POST['search'] ? $_POST['search'] : $_GET['getsearch'];
+        $searchText = trim($_POST['search'] ? $_POST['search'] : $_GET['getsearch']);
         if (!empty($searchText)) $isSearch = true;
 
 
@@ -330,9 +333,9 @@ class adminblockedit extends manage
 
             if (all::getVar("page") != "" && isset($_POST['search'])) {
                 $page->lpage = $lpage = all::getVar("page");
-            } else if(all::getVar("page") !=""){
+            } else if (all::getVar("page") != "") {
                 $page->lpage = $lpage = all::getVar("page");
-            }else{
+            } else {
                 $page->lpage = $lpage = 0;
             }
 
@@ -388,6 +391,9 @@ class adminblockedit extends manage
 
             if (!$orderSql) {
                 $orderSql = " `sort` ASC";
+            }
+            if ($currentTemplate == 'orderinfo') {
+                $orderSql = 'id DESC';
             }
 
 
@@ -526,6 +532,7 @@ class adminblockedit extends manage
                         $jj++;
                     }
                 $page->item[$j]->visible = $r['visible'];
+                $page->item[$j]->sort = $r['sort'];
 
                 $j++;
 
@@ -544,6 +551,7 @@ class adminblockedit extends manage
             echo $ajaxHtml;
             die();
         }
+
         $this->html['text'] = sprintt($page, 'templates/' . $control->template . '/' . $control->template . '.html');
     }
 
@@ -568,7 +576,14 @@ class adminblockedit extends manage
 
         if ($blockparent) {
 
-            $result = sql::query("SELECT * FROM prname_b_" . $template . " WHERE blockparent=" . $blockparent . " ORDER by sort");
+            if (\in_array($template, ['aarts', 'aarts2'], true)) {
+                $result = sql::query("SELECT dub.id, dub.blockparent, dub.visible, dub.good_id_arts, good.art, good.name_rus name
+                    FROM prname_b_" . $template . " dub
+                    JOIN prname_b_catitem good on good.id = dub.good_id_arts
+                    WHERE dub.blockparent=" . $blockparent . " ORDER by dub.sort");
+            } else {
+                $result = sql::query("SELECT * FROM prname_b_" . $template . " WHERE blockparent=" . $blockparent . " ORDER by sort");
+            }
 
             $dataRel = sql::query("SELECT p2.* from prname_btemplates p1, prname_bdatarel p2 WHERE p1.key='" . $template . "' AND p2.templid=p1.id AND p2.show=1 ORDER by p2.sort");
 
@@ -706,6 +721,13 @@ class adminblockedit extends manage
 
         $page->add = true;
 
+
+        if (in_array($page->template, array('aarts2', 'aarts'))) {
+            $page->aatrs = true;
+        } else {
+            $page->aatrs = false;
+        }
+
         if ($mode == '') {
             $page->menu = $this->menu;
             $this->html['text'] = sprintt($page, 'templates/' . $control->template . '/' . $control->template . '_add.html');
@@ -733,6 +755,7 @@ class adminblockedit extends manage
 
         $sort = 1 + sql::one_record("SELECT MAX(sort) as msort FROM prname_b_" . $template);
 
+
         //Сначала то, что знаем
         $query = "INSERT INTO prname_b_" . $template . " SET parent=" . $parent . ", visible=1, sort=" . $sort;
 
@@ -741,17 +764,18 @@ class adminblockedit extends manage
             $query = "INSERT INTO prname_b_" . $template . " SET visible=1, sort=" . $sort . ", blockparent=" . $blockparent;
         }
 
-        sql::query($query);
-
-        $_SESSION['newId'] = sql::insert_id();
+//        sql::query($query);
 
 
-        $query = "UPDATE prname_b_" . $template . " SET visible=1";
+//        $query .= ", visible=1";
 
         //Дальше - поля блока
+
+
         for ($i = 0; $i < count($_POST['dat']); $i++) {
             $class = "type_" . $_POST['dkey'][$i];
             $obj = new $class();
+
             $_genValue = $obj->save('data' . $i);
             if (is_array($_genValue)) {
                 foreach ($_genValue as $k => $v) {
@@ -778,9 +802,11 @@ class adminblockedit extends manage
 
 
             $query .= " , `" . addslashes($_POST['dat'][$i]) . "` = '" . $genValueS . "' ";
+
         }
 
-        if ($template == 'aarts') {
+
+        if ($template == 'aarts' || $template == 'aarts2') {
             $row = sql::fetch_row(sql::query("SELECT art,name_rus  FROM prname_b_catitem WHERE id = " . $blockparent), -1);
             if (!empty($data['art']) && !empty($data['name'])) {
                 if (!empty($row[0]) && !empty($row[1]) && !empty($data['good_id_arts'])) {
@@ -817,10 +843,34 @@ class adminblockedit extends manage
             $query .= " , `ukeywords`='" . $value . "' ";
         }
 
-        $query .= " WHERE id=" . $_SESSION['newId'];
+//        $query .= " WHERE id=" . $_SESSION['newId'];
+
+
+        # via-profit
+        # if good_id are emty then set it permanetly (inject in sql query)
+        if (
+            isset($_POST['dat'][4]) &&
+            $_POST['dat'][4] === 'good_id' &&
+            isset($_POST['data4']) &&
+            $_POST['data4'] === ''
+        ) {
+
+            $goodId = All::insert_block('catitem', $parent, array(
+                'good_id' => '',
+                'no_link' => '1',
+                'num' => $_POST['data0'],
+                'art' => $_POST['data1'],
+                'name_rus' => $_POST['data2'],
+                'name_eng' => $_POST['data3']
+            ));
+            $query = preg_replace('/`good_id`\s=\s\'\'/', 'good_id = \'' . $goodId . '\'', $query);
+        }
+
 
 
         sql::query($query);
+        $_SESSION['newId'] = sql::insert_id();
+//        sql::query($query);
 
         //Сохраняем в таблицу с ЧПУ
         if ($_POST['uurl'] != '') {
@@ -841,8 +891,8 @@ class adminblockedit extends manage
             sql::query($urlSql);
         }
 
-        if ($template == 'aarts' && $mode == 'item') {
-            self::addItemsByParentId($blockparent);
+        if (($template == 'aarts2' || $template == 'aarts') && $mode == 'item') {
+            self::addItemsByParentId($blockparent, $template);
         }
         if ($mode == '') {
             header("Location: /manage/blockedit/_alist_parent" . $parent . "_template" . $template . "_page" . $lpage . "/");
@@ -925,6 +975,15 @@ class adminblockedit extends manage
         $sqlData = sql::fetch_assoc(sql::query("SELECT * FROM prname_b_" . $template . " WHERE id=" . $blockid));
 
         $i = 0;
+
+
+        $page->tabs[0]->fields[$i]->name = 'Порядок вывода';
+        $page->tabs[0]->fields[$i]->value = (new type_text())->input('data'.$i, $sqlData['sort'], '', false);
+        $page->tabs[0]->fields[$i]->key = 'sort';
+        $page->tabs[0]->fields[$i]->datatkey = 'text';
+        $page->tabs[0]->fields[$i]->index = $i;
+        $i++;
+
         while ($field = sql::fetch_assoc($sqlFields)) {
             if ($blockid == 80 && $field['key'] == 'texthtml') {
                 continue;
@@ -971,6 +1030,7 @@ class adminblockedit extends manage
         if ($_GET['back_url']) {
             $page->back_url = $_GET['back_url'];
         }
+
         if ($mode == '') {
             $page->menu = $this->menu;
             $this->html['text'] = sprintt($page, 'templates/' . $control->template . '/' . $control->template . '_add.html');
@@ -1034,7 +1094,10 @@ class adminblockedit extends manage
                 $urlS = sql::one_record("SELECT id FROM prname_urls WHERE template='" . $template . "' AND blockid=" . $blockid);
                 //Если урл уже был - обновляем
 
-                if ($urlS > 0) sql::query("UPDATE prname_urls SET url='" . $value . "' WHERE template='" . $template . "' AND blockid=" . $blockid);
+                if ($urlS > 0) {
+                    $q1 = "UPDATE prname_urls SET url='" . sql::escape_string($value) . "', realurl='".sql::escape_string($realUrl)."' WHERE template='" . $template . "' AND blockid=" . $blockid;
+                    sql::query($q1);
+                }
                 //Если нет - вставляем новую запись
                 else sql::query("INSERT INTO prname_urls (`url`, `realurl`, `template`, `blockid`) VALUES ('" . $value . "', '" . $realUrl . "', '" . $template . "', " . $blockid . ")");
             }
@@ -1065,7 +1128,8 @@ class adminblockedit extends manage
         $query .= " WHERE id=" . $blockid;
 
         if ($template == 'catitem') {
-            $this->addItemsByParentId($blockid);
+            $this->addItemsByParentId($blockid, 'aarts');
+            $this->addItemsByParentId($blockid, 'aarts2');
         }
 
         //$this->updateCache($blockid, $parent, $template);
@@ -1100,7 +1164,7 @@ class adminblockedit extends manage
         }
 
 
-        if ($template == 'aarts' && $mode == 'item') {
+        if (($template == 'aarts' || $template == 'aarts2') && $mode == 'item') {
             self::addItemsByParentId($blockparent);
         }
         if ($_REQUEST['back_url']) {
@@ -1123,11 +1187,14 @@ class adminblockedit extends manage
 
     }
 
-    function addItemsByParentId($id)
+    function addItemsByParentId($id, $template)
     {
-        $q = sql::query('select * from it_b_aarts where blockparent = ' . $id);
+
+        $q = sql::query('select * from it_b_' . $template . ' where blockparent = ' . $id);
         $parents = array();
-        $parents[] = $id;
+        if ($id) {
+            $parents[$id] = $id;
+        }
 
         while ($item = sql::fetch_assoc($q)) {
             $items[$item['blockparent']] = array(
@@ -1135,19 +1202,37 @@ class adminblockedit extends manage
                 'art' => $item['art'],
                 'good_id_arts' => $item['good_id_arts'],
             );
-            $parents[] = $item['good_id_arts'];
+            if ($item['good_id_arts']) {
+                $parents[$item['good_id_arts']] = $item['good_id_arts'];
+            }
         }
 
-        $parents = array_diff($parents, array('', null));
+        $q = sql::query('select * from it_b_' . $template . ' where blockparent in (' . implode(',', $parents) . ') ');
 
-        $q = sql::query('select distinct art,name,good_id_arts from it_b_aarts where blockparent in(' . implode(',', $parents) . ')');
-        $distinctItems = array();
         while ($item = sql::fetch_assoc($q)) {
-            $distinctItems[$item['art']] = array(
+            $items[$item['blockparent']] = array(
                 'name' => $item['name'],
                 'art' => $item['art'],
                 'good_id_arts' => $item['good_id_arts'],
             );
+            if ($item['good_id_arts']) {
+                $parents[$item['good_id_arts']] = $item['good_id_arts'];
+            }
+        }
+
+        $parents = array_diff($parents, array('', null));
+
+
+        $q = sql::query('select distinct art,name,good_id_arts from it_b_' . $template . ' where blockparent in(' . implode(',', $parents) . ')');
+        $distinctItems = array();
+        while ($item = sql::fetch_assoc($q)) {
+            if ($item['good_id_arts']) {
+                $distinctItems[$item['art']] = array(
+                    'name' => $item['name'],
+                    'art' => $item['art'],
+                    'good_id_arts' => $item['good_id_arts'],
+                );
+            }
         }
 
         $q = sql::query('select * from it_b_catitem where id in(' . implode(',', $parents) . ')');
@@ -1164,7 +1249,7 @@ class adminblockedit extends manage
                 'good_id_arts' => $item['id']
             );
         }
-        $q = sql::query('select * from it_b_aarts where blockparent in (' . implode(',', $parents) . ')');
+        $q = sql::query('select * from it_b_' . $template . ' where blockparent in (' . implode(',', $parents) . ')');
         while ($item = sql::fetch_assoc($q)) {
             $parentsList[$item['blockparent']]['items'][] = $item;
         }
@@ -1174,16 +1259,16 @@ class adminblockedit extends manage
             foreach ($distinctItems as $distinctItem) {
                 $insert = true;
                 foreach ($parentData['items'] as $parentItem) {
-                    if ($distinctItem['art'] == $parentItem['art']) {
+                    if ($distinctItem['art'] == $parentItem['art'] || $distinctItem['good_id_arts'] == $parentItem['good_id_arts']) {
                         $insert = false;
                     }
                 }
-                if($distinctItem['good_id_arts'] == $parentId){
+                if ($distinctItem['good_id_arts'] == $parentId) {
                     $insert = false;
                 }
 
                 if ($insert) {
-                    all::insert_block('aarts', null, $distinctItem, 1, $parentId);
+                    all::insert_block($template, null, $distinctItem, 1, $parentId);
                 }
             }
         }
@@ -1311,7 +1396,24 @@ class adminblockedit extends manage
 
         if ($mode == 'item') {
             $blockparent = all::getVar("blockparent");
+            $data = all::b_data_all($blockid, $template);
+
+
+            if ($template == 'aarts' || $template == 'aarts2') {
+                $q = sql::query("select id from prname_b_$template where good_id_arts = " . $blockparent);
+                while ($id = sql::fetch_assoc($q)) {
+                    delete_block($id['id'], $template);
+                }
+
+                if ($data->good_id_arts && $data->art) {
+                    $q = sql::query("select id from prname_b_$template where good_id_arts = " . $data->good_id_arts . ' and art = "' . $data->art . '"');
+                    while ($id = sql::fetch_assoc($q)) {
+                        delete_block($id['id'], $template);
+                    }
+                }
+            }
         }
+
 
         //Определяем разрешение на удаление
         if (!$this->getRight("candel", $template)) {
@@ -1535,10 +1637,23 @@ class adminblockedit extends manage
         $ids = explode(";", $ids);
         $sort = sql::one_record("SELECT MAX(sort) FROM prname_b_$template WHERE parent=$newParent");
 
+
         foreach ($ids as $val) {
             if ($val !== "") {
                 $sort++;
                 sql::query("UPDATE prname_b_$template SET parent=$newParent, sort=$sort WHERE id=$val");
+                $updateId = sql::one_record("SELECT id FROM prname_urls WHERE blockid=" . $val);
+
+                $rurl = sql::one_record("SELECT url FROM prname_tree WHERE id=" . $newParent);
+                if ($rurl && $updateId) {
+                    $url = sql::one_record("SELECT uurl FROM prname_b_$template WHERE id=" . $val);
+                    $url = explode('/', $url);
+                    $url  = $url[count($url) -2];
+                    sql::query("UPDATE prname_urls SET realurl='$rurl', url='$rurl$url/' WHERE blockid=$val");
+                    sql::query("UPDATE prname_b_$template SET uurl='$rurl$url/' WHERE id=$val");
+
+                }
+
             }
         }
 

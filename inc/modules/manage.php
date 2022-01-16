@@ -53,10 +53,8 @@ class manage {
 		global $config;
 		global $control;
 
-		sql::query("TRUNCATE TABLE prname__templates");
-		sql::query("TRUNCATE TABLE prname_tree");
-		$tree = new tree();
-		$tree->makeTree();
+//		sql::query("TRUNCATE TABLE prname__templates");
+//		sql::query("TRUNCATE TABLE prname_tree");
 
 		if (user_is("super") == '1') {
 			$super = 1;

@@ -13,7 +13,7 @@
 
 	<!--admin scripts AND TinyMce-->
 	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
-	<script src="/admin/scripts/adminNew.js?v1"></script>
+	<script src="/admin/scripts/adminNew.js?v2"></script>
 	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
 
 	<!--bootstrap js-->
@@ -132,18 +132,18 @@
                 </div>
                 {/}
 
-				{set:page}
-				<ul class="pagination pagination-sm" style="{set:hidePagination}display:none;{/set}">
-					{mask:page}
-						{if:!{active}}
-						<li><a href="{url}">{title}</a></li>
-						{/if}
-						{if:{active}}
-						<li class="active"><span>{title}</span></li>
-						{/if}
-					{/mask}
-				</ul>
-				{/set}
+				<!--{set:page}-->
+				<!--<ul class="pagination pagination-sm" style="{set:hidePagination}display:none;{/set}">-->
+					<!--{mask:page}-->
+						<!--{if:!{active}}-->
+						<!--<li><a href="{url}">{title}</a></li>-->
+						<!--{/if}-->
+						<!--{if:{active}}-->
+						<!--<li class="active"><span>{title}</span></li>-->
+						<!--{/if}-->
+					<!--{/mask}-->
+				<!--</ul>-->
+				<!--{/set}-->
 
 
 				<table cellspacing="1" cellpadding="0" border="0" id="tree" class="blocks">
@@ -153,6 +153,7 @@
 							<th class="center"><button class="checkAll btn btn-small">☑</button></th>
 							<th>№</th>
 							<th data-key="id" class="header {idSort}">ID</th>
+							<th data-key="sort" class="">Порядок вывода</th>
 							<th data-key="modified" class="header {modSort}">Изм.</th>
 							{mask:fields}
 								<th data-key="{key}" class="{sorting} header">{name}</th>
@@ -175,6 +176,7 @@
 							<td class="center"><input type="checkbox" class="group-checkbox" data-id="{id}"></td>
 							<td>{php}{_rank} + {../istart}{/php}</td>
 							<td>{id}</td>
+							<td>{sort}</td>
 							<td>{modified}</td>
 							{mask:fields}
 								<td{if:{../visible}==0} class="hiddentext"{/if}>{val}</td>

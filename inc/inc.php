@@ -270,9 +270,12 @@ function delete_block($parent, $templ) {
 	}
 
 	$sort = sql::one_record("SELECT sort FROM prname_b_$templ WHERE id=$parent");
+	
 
-	sql::query("UPDATE prname_b_$templ SET sort = sort-1 WHERE sort>$sort");
 	sql::query("DELETE FROM prname_b_$templ WHERE id=$parent");
+    if($sort && $sort != ''){
+        sql::query("UPDATE prname_b_$templ SET sort = sort-1 WHERE sort>$sort");
+    }
 }
 
 //Ресайз изображения

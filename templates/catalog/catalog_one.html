@@ -1,11 +1,17 @@
 {reduce:nothing}
 {mask:main}
 </div>
+<div class="wrap">
+    <a class="content-back content-back_list" href="">Назад</a>
+</div>
 {set:html_top}
 <div class="wrap">
     {html_top}
+    
 </div>
 {/}
+
+
 <div class="box">
 <div class="wrap"> 
     <div class="detals">
@@ -20,7 +26,7 @@
                     <th>Цена</th>
                 </tr>
                 {mask:items}
-                <tr class="detal-list-one" data-url="{url}">
+                <tr class="detal-list-one" data-url="{url}" data-item="#num{nnum}">
                     <td>{nnum}</td>
                     <td><a href="javascript:void(0);" class="detal-art">{art}</a></td>
                     <td><span title="{name_rus}">{name_rus}</span></td>

@@ -11,8 +11,10 @@
             <tr>
                 <th>№</th>
                 <!--<th>Фото</th>-->
-                <th>Название и артикул</th>
-                <th>Срок поставки</th>
+                <th>Aртикул</th>
+                <th>Название</th>
+                <th></th>
+                <!--<th>Срок поставки</th>-->
                 <th>Количество</th>
                 <th>Цена</th>
                 <th>Сумма</th>
@@ -24,14 +26,16 @@
                 <!--<td>-->
                 <!--<div class="detal-photo" {set:img}data-url="/files/0/{img}"{/}></div>-->
                 <!--</td>-->
+                <td>{art}</td>
                 <td>
                     <div class="cart-list-title">
                         <!--<a href="/{url}{set:bid}_aview_b{bid}/{/}"></a>-->
                         {name}
-                        {art}
                     </div>
                 </td>
-                <td>{time}</td>
+                <td>{name_eng}</td>
+
+                <!--<td>{time}</td>-->
                 <td>
                     {set:count}
                     <div class="good-quant">
@@ -58,7 +62,7 @@
             {/}
 
             <tr class="cart-list-bottom">
-                <td colspan="5"></td>
+                <td colspan="6"></td>
                 <td>
                     <div class="good-total-title">Итого:</div>
                 </td>
@@ -77,8 +81,10 @@
             <tr>
                 <th>№</th>
                 <!--<th>Фото</th>-->
-                <th>Название и артикул</th>
-                <th>Срок поставки</th>
+                <th>Aртикул</th>
+                <th>Название</th>
+                <th></th>
+                <!--<th>Срок поставки</th>-->
                 <th>Количество</th>
                 <th></th>
                 <th></th>
@@ -90,14 +96,16 @@
                 <!--<td>-->
                 <!--<div class="detal-photo" {set:img}data-url="/files/0/{img}"{/}></div>-->
                 <!--</td>-->
+                <td>{art}</td>
                 <td>
                     <div class="cart-list-title">
                         <!--<a href="/{url}{set:bid}_aview_b{bid}/{/}"></a>-->
                         {name}
-                        {art}
+
                     </div>
                 </td>
-                <td>{time}</td>
+                <td>{name_eng}</td>
+                <!--<td>{time}</td>-->
                 <td>
                     {set:count}
                     <div class="good-quant">
@@ -146,7 +154,7 @@
         </div>
         <div class="inline-form">
             <label for="">Адрес:</label>
-            <input type="text" name="address" value="{user/address}">
+            <input type="text" name="address" value="{user/adres}">
         </div>
         <div class="inline-form">
             <label for="">Номер телефона<span>*</span>:</label>

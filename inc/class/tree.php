@@ -25,35 +25,18 @@ class Tree {
 
 	/**
 	 *
-	 * @return boolean
-	 */
-	function beginTree() {
-		$q = "SELECT count(id) FROM prname_tree WHERE writeend = 1 ";
-		if (!sql::one_record($q)) {
-			return true;
-		}
-		else {
-			$q = "UPDATE prname_tree SET writeend=0";
-		}
-	}
-
-	/**
-	 *
 	 * @return type
 	 */
 	function makeTree() {
-		if (!$this->beginTree())
-			return;
-
-		$q = "TRUNCATE TABLE prname_tree ";
-		sql::query($q);
+        sql::query("BEGIN");
+		sql::query("TRUNCATE TABLE prname_tree");
 
 		$q = "INSERT INTO prname_tree (id, parent, name, level, left_key, right_key, `key`, template, visible) VALUES (1, 0, 'Главная страница', 0, 1, 2, 'main', 'first', 1) ";
 		sql::query($q);
 
 		$this->getTree(1);
 		$this->writeUrlTree();
-		$this->endTree();
+        sql::query("COMMIT");
 	}
 
 
@@ -76,14 +59,6 @@ class Tree {
 		}
 		if (isset($array))
 			return $array;
-	}
-
-	/**
-	 *
-	 */
-	function endTree() {
-		$q = "UPDATE prname_tree SET writeend = 1 ";
-		sql::query($q);
 	}
 
 	/**
@@ -387,7 +362,7 @@ class Tree {
 		return $parents;
 	}
 
-    function getParentsItems($id) {
+    function getParentsItems($id, $min_level=0, $max_level=null) {
         $parents = array();
 
         $q = "SELECT left_key, right_key FROM prname_tree WHERE id = '$id' ";
@@ -395,7 +370,19 @@ class Tree {
         $left_key = $str['left_key'];
         $right_key = $str['right_key'];
 
-        $q = "SELECT id, `key`, level,`name` FROM prname_tree WHERE left_key <= '$left_key' AND right_key >= '$right_key'  AND id!= 1 ORDER BY left_key ";
+        if ($min_level || $max_level) {
+            if ($min_level > 0 && $max_level) {
+                $level = "and level between $min_level and $max_level";
+            } elseif ($max_level) {
+                $level = "and level <= $max_level";
+            } else {
+                $level = "and level >= $min_level";
+            }
+        } else {
+            $level = '';
+        }
+
+        $q = "SELECT id, `key`, level,`name` FROM prname_tree WHERE left_key <= '$left_key' AND right_key >= '$right_key'  AND id!= 1 {$level} ORDER BY left_key ";
         $res2 = sql::query($q);
         $i = 0;
         while ($str2 = sql::fetch_array($res2)) {

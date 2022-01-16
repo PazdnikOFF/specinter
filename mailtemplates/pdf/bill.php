@@ -7,13 +7,13 @@ function htmlForPdfBill($items, $from)
         <style>
         @font-face {
             font-family: Calibri;
-            src: url("/home/u67887/u67887.netangels.ru/www/img/pdf/8277.ttf");
+            src: url("/home/c26864/specinter.ru/www/img/pdf/8277.ttf");
             
             
         }
         @font-face {
             font-family: Calibri;
-            src: url("/home/u67887/u67887.netangels.ru/www/img/pdf/calibrib.ttf");
+            src: url("/home/c26864/specinter.ru/www/img/pdf/calibrib.ttf");
             font-weight: bold;
         }
         * {
@@ -110,8 +110,8 @@ function htmlForPdfBill($items, $from)
 </style>
     </head>
     <body>
-    <img src="/home/u67887/u67887.netangels.ru/www//img/newlogo.jpg"  class="logo">
-    <img src="/home/u67887/u67887.netangels.ru/www/img/pdf/item.png"  class="item">
+    <img src="/home/c26864/specinter.ru/www//img/newlogo.jpg"  class="logo">
+    <img src="/home/c26864/specinter.ru/www/img/pdf/item.png"  class="item">
         <table>
             <tr class="wrapper_head">
                 <td></td>
@@ -126,7 +126,7 @@ function htmlForPdfBill($items, $from)
                 
             </tr>
         </table>
-        <img src="/home/u67887/u67887.netangels.ru/www/img/pdf/right.png"  class="right">
+        <img src="/home/c26864/specinter.ru/www/img/pdf/right.png"  class="right">
         <hr>
         <table>
             <tr>
@@ -173,8 +173,8 @@ function htmlForPdfBill($items, $from)
             Директор ООО "Специнтер" ________________________________________ ' . $from['user_1'] . '
         </p>
         <div class="relative">
-            <img class="sign-1" src="/home/u67887/u67887.netangels.ru/www/img/podps.png" width="150px">
-            <img class="printing" src="/home/u67887/u67887.netangels.ru/www/img/pechat.png" width="150px">
+            <img class="sign-1" src="/home/c26864/specinter.ru/www/img/podps.png" width="150px">
+            <img class="printing" src="/home/c26864/specinter.ru/www/img/pechat.png" width="150px">
         </div>
         
         <br/>

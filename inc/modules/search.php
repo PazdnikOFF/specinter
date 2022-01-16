@@ -18,18 +18,29 @@ class search
         if (strlen($_REQUEST['search-request']) > 2) {
 
 
-            $word = mysql_escape_string($_REQUEST['search-request']);
+            $word = mysql_escape_string(trim($_REQUEST['search-request']));
             $page = new stdClass();
             $page->word = $word;
             $list = new Listing("ablock", "blocks", 'all', " (name_eng like '%{$word}%' or name_rus like '%{$word}%'   or art like '%{$word}%') AND");
+            $list->sortfield = 'if (parent = 451, 1, 0)';
             $list->getList();
             $list->getItem();
             $page->count = $list->count;
-            $page->items = $list->item;
+            $page->items = [];
+            $existent_goods = [];
             if (is_array($page->items))
-                foreach ($page->items as &$item) {
-                    $item->url = all::getUrl($item->parent);
-                    $item->parents = implode(' - ', tree::getParentsItems($item->parent));
+                foreach ($list->item as &$item) {
+                    if (isset($existent_goods[$item->good_id]) || !$item->good_id) {
+                        continue;
+                    }
+                    $page->items[] = $item;
+                    $existent_goods[$item->good_id] = 1;
+                    if ($item->uurl) {
+                        $item->url = '/'.$item->uurl;
+                    } else {
+                        $item->url = all::getUrl($item->parent) . '_aview_b'.$item->id;
+                    }
+                    $item->parents = implode(' - ', tree::getParentsItems($item->parent, 2, 2));
                 }
         }
 
@@ -50,17 +61,28 @@ class search
         //     die();
             // die("ablock", "blocks", 'all', " (name_eng like '%{$q}%' or name_rus like '%{$q}%'   or art like '%{$q}%') AND");
         // }
-        $q = mysql_escape_string($q);
+        $q = mysql_escape_string(trim($q));
         $list = new Listing("ablock", "blocks", 'all', " (name_eng like '%{$q}%' or name_rus like '%{$q}%'   or art like '%{$q}%') AND");
+        $list->sortfield = 'if (parent = 451, 1, 0)';
         $list->getList();
         $list->getItem();
         $list->limit = 9999999;
         $page = new stdClass();
         $page->count = $list->count;
-        $page->items = $list->item;
-        foreach ($page->items as &$item) {
-
-            $item->parents = implode(' - ', tree::getParentsItems($item->parent));
+        $page->items = [];
+        $existent_goods = [];
+        foreach ($list->item as &$item) {
+            if (isset($existent_goods[$item->good_id]) || !$item->good_id) {
+                continue;
+            }
+            $page->items[] = $item;
+            $existent_goods[$item->good_id] = 1;
+            if ($item->uurl) {
+                $item->url = '/'.$item->uurl;
+            } else {
+                $item->url = all::getUrl($item->parent) . '_aview_b'.$item->id;
+            }
+//            $item->parents = implode(' - ', tree::getParentsItems($item->parent, 2, 2));
         }
 
         //        $list = new Listing("variant", "items", 'all', " (name like '%{$q}%' or art like '%{$q}%') AND");

@@ -1,0 +1,106 @@
+{reduce:nothing}
+{mask:main}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+    <title>{sitename} - *Блоки*</title>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/admin/decor/{theme}/css/styles.css">
+    <link rel="stylesheet" href="/admin/decor/{theme}/bootstrap/css/bootstrap.css">
+    <link rel="icon" type="image/png" href="/admin/decor/{theme}/img/favicon.png">
+
+    <!--admin scripts AND TinyMce-->
+    <script src="/admin/scripts/jquery-1.11.1.min.js"></script>
+    <script src="/admin/scripts/adminNew.js?v1"></script>
+    <script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
+
+    <!--bootstrap js-->
+    <script src="/admin/decor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!--right click and table sorter-->
+    <script src="/admin/scripts/jquery.jscontext-1.0.js"></script>
+    <script src="/admin/scripts/jquery.tablesorter.min.js"></script>
+    <script src="/admin/scripts/jquery.touchSwipe.js"></script>
+
+    <!--chosen-->
+    <link rel="stylesheet" href="/admin/scripts/chosen/chosen.css">
+    <script src="/admin/scripts/chosen/chosen.jquery.min.js"></script>
+
+    <!--iCheck-->
+    <link href="/admin/scripts/iCheck/skins/flat/blue.css" rel="stylesheet">
+    <link href="/admin/scripts/iCheck/skins/minimal/minimal.css" rel="stylesheet">
+    <script src="/admin/scripts/iCheck/icheck.min.js"></script>
+
+</head>
+
+<body>
+
+<!--MAIN-->
+<div class="main">
+
+
+    <!--MENU-->
+    <div class="menu">
+        <div class="logo"><img src="/admin/decor/{theme}/img/logo.png" alt=""></div>
+        {menu}
+    </div>
+    <!--/MENU-->
+
+    <!--CONTENT-->
+    <div class="content">
+        <h1>Обновление цен</h1>
+        {if:{update}}
+        <h3>Обновлено : {update}</h3>
+        {/if}
+        {if:{crete}}
+        <h3>Создано : {crete}</h3>
+        {/if}
+        <form enctype="multipart/form-data" method="post">
+
+            <div class="row">
+                <select name="supplier" class="form-control">
+                    <option value="uralkomavto">УРАЛКОМАВТО</option>
+                </select>
+            </div>
+            <br/>
+            <div class="row">
+                <input type="file" name="file">
+            </div>
+            <br/>
+            <div class="row">
+                <button type="submit" class="btn-default btn">Загрузить</button>
+            </div>
+        </form>
+        <br/>
+        <br/>
+        <br/>
+
+
+        <div class="row">
+            <a href="?bu=1" class="btn-default btn">Создать резервную копию</a>
+        </div>
+        <br/>
+        <br/>
+        <div class="row">
+            <table width="400px">
+                {mask:items}
+                <tr>
+                    <th>{name}</th>
+                    <th><a href="?b={code}">Восстановить</a></th>
+                    <th><a href="?d={code}">Удалить</a></th>
+                </tr>
+                {/}
+            </table>
+        </div>
+    </div>
+
+    <!--/CONTENT-->
+</div>
+<!--/MAIN-->
+
+
+</body>
+</html>
+{/mask}

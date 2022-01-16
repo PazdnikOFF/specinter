@@ -130,7 +130,7 @@ class Listing
 	 * @param mixed $cid Родитель
 	 * @param string $critery Критерий для sql
 	 */
-	function __construct($template, $type = 'blocks', $cid = '', $critery = '', $preventRecursion = false)
+	function __construct($template, $type = 'blocks', $cid = '', $critery = '', $preventRecursion = false, $groupBy = '')
 	{
 		global $control;
 		global $sql;
@@ -150,7 +150,9 @@ class Listing
 		if (strpos($critery, "GROUP BY") !== false) {
 			$this->groupBy = $this->critery;
 			$this->critery = "";
-		}
+		} elseif ($groupBy) {
+            $this->groupBy = $groupBy;
+        }
 
 		if ($this->on == 'false') {
 			$this->on = '(visible=1 OR visible=0)';
@@ -210,7 +212,6 @@ class Listing
 			$q = "SELECT count(id) FROM prname_b_$this->template WHERE $this->parent $this->critery $this->on";
 			$sql = "select * from prname_b_$this->template where $this->parent $this->critery $this->on $this->groupBy " . "order by " . ($this->sortfield && $this->sortfield !== 'sort' ? ($this->sortfield) : 'sort') . " $this->sortby" . "" . ($this->limit ? ' limit ' . ($this->start ? $this->start : '0') . ', ' . $this->limit : '') . "";
 
-			
 			$this->items = sql::query($sql);
 		
 			
@@ -275,6 +276,7 @@ class Listing
 
 			if (!isset($this->url[$one_arr['parent']]) && !isset($this->is_global)) {
 				$this->url[$one_arr['parent']] = all::getUrl($one_arr['parent']);
+
 			}
 
 			if ($this->type !== 'cats') {
@@ -284,6 +286,7 @@ class Listing
 				} else {
 					$this->item[$i]->url = $this->tmp_url;
 				}
+
 
 
 				if (isset($this->page))
@@ -301,6 +304,7 @@ class Listing
 				if (isset($one_arr['uurl']) && $one_arr['uurl'] != '') {
 					$this->item[$i]->url = "/" . $one_arr['uurl'];
 				}
+
 			}
 
 			if ($this->type == 'cats') {

@@ -83,7 +83,7 @@ $(document).ready(function() {
     var h = 0;
     setTimeout(function() {
       $.each($('.recomended-one'), function() {
-        console.log($(this).height());
+      
         if ($(this).height() > h) {
           h = $(this).height();
         }
@@ -289,7 +289,7 @@ $(document).ready(function() {
   });
 
   $('.detal-photo.disable').on('mouseenter', function() {
-    $(this).append('<div class="tooltip">Нет фото</div>');
+    $(this).append('<div class="tooltip">Нет фото. Товары без фото и цены могут быть в наличии</div>');
   });
 
   $('.detal-photo.disable').on('mouseleave', function() {
@@ -420,4 +420,22 @@ $(document).ready(function() {
         },
       },
     }); */
+
+    if($('.content-back_list').length > 0){
+      let link = $('.breadcrumbs a:last-of-type').attr('href');
+      $('.content-back_list').attr('href',link);
+       
+    }
+
+    if($('.item-articul').length > 0){
+     
+      $('.item-articul').each(function(idx,item){
+        
+        let val = $(item).text();
+        if(val.indexOf('/') !== -1){
+          console.log($(item).text().indexOf('/'));
+          $(item).html($(item).text().replaceAll("/","/<br>"));
+        }
+      });
+    }
 });

@@ -1,0 +1,61 @@
+{reduce:space}
+{mask:main}
+{set:html_top}
+<br/>
+<div class="wrap">
+    {html_top}
+</div>
+{/}
+<div>
+    {mask:items}
+    <div class="special_list_item 1212">
+        {set:img}
+
+        <a href="{url}">
+            <div class="img" style="background:url(/files/1/{img}) center no-repeat;background-size: cover"></div>
+            <!--<img src="/files/1/{img}" width="140">-->
+        </a>
+
+        {/} {mis:img}
+
+        <a href="{url}">
+            <!--<img src="/img/recom.jpg" width="140">-->
+            <div class="img" style="background:url(/img/recom.jpg)"></div>
+        </a>
+
+        {/}
+
+        <a href="{url}" class="recomended-one__title">
+
+            {name_rus} {name} <br/>{art} 
+
+        </a> {set:price}
+
+        <div class="recomended-one__price">от {price} ₽</div>
+
+        {/} {mis:price}
+
+        <div class="recomended-one__price">Уточните цену</div>
+
+        {/}
+
+        <input type="text" value="1" class="good-quant__input" id="{id}" style="display: none;">
+
+        <a href="{url}" class="recomended__to-cart">Подробнее</a>
+    </div>
+    {/}
+    {set:navigation_list}
+    <div class="navigation">
+        {mask:navigation_list} <a class="{if:{active} == 1}active{/}" href="{url}">{title}</a> {/}
+    </div>
+
+    {/}
+    <div class="clear"></div>
+</div>
+{set:html_bot}
+<br/>
+<div class="wrap">
+    {html_bot}
+</div>
+{/}
+{/mask}

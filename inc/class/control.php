@@ -198,6 +198,7 @@ class Controller {
 
 		// Если нету - ошибка 404 (см. файл inner.php)
 		else {
+            echo '<!--'.$this->pathstring.'-->';
 			$this->error = "error404";
 			return;
 		}
@@ -208,16 +209,7 @@ class Controller {
 		// Параметры урла
 		$arr_param = explode("_", $urlparams);
 
-		// if (isset($_COOKIE['vas-vas'])) {
-		// 	var_dump(array(
-		// 		$this->cid,
-		// 		$this->module_url,
-		// 		$this->template,
-		// 		$this->name,
-		// 		$this->module_url,
-		// 		$this->parents
-		// 	));
-		// }
+
 
 
 		if (count($arr_param) > 0) {
@@ -251,6 +243,7 @@ class Controller {
 				}
 			}
 		}
+		
 
 		if (trim($this->module) == '') {
 
@@ -331,7 +324,6 @@ class Controller {
 
 		$path_to_file =str_replace("//", "/",  DOC_ROOT."/inc/modules/".$this->module.".php");
 		if (is_file($path_to_file)) {
-//			echo ($path_to_file)."start import1213\r\n";
 			require_once($path_to_file);
 		}
 		else {

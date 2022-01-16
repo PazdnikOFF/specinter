@@ -3,6 +3,8 @@
 {set:html}
 <div class="advance">{register_html}</div>
 {/}
+<script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit' async defer></script>
+
                 <div class="lk">
                     <div class="lk-tabs">
                         <div class="tab-menu">
@@ -43,6 +45,10 @@
                                 				<input type="checkbox" id="politic" name="politic" checked="checked">
                                 				<label for="politic"><i></i>Согласен на обработку персональных данных <a href="/policy/">Политика конфиденциальности</a></label>
                                 			</div>
+                                            <div class="form-line">
+                                                <div id="personal-reg-captcha" class="captcha"></div>
+                                                <div class="text-danger recaptcha-error" ></div>
+                                            </div>
                                 	        <div class="form-line">
                                 	            <button class="form-send">Зарегистрироваться</button>
                                 	        </div>
@@ -92,6 +98,10 @@
                                 				<input type="checkbox" id="politic2" name="politic2" checked="checked">
                                 				<label for="politic2"><i></i>Согласен на обработку персональных данных <a href="/policy/">Политика конфиденциальности</a></label>
                                 			</div>
+                                            <div class="form-line">
+                                                <div id="ul-reg-captcha" class="captcha"></div>
+                                                <div class="text-danger recaptcha-error" ></div>
+                                            </div>
                                 	        <div class="form-line">
                                 	            <button class="form-send">Зарегистрироваться</button>
                                 	        </div>
@@ -120,7 +130,7 @@
                                 			</div>
                                 			<div class="form-line">
                                 				<label for="">Повторите пароль*:</label>
-                                				<input placeholder="Повторите пароль" type="password" name="password">
+                                				<input placeholder="Повторите пароль" type="password" name="password2">
                                 			</div>
                                 		</div>
                                 	</form>

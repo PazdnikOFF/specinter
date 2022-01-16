@@ -11,7 +11,7 @@ class catalogblock {
 
 		if ($content == null) {
 			$list = new Listing("catalog", "cats",40);
-			$list->limit = 3;
+//			$list->limit = 3;
 			$list->getList();
 			$list->getItem();
 			

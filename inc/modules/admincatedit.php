@@ -11,32 +11,51 @@ class admincatedit extends manage {
 
 		$this->page = $control->page;
 		if ($control->oper == 'add') {
-			if (isset($_POST['cat_name']))
-				return $this->add();
+			if (isset($_POST['cat_name'])) {
+                $this->add();
+                $tree = new tree();
+                $tree->makeTree();
+                return;
+            }
 			else $this->printAdd();
 		}
 
 		if ($control->oper == 'edit') {
-			if (isset($_POST['cat_name']))
-				return $this->edit();
+			if (isset($_POST['cat_name'])){
+                $this->edit();
+                $tree = new tree();
+                $tree->makeTree();
+                return;
+            }
 			else $this->printEdit();
 		}
 
 		if ($control->oper == 'showhide') {
-			return $this->showHide();
+			$this->showHide();
+            $tree = new tree();
+            $tree->makeTree();
+            return;
 		}
 
 		if ($control->oper == 'del') {
-			return $this->delete();
+			$this->delete();
+            $tree = new tree();
+            $tree->makeTree();
+            return;
 		}
 
 		if ($control->oper == 'move') {
-
-			return $this->move();
+			$this->move();
+            $tree = new tree();
+            $tree->makeTree();
+            return;
 		}
 
 		if ($control->oper == 'copy') {
-			return $this->copy();
+			$this->copy();
+            $tree = new tree();
+            $tree->makeTree();
+            return;
 		}
 	}
 
