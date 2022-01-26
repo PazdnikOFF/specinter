@@ -27,14 +27,14 @@ class search
             $list->getItem();
             $page->count = $list->count;
             $page->items = [];
-            $existent_goods = [];
+//            $existent_goods = [];
             if (is_array($page->items))
                 foreach ($list->item as &$item) {
-                    if (isset($existent_goods[$item->good_id]) || !$item->good_id) {
-                        continue;
-                    }
+//                    if (isset($existent_goods[$item->good_id]) || !$item->good_id) {
+//                        continue;
+//                    }
                     $page->items[] = $item;
-                    $existent_goods[$item->good_id] = 1;
+//                    $existent_goods[$item->good_id] = 1;
                     if ($item->uurl) {
                         $item->url = '/'.$item->uurl;
                     } else {
