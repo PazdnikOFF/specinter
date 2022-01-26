@@ -40,7 +40,7 @@ class search
                     } else {
                         $item->url = all::getUrl($item->parent) . '_aview_b'.$item->id;
                     }
-                    $item->parents = implode(' - ', tree::getParentsItems($item->parent, 2, 2));
+                    $item->parents = implode(' - ', tree::getParentsItems($item->parent, 2, null));
                 }
         }
 
