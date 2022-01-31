@@ -25,6 +25,7 @@ class admincatedit extends manage {
                 $this->edit();
                 $tree = new tree();
                 $tree->makeTree();
+                tree::fixUrls($_POST['parent']);
                 return;
             }
 			else $this->printEdit();
@@ -48,6 +49,8 @@ class admincatedit extends manage {
 			$this->move();
             $tree = new tree();
             $tree->makeTree();
+            $parent = all::getVar("parent");
+            tree::fixUrls($parent);
             return;
 		}
 
@@ -456,7 +459,7 @@ class admincatedit extends manage {
     function checkNewParent($id, $newParent) {
         $row1 = sql::fetch_assoc(sql::query('select left_key, right_key from prname_tree where id = ' . (int)$id));
         $row2 = sql::fetch_assoc(sql::query('select left_key, right_key from prname_tree where id = '. (int)$newParent));
-        return $row2['left_key'] < $row1['left_key'] && $row2['right_key'] > $row1['right_key'];
+        return $row2['left_key'] < $row1['left_key'] || $row2['right_key'] > $row1['right_key'];
     }
 
 	function copy() {

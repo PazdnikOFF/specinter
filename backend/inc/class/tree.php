@@ -139,13 +139,49 @@ class Tree {
             }
         }
         mysqli_stmt_close($stmt);
-        echo microtime(true) - $time;
-//        $this->writeUrlTree();
+//        echo microtime(true) - $time;
 
         sql::query("TRUNCATE TABLE prname_tree");
         sql::query('INSERT INTO prname_tree SELECT * FROM prname_tree_tmp');
         sql::query("COMMIT");
 	}
+
+    function fixUrls($parent) {
+        $template = sql::one_record('SELECT template FROM prname_categories WHERE id = ' . (int)$parent);
+        $blocktypes = explode(' ', sql::one_record("select blocktypes from prname_ctemplates where `key` = '$template'"));
+        $realUrl = sql::one_record("SELECT url FROM prname_tree WHERE id=" . $parent);
+        foreach ($blocktypes as $blocktype) {
+            if (!$blocktype) {
+                continue;
+            }
+            if (!sql::one_record("select seo from prname_btemplates where `key` = '$blocktype'")) {
+                continue;
+            }
+            $res = sql::query("select id, uurl from prname_b_$blocktype where parent = $parent");
+            while ($row = sql::fetch_assoc($res)) {
+                $uurl = $row['uurl'];
+                if ($uurl != '') {
+                    $uurl = trim($uurl, "/");
+                    $uurl = substr($uurl, strrpos($uurl, "/") + 1);
+                }
+                if (!$uurl) {
+                    sql::query("DELETE FROM prname_urls WHERE template='" . $blocktype . "' AND blockid=" . $row['id']);
+                } else {
+                    $value = $realUrl . $uurl . "/";
+                    $urlS = sql::one_record("SELECT id FROM prname_urls WHERE template='" . $blocktype . "' AND blockid=" . $row['id']);
+                    //Если урл уже был - обновляем
+
+                    if ($urlS > 0) {
+                        $q1 = "UPDATE prname_urls SET url='" . sql::escape_string($value) . "', realurl='".sql::escape_string($realUrl)."' WHERE template='" . $blocktype . "' AND blockid=" . $row['id'];
+                        sql::query($q1);
+                    }
+                    //Если нет - вставляем новую запись
+                    else sql::query("INSERT INTO prname_urls (`url`, `realurl`, `template`, `blockid`) VALUES ('" . $value . "', '" . $realUrl . "', '" . $blocktype . "', " . $row['id'] . ")");
+                    sql::query("update prname_b_$blocktype set uurl = '". sql::escape_string($value) . "' where id = " . $row['id']);
+                }
+            }
+        }
+    }
 
 
 	/**
@@ -167,82 +203,6 @@ class Tree {
 		}
 		if (isset($array))
 			return $array;
-	}
-
-	/**
-	 *
-	 * @global type $sql
-	 */
-	function writeUrlTree() {
-		global $sql;
-
-		$q = "SELECT id, `key`, level, left_key, right_key FROM prname_tree_tmp ORDER BY id";
-		$res = sql::query($q);
-		while ($str = sql::fetch_array($res)) {
-			$id = $str['id'];
-			$key = $str['key'];
-			$left_key = $str['left_key'];
-			$right_key = $str['right_key'];
-
-            $url = '';
-            $q = "SELECT id, `key`, level FROM prname_tree_tmp WHERE left_key <= '$left_key' AND right_key >= '$right_key' ORDER BY left_key ";
-            $res2 = sql::query($q);
-            $i = 0;
-            while ($str2 = sql::fetch_array($res2)) {
-                $tmp_id = $str2['id'];
-                if ($str2['level'] > 0) {
-                    $tmp_key = $str2['key'];
-                    if ($i > 1)
-                        $url .= '/';
-                    if ($tmp_key <> '') {
-                        $url .= $tmp_key;
-                    }
-                    else {
-                        $url .= $tmp_id;
-                    }
-                }
-                $i++;
-            }
-            $url .= '/';
-//            $url = substr($url, 4);
-			$q = "UPDATE prname_tree_tmp SET url = '$url' WHERE id = '$id' ";
-			sql::query($q);
-		}
-	}
-
-	/**
-	 * @param array $categories
-	 * @param array $tree
-	 * @param int $nodeIndex
-	 * @param int $parent
-	 */
-	function getTree(&$categories, &$tree, &$nodeIndex, $parent) {
-        foreach ($categories[$parent] as $str) {
-            $id = $str['id'];
-            $name = $str['name'];
-            $sort = $str['sort'];
-            $key = $str['key'];
-            $template = $str['template'];
-            $visible = $str['visible'];
-
-//            $q = "SELECT level, right_key FROM prname_tree_tmp WHERE id = '$parent' ";
-//            $str1 = sql::fetch_array(sql::query($q));
-            $str1 = $tree[$parent];
-            $level = $str1['level'];
-//				$left_key = $str1['left_key'];
-            $right_key = $str1['right_key'];
-
-            $q = "UPDATE prname_tree_tmp SET left_key = left_key + 2, right_key = right_key + 2 WHERE left_key > $right_key ";
-            sql::query($q);
-
-            $q = " UPDATE prname_tree_tmp SET right_key = right_key + 2 WHERE right_key >= '$right_key' AND left_key < '$right_key' ";
-            sql::query($q);
-
-            $q = "INSERT INTO prname_tree_tmp SET left_key = $right_key, right_key = $right_key + 1, level = $level + 1, id = '$id', name = '".sql::escape_string($name)."', parent = '$parent', sort = '$sort', `key` = '$key', template = '$template', visible = '$visible' ";
-            sql::query($q);
-
-            $this->getTree($categories, $id);
-        }
 	}
 
 	/**

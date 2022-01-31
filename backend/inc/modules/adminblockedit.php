@@ -303,7 +303,7 @@ class adminblockedit extends manage
 
         // Если есть текущий шаблон - выбираем возможные места переноса блоков
         if ($currentTemplate) {
-            $sql = "SELECT tree.*, templ.blocktypes as block FROM prname_ctemplates templ, prname_tree tree WHERE templ.key=tree.template AND tree.id>10";
+            $sql = "SELECT tree.*, templ.blocktypes as block FROM prname_ctemplates templ, prname_tree tree WHERE templ.key=tree.template ORDER BY tree.left_key";
 
             $query = sql::query($sql);
             while ($res = sql::fetch_object($query)) {
@@ -1682,6 +1682,7 @@ class adminblockedit extends manage
 
             }
         }
+        tree::fixUrls($newParent);
 
         header("Location: /manage/blockedit/_alist_parent" . $parent . "_template" . $template . "/");
     }
