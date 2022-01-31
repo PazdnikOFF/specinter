@@ -39,6 +39,11 @@ phpFastCache::cleanup();
 
 $sql = new Sql();
 $sql->connect();
+
+//$tree = new tree();
+//$tree->makeTree();
+//exit;
+
 $control = new Controller($url);
 
 if (defined('ENVIRONMENT') && ENVIRONMENT == 'development') {

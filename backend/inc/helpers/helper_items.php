@@ -80,7 +80,7 @@ class helper_items {
 			$val->cnt_ballance=$cnt_ballance;
 
 			// Бренд
-			$val->brand = mysql_real_escape_string($val->brand);
+			$val->brand = mysqli_real_escape_string(Sql::$connection, $val->brand);
 
 
 			// Виды товара

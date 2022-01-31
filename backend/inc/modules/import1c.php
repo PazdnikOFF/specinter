@@ -32,7 +32,7 @@ class import1c
         $users_to_xml = sql::query("SELECT `email`, `phone`, `Address`, `Code` FROM `it_b_user`");
         $xml = '<?xml version="1.0" encoding="UTF-8"?>';
         $xml .= '<DATATOSITE>';
-        while ($row = mysql_fetch_assoc($users_to_xml)) {
+        while ($row = mysqli_fetch_assoc($users_to_xml)) {
             $code = $row["Code"];
             $address = $row["Address"];
             $email = $row["email"];
@@ -277,7 +277,7 @@ class import1c
 
         foreach ($creationParents as $key => $val) {
 //			debug("\t\t if for1");
-            $val->name = htmlspecialchars(mysql_real_escape_string($val->name));
+            $val->name = htmlspecialchars(sql::escape_string($val->name));
             if (in_array($key, $tgroups)) {
                 sql::query("UPDATE prname_b_tgroup SET name='$val->name', parentcode=0 WHERE code='$key'");
 //				 debug("Updated block");
@@ -294,7 +294,7 @@ class import1c
 
             if ($val->item) {
                 foreach ($val->item as $key2 => $val2) {
-                    $val2->name = htmlspecialchars(mysql_real_escape_string($val2->name));
+                    $val2->name = htmlspecialchars(sql::escape_string($val2->name));
 //					debug("\t\t if for2");
                     if (in_array($key2, $tgroups)) {
 //						debug("\t\t update in 1");
@@ -312,7 +312,7 @@ class import1c
 
                     if (is_array($val2->item))
                         foreach ($val2->item as $key3 => $val3) {
-                            $val3->name = htmlspecialchars(mysql_real_escape_string($val3->name));
+                            $val3->name = htmlspecialchars(sql::escape_string($val3->name));
                             if (in_array($key3, $tgroups)) {
 //							debug("\t\t update in 2: "."UPDATE prname_b_tgroup SET name='$val3->name', parentcode='$key2' WHERE code='$key3'");
                                 sql::query("UPDATE prname_b_tgroup SET name='$val3->name', parentcode='$key2' WHERE code='$key3'");
@@ -383,7 +383,7 @@ class import1c
             }
 
             $description = (string)$item->attributes()->Description;
-            $description = htmlspecialchars(mysql_real_escape_string($description));
+            $description = htmlspecialchars(sql::escape_string($description));
 
             // 1 отсечка
             $time[$k][] = microtime(true);

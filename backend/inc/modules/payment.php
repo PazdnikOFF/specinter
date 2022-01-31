@@ -37,7 +37,7 @@ class payment{
 			$page->name = 		$control->name;
 			
 			$page->VALUE_1 = $page->ORDER_ID = (int)$_GET['payment'];
-			$sql = "SELECT * FROM `prname_b_order` WHERE `id` = '".mysql_real_escape_string($page->ORDER_ID)."'";
+			$sql = "SELECT * FROM `prname_b_order` WHERE `id` = '".sql::escape_string($page->ORDER_ID)."'";
 			$res = sql::fetch_array(sql::query($sql));
 			
 			$this->requestInBank($url, $data);
@@ -144,7 +144,7 @@ class payment{
 		all::send_mail($to_email->emailAdmin, $to_email->theme, $to_email->htmlAdmin, false, false, "$sitename");*/
 		
 		/*письмо покупателю*/
-		/*$sql = "SELECT `email` FROM `prname_b_order` WHERE `id` = '".mysql_real_escape_string($_POST['ORDER_ID'])."'";
+		/*$sql = "SELECT `email` FROM `prname_b_order` WHERE `id` = '".sql::escape_string($_POST['ORDER_ID'])."'";
 		$res = sql::fetch_assoc(sql::query($sql));
 		$to_email->ORDER_ID = $_POST['ORDER_ID'];
 		$to_email->ORDER_IDP = $_POST['ORDER_IDP'];
@@ -156,7 +156,7 @@ class payment{
 
 		$sql = "UPDATE `prname_b_order` 
 				SET `paymentData` = '".$getPaymentInfo."' 
-				WHERE `id` = '".mysql_real_escape_string($_POST['ORDER_ID'])."'
+				WHERE `id` = '".sql::escape_string($_POST['ORDER_ID'])."'
 				";
 		@sql::query($sql);
 		
@@ -192,7 +192,7 @@ class payment{
 	
 		all::send_mail($to_email->emailAdmin, $to_email->theme, $to_email->htmlAdmin, $checkFile, false, "$sitename");
 		/*письмо покупателю*/
-		$sql = "SELECT `email` FROM `prname_b_order` WHERE `id` = '".mysql_real_escape_string($_POST['ORDER_ID'])."'";
+		$sql = "SELECT `email` FROM `prname_b_order` WHERE `id` = '".sql::escape_string($_POST['ORDER_ID'])."'";
 		$res = sql::fetch_assoc(sql::query($sql));
 
 		$to_email->ORDER_ID = $_POST['ORDER_ID'];
@@ -205,7 +205,7 @@ class payment{
 	
 		$sql = "UPDATE `prname_b_order` 
 				SET `paymentData` = '".$getPaymentInfo."' 
-				WHERE `id` = '".mysql_real_escape_string($_POST['ORDER_ID'])."'
+				WHERE `id` = '".sql::escape_string($_POST['ORDER_ID'])."'
 				";
 		@sql::query($sql);
 	}
@@ -242,7 +242,7 @@ if(isset($_COOKIE['developer'])){
 		all::send_mail($to_email->emailAdmin, $to_email->theme, $to_email->htmlAdmin, $checkFile, false, "$sitename");
 }
 		/*письмо покупателю*/
-		$sql = "SELECT `email` FROM `prname_b_order` WHERE `id` = '".mysql_real_escape_string($_POST['ORDER_ID'])."'";
+		$sql = "SELECT `email` FROM `prname_b_order` WHERE `id` = '".sql::escape_string($_POST['ORDER_ID'])."'";
 		$res = sql::fetch_assoc(sql::query($sql));
 
 		$to_email->ORDER_ID = $_POST['ORDER_ID'];

@@ -272,7 +272,7 @@ class users {
 			}
 		}
 		else {
-			$email = mysql_real_escape_string($_POST['login']);
+			$email = sql::escape_string($_POST['login']);
 			$password = md5($_POST['password'].$salt);
 		}
 

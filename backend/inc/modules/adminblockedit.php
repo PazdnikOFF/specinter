@@ -805,11 +805,11 @@ class adminblockedit extends manage
             $_genValue = $obj->save('data' . $i);
             if (is_array($_genValue)) {
                 foreach ($_genValue as $k => $v) {
-                    $genValue[$k] = mysql_real_escape_string($v);
+                    $genValue[$k] = mysqli_real_escape_string(Sql::$connection, $v);
                 }
 
             } else {
-                $genValueS = mysql_real_escape_string($_genValue);
+                $genValueS = mysqli_real_escape_string(Sql::$connection, $_genValue);
             }
 
             if (is_array($genValue)) {
@@ -1091,7 +1091,7 @@ class adminblockedit extends manage
         for ($i = 0; $i < count($_POST['dat']); $i++) {
             $class = "type_" . $_POST['dkey'][$i];
             $obj = new $class();
-            $genValue = mysql_real_escape_string($obj->save('data' . $i));
+            $genValue = mysqli_real_escape_string(Sql::$connection, $obj->save('data' . $i));
 
             $query .= " , `" . addslashes($_POST['dat'][$i]) . "` = '" . $genValue . "' ";
         }
@@ -1130,21 +1130,21 @@ class adminblockedit extends manage
 
 
             if ($_POST['utitle'] != '') {
-                $value = htmlspecialchars(mysql_real_escape_string(trim($_POST['utitle'])));
+                $value = htmlspecialchars(mysqli_real_escape_string(Sql::$connection, trim($_POST['utitle'])));
                 $query .= " , `utitle`='" . $value . "' ";
                 //$value = htmlspecialchars(trim($_POST['utitle']));
                 //$query .= " , `utitle`='".$value."' ";
             }
 
             if ($_POST['udescription'] != '') {
-                $value = htmlspecialchars(mysql_real_escape_string(trim($_POST['udescription'])));
+                $value = htmlspecialchars(mysqli_real_escape_string(Sql::$connection, trim($_POST['udescription'])));
                 $query .= " , `utitle`='" . $value . "' ";
                 //$value = htmlspecialchars(trim($_POST['udescription']));
                 //$query .= " , `udescription`='".$value."' ";
             }
 
             if ($_POST['ukeywords'] != '') {
-                $value = htmlspecialchars(mysql_real_escape_string(trim($_POST['ukeywords'])));
+                $value = htmlspecialchars(mysqli_real_escape_string(Sql::$connection, trim($_POST['ukeywords'])));
                 $query .= " , `utitle`='" . $value . "' ";
                 //$value = htmlspecialchars(trim($_POST['ukeywords']));
                 //$query .= " , `ukeywords`='".$value."' ";

@@ -79,8 +79,8 @@ function user_is($s, $userid = 0) {
 	}
 	$q = "SELECT `$s` FROM $prname"."_sadmin, $prname"."_rt WHERE aid = $prname"."_sadmin.admin_id AND $qq";
 
-	$res = mysql_query($q);
-	$row = mysql_fetch_array($res);
+	$res = mysqli_query(Sql::$connection, $q);
+	$row = mysqli_fetch_array($res);
 	return $row[$s];
 }
 
@@ -213,23 +213,23 @@ function delete_category($parent) {
 //Копирует блок
 function dublicate_block($parent, $templ, $newparent) {
 	global $prname;
-	$v = mysql_query("select * from $prname"."_b_".$templ." where `parent`='$parent'");
-	$vd = mysql_query("select p1.* from $prname"."_bdatarel p1,  $prname"."_btemplates p2 where p1.templid =p2.id and p2.key='$templ'");
-	while ($fr = mysql_fetch_array($vd))
+	$v = mysqli_query(Sql::$connection, "select * from $prname"."_b_".$templ." where `parent`='$parent'");
+	$vd = mysqli_query(Sql::$connection, "select p1.* from $prname"."_bdatarel p1,  $prname"."_btemplates p2 where p1.templid =p2.id and p2.key='$templ'");
+	while ($fr = mysqli_fetch_array($vd))
 		$keyses[$fr[key]] = $fr[datatkey];
-	$sort =  mysql_result(mysql_query("select MAX(sort) from $prname"."_b_".$templ." where `parent`='$parent'"), 0, 0);
-	$c = mysql_query("describe  $prname"."_b_".$templ);
+	$sort =  mysqli_result(mysqli_query(Sql::$connection, "select MAX(sort) from $prname"."_b_".$templ." where `parent`='$parent'"), 0, 0);
+	$c = mysqli_query(Sql::$connection, "describe  $prname"."_b_".$templ);
 
-	while ($r = mysql_fetch_array($v)) {
+	while ($r = mysqli_fetch_array($v)) {
 		$str = "insert into  $prname"."_b_".$templ." set ";
-		while ($keys = mysql_fetch_assoc($c)) {
+		while ($keys = mysqli_fetch_assoc($c)) {
 			if ($keyses[$keys['Field']] != 'file' && $keys['Field'] !== 'id' && $keys['Field'] !== 'sort' && $keys['Field'] !== 'parent') {
 				$str .= "`".$keys['Field']."` = '".$r[$keys['Field']]."' ,";
 			}
 		}
 		$str .= "`sort` = '".++$sort."' , `parent`='$newparent'";
 	}
-	mysql_query($str);
+	mysqli_query(Sql::$connection, $str);
 }
 
 
@@ -314,11 +314,11 @@ function update_images($fn, $resized) {
 	global $prname;
 	if ($resized < 1) return false;
 	$q = "SELECT * FROM $prname"."_data WHERE data='$fn'";
-	$res = mysql_query($q);
-	$row = mysql_fetch_array($res);
+	$res = mysqli_query(Sql::$connection, $q);
+	$row = mysqli_fetch_array($res);
 	$q = "SELECT comment FROM $prname"."_".(($row['blockid'] > 0)?'b':'c')."datarel WHERE `key`='".addslashes($row['relkey'])."'";
-	$res2 = mysql_query($q);
-	if (($comment = @mysql_result($res2, 0, 0)) === false) {
+	$res2 = mysqli_query(Sql::$connection, $q);
+	if (($comment = @mysqli_result($res2, 0, 0)) === false) {
 		return false;
 	}
 	if (($n = strpos(strtolower($comment), 'resize:')) === false) {
@@ -340,16 +340,16 @@ function update_images($fn, $resized) {
 
 function btemplate_num_fields($s) {
 	global $prname;
-	$res = mysql_query("SELECT COUNT(r.id) FROM $prname"."_bdatarel r, $prname"."_btemplates t WHERE t.key='".addslashes($s)."' AND t.id=r.templid");
-	return mysql_result($res, 0, 0);
+	$res = mysqli_query(Sql::$connection, "SELECT COUNT(r.id) FROM $prname"."_bdatarel r, $prname"."_btemplates t WHERE t.key='".addslashes($s)."' AND t.id=r.templid");
+	return mysqli_result($res, 0, 0);
 }
 
 
 
 function ctemplate_num_fields($s) {
 	global $prname;
-	$res = mysql_query("SELECT COUNT(r.id) FROM $prname"."_cdatarel r, $prname"."_ctemplates t WHERE t.key='".addslashes($s)."' AND t.id=r.templid");
-	return mysql_result($res, 0, 0);
+	$res = mysqli_query(Sql::$connection, "SELECT COUNT(r.id) FROM $prname"."_cdatarel r, $prname"."_ctemplates t WHERE t.key='".addslashes($s)."' AND t.id=r.templid");
+	return mysqli_result($res, 0, 0);
 }
 
 //Автолоад
@@ -400,7 +400,7 @@ function tree_create($id = false, $addq = '', $hidestructure = false) {
 	if ($hidestructure && ($hidestructure !== true)) {
 		$pars = array($id2 = $hidestructure);
 		while ($id2 > 0) {
-			array_push($pars, $id2 = mysql_result(mysql_query("SELECT parent FROM $prname"."_categories WHERE id=$id2"), 0, 0));
+			array_push($pars, $id2 = mysqli_result(mysqli_query(Sql::$connection, "SELECT parent FROM $prname"."_categories WHERE id=$id2"), 0, 0));
 		}
 	}
 	addcats($id, 0, $prefix, $addq, $pars, $hidestructure);
@@ -444,11 +444,11 @@ function tree_count($prefix) {
 
 function tree_path($id) {
 	global $prname;
-	$res = mysql_query("SELECT * FROM $prname"."_categories WHERE id=$id");
-	if ($row = mysql_fetch_array($res)) $s = " / ".strip_tags($row['name']);
+	$res = mysqli_query(Sql::$connection, "SELECT * FROM $prname"."_categories WHERE id=$id");
+	if ($row = mysqli_fetch_array($res)) $s = " / ".strip_tags($row['name']);
 	while ($row['parent'] > 0) {
-		$res = mysql_query("SELECT * FROM $prname"."_categories WHERE id=".$row['parent']);
-		$row = mysql_fetch_array($res);
+		$res = mysqli_query(Sql::$connection, "SELECT * FROM $prname"."_categories WHERE id=".$row['parent']);
+		$row = mysqli_fetch_array($res);
 		$s = " / " . strip_tags($row['name']) . $s;
 	}
 	$s = "Структура" . $s;
@@ -468,14 +468,14 @@ function addcats($id, $lev, $prefix, $addq, $pars, $hidestructure) {
 	global ${$prefix.'stree'};
 	global $prname;
 	$q = "SELECT c.*, t.hidestructure FROM $prname"."_categories c, $prname"."_ctemplates t WHERE c.parent=$id AND c.template=t.key AND c.id>0 $addq ORDER BY c.sort";
-	$res = mysql_query($q);
-	while ($row = mysql_fetch_array($res)) {
+	$res = mysqli_query(Sql::$connection, $q);
+	while ($row = mysqli_fetch_array($res)) {
 		$row['lev'] = $lev + 1;
 		if (is_array($pars)) $can = in_array($row['id'], $pars) || ($row['lev'] >= count($pars)); else $can = true;
 		if ($can) {
 			if ($hidestructure === false) $can = true;
 			elseif (($hidestructure === true) || ($row['lev'] >= @count($pars))) $can = $row['hidestructure'] < 1; else $can = true;
-			if (!$can) $row['catcount'] = mysql_result(mysql_query("SELECT COUNT(id) FROM $prname"."_categories WHERE parent=".$row['id']), 0, 0);
+			if (!$can) $row['catcount'] = mysqli_result(mysqli_query(Sql::$connection, "SELECT COUNT(id) FROM $prname"."_categories WHERE parent=".$row['id']), 0, 0);
 			array_push(${$prefix.'stree'}, $row);
 			if ($can) addcats($row['id'], $lev + 1, $prefix, $addq, $pars, $hidestructure);
 		}

@@ -400,7 +400,7 @@ class formvalidator {
 
 	// SQL validation
 	private function check_login($field, $value) {
-		$email = mysql_real_escape_string($this->post[$field]);
+		$email = sql::escape_string($this->post[$field]);
 		$array = explode("_", $value);
 		$table = $array[0];
 		$field = $array[1];

@@ -697,6 +697,14 @@ function beginMove(parent, mode) {
       .attr("id")
       .substr(2);
     if (parent != curId) {
+      var new_left_key = parseInt($(e.currentTarget).data("left-key"), 10)
+      var new_right_key = parseInt($(e.currentTarget).data("right-key"), 10)
+      var old_left_key = parseInt($('#tr' + parent).data('left-key'), 10);
+      var old_right_key = parseInt($('#tr' + parent).data('right-key'), 10);
+      if (new_left_key >= old_left_key && new_right_key <= old_right_key) {
+        return;
+      }
+
       var height = $(curId).height();
 
       var offset = $("#tree").offset();
@@ -731,7 +739,7 @@ function beginMove(parent, mode) {
         after = 0;
         before = 0;
       }
-
+      $(e.currentTarget).unbind('click');
       $(e.currentTarget).bind("click", function() {
         window.location.href =
           "/manage/catedit/_a" +

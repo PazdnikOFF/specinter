@@ -244,7 +244,7 @@ class admincatedit extends manage {
 
 					$obj = new $class();
 
-					$genValue = mysql_real_escape_string($obj->save('data'.$i));
+					$genValue = mysqli_real_escape_string(Sql::$connection, $obj->save('data'.$i));
 					debug($genValue);
 
 

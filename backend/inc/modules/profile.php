@@ -67,7 +67,7 @@ class profile
         $page->recover = false;
 
         if ($_REQUEST['email'] && filter_var($_REQUEST['email'], FILTER_VALIDATE_EMAIL)) {
-            $page->email = mysql_escape_string($_REQUEST['email']);
+            $page->email = sql::escape_string($_REQUEST['email']);
             $page->recover = true;
         } elseif ($_REQUEST['email']) {
             $page->email = $_REQUEST['email'];
@@ -112,7 +112,7 @@ class profile
 
     private function _act()
     {
-        $code = mb_substr(mysql_escape_string($_REQUEST['act']), 0, -1);
+        $code = mb_substr(sql::escape_string($_REQUEST['act']), 0, -1);
         $result = sql::one_record("SELECT id FROM `prname_b_user3` WHERE code = '" . $code . "'");
         if ($result) {
             sql::one_record("UPDATE `prname_b_user3` SET  `visible` =  '1', `code` = '' WHERE id = '" . $result . "'");
@@ -141,7 +141,7 @@ class profile
 
                 foreach ($_POST as $k => $v) {
                     if (strlen($v))
-                        $data[$k] = mysql_escape_string($v);
+                        $data[$k] = sql::escape_string($v);
                 }
                 if (!strlen($data['password'])) {
                     $return['error'][] = 'Не знаполнен пароль';

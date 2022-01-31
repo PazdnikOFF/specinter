@@ -132,8 +132,8 @@ class admincatedit extends manage {
 	function add() {
 		global $control;
 
-		$cache = new phpFastCache();
-		$cache->cleanup();
+//		$cache = new phpFastCache();
+//		$cache->cleanup();
 
 		$parent = $_POST['parent'];
 		$template = $_POST['template'];
@@ -286,7 +286,7 @@ class admincatedit extends manage {
 
 					$obj = new $class();
 
-					$genValue = mysql_real_escape_string($obj->save('data'.$i));
+					$genValue = mysqli_real_escape_string(Sql::$connection, $obj->save('data'.$i));
 					debug($genValue);
 
 
@@ -364,6 +364,7 @@ class admincatedit extends manage {
 		$before = all::getVar("before");
 
 
+        sql::query('BEGIN');
 
 		$oldParent = sql::one_record("SELECT parent FROM prname_categories WHERE id=".$parent);
 
@@ -382,8 +383,13 @@ class admincatedit extends manage {
 					return;
 				}
 
-				$sort = 1 + sql::one_record("SELECT MAX(sort) FROM prname_categories WHERE parent=".$newParent);
-				sql::query("UPDATE prname_categories SET sort=".$sort.", parent=".$newParent." WHERE id=".$parent);
+                if ($this->checkNewParent($parent, $newParent)) {
+                    $sort = 1 + sql::one_record("SELECT MAX(sort) FROM prname_categories WHERE parent=" . $newParent);
+                    sql::query("UPDATE prname_categories SET sort=" . $sort . ", parent=" . $newParent . " WHERE id=" . $parent);
+                } else {
+                    header("Location: /manage/_aerror_b1/");
+                    return;
+                }
 
 			}
 		}
@@ -407,8 +413,13 @@ class admincatedit extends manage {
 
 			$sort = $info['sort'] + 1;
 
-			sql::query("UPDATE prname_categories SET sort=sort+1 WHERE sort>".$info['sort']." AND parent=".$info['parent']);
-			sql::query("UPDATE prname_categories SET sort=".$sort.", parent=".$info['parent']." WHERE id=".$parent);
+            if ($this->checkNewParent($parent, $info['parent'])) {
+                sql::query("UPDATE prname_categories SET sort=sort+1 WHERE sort>" . $info['sort'] . " AND parent=" . $info['parent']);
+                sql::query("UPDATE prname_categories SET sort=" . $sort . ", parent=" . $info['parent'] . " WHERE id=" . $parent);
+            } else {
+                header("Location: /manage/_aerror_b1/");
+                return;
+            }
 		}
 
 		if ($before > 0) {
@@ -428,13 +439,25 @@ class admincatedit extends manage {
 
 			$sort = $info['sort'];
 
-			sql::query("UPDATE prname_categories SET sort=sort+1 WHERE sort>=".$info['sort']." AND parent=".$info['parent']);
-			sql::query("UPDATE prname_categories SET sort=".$sort.", parent=".$info['parent']." WHERE id=".$parent);
+            if ($this->checkNewParent($parent, $info['parent'])) {
+                sql::query("UPDATE prname_categories SET sort=sort+1 WHERE sort>=".$info['sort']." AND parent=".$info['parent']);
+                sql::query("UPDATE prname_categories SET sort=".$sort.", parent=".$info['parent']." WHERE id=".$parent);
+            } else {
+                header("Location: /manage/_aerror_b1/");
+                return;
+            }
 		}
+        sql::query('COMMIT');
 
 		header("Location: /manage/");
 		return;
 	}
+
+    function checkNewParent($id, $newParent) {
+        $row1 = sql::fetch_assoc(sql::query('select left_key, right_key from prname_tree where id = ' . (int)$id));
+        $row2 = sql::fetch_assoc(sql::query('select left_key, right_key from prname_tree where id = '. (int)$newParent));
+        return $row2['left_key'] < $row1['left_key'] && $row2['right_key'] > $row1['right_key'];
+    }
 
 	function copy() {
 		global $control;

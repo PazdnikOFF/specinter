@@ -172,7 +172,7 @@ class type_features {
 
 		foreach ($fields as $val) {
 			if (isset($_POST[$val."_feat"])) {
-				$postval = mysql_real_escape_string($_POST[$val."_feat"]);
+				$postval = mysqli_real_escape_string(Sql::$connection, $_POST[$val."_feat"]);
 				$query .= " , `".$val."` = '".$postval."' ";
 			}
 		}

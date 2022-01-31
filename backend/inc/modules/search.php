@@ -18,7 +18,7 @@ class search
         if (strlen($_REQUEST['search-request']) > 2) {
 
 
-            $word = mysql_escape_string(trim($_REQUEST['search-request']));
+            $word = sql::escape_string(trim($_REQUEST['search-request']));
             $page = new stdClass();
             $page->word = $word;
             $list = new Listing("ablock", "blocks", 'all', " (name_eng like '%{$word}%' or name_rus like '%{$word}%'   or art like '%{$word}%') AND");
@@ -54,14 +54,14 @@ class search
 
         // if (isset($_COOKIE['vas-vas'])) {
         //     global $sql;
-        //     echo "select * from it_b_ablock  where name_eng like '%".mysql_escape_string($q)."%' or name_rus like '%".mysql_escape_string($q)."%'";
-        //     $res = sql::query("select * from it_b_ablock  where name_eng like '%".mysql_escape_string($q)."%' or name_rus like '%".mysql_escape_string($q)."%'");
+        //     echo "select * from it_b_ablock  where name_eng like '%".sql::escape_string($q)."%' or name_rus like '%".sql::escape_string($q)."%'";
+        //     $res = sql::query("select * from it_b_ablock  where name_eng like '%".sql::escape_string($q)."%' or name_rus like '%".sql::escape_string($q)."%'");
         //    var_dump($res);
         //     var_dump(sql::fetch_assoc($res));
         //     die();
             // die("ablock", "blocks", 'all', " (name_eng like '%{$q}%' or name_rus like '%{$q}%'   or art like '%{$q}%') AND");
         // }
-        $q = mysql_escape_string(trim($q));
+        $q = sql::escape_string(trim($q));
         $list = new Listing("ablock", "blocks", 'all', " (name_eng like '%{$q}%' or name_rus like '%{$q}%'   or art like '%{$q}%') AND");
         $list->sortfield = 'if (parent = 451, 1, 0)';
         $list->getList();

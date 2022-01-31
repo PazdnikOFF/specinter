@@ -28,14 +28,122 @@ class Tree {
 	 * @return type
 	 */
 	function makeTree() {
+        sql::query("CREATE TEMPORARY TABLE IF NOT EXISTS `prname_tree_tmp` (
+          `id` bigint NOT NULL,
+          `parent` bigint NOT NULL DEFAULT 0,
+          `level` tinyint NOT NULL DEFAULT 0,
+          `sort` bigint NOT NULL DEFAULT 0,
+          `visible` tinyint NOT NULL DEFAULT 0,
+          `left_key` bigint NOT NULL DEFAULT 0,
+          `right_key` bigint NOT NULL DEFAULT 0,
+          `name` text NOT NULL,
+          `key` text NOT NULL,
+          `template` text NOT NULL,
+          `url` text NULL DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          KEY `prname_tree_tmp_left_key_right_key_index` (`left_key`,`right_key`),
+          KEY `prname_tree_tmp_left_key_index` (`left_key`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
         sql::query("BEGIN");
-		sql::query("TRUNCATE TABLE prname_tree");
+        sql::query('TRUNCATE TABLE prname_tree_tmp');
 
-		$q = "INSERT INTO prname_tree (id, parent, name, level, left_key, right_key, `key`, template, visible) VALUES (1, 0, 'Главная страница', 0, 1, 2, 'main', 'first', 1) ";
-		sql::query($q);
+        $time = microtime(true);
+        $categories = [];
+        $parentToIds = [];
+        $idsToParent = [];
+        $q = "SELECT * FROM prname_categories ORDER BY parent, sort  DESC";
+        $res = sql::query($q);
+        while ($row = sql::fetch_assoc($res)) {
+            $categories[$row['id']] = $row;
+            $parentToIds[$row['parent']][] = $row['id'];
+            $idsToParent[$row['id']] = $row['parent'];
+        }
 
-		$this->getTree(1);
-		$this->writeUrlTree();
+        $currentParentId = 0;
+        $currentNodeIndex = null;
+        $parentQueue = [];
+        $i = 0;
+        do {
+            if (empty($parentQueue)) {
+                $currentNodeIndex = 0;
+            }
+            if (isset($parentToIds[$currentParentId]) && !empty($parentToIds[$currentParentId])) {
+                if (isset($categories[$currentParentId]) && !isset($categories[$currentParentId]['left_key'])) {
+                    $categories[$currentParentId]['left_key'] = ++$currentNodeIndex;
+                    $categories[$currentParentId]['level'] = count($parentQueue)-1;
+                    if ($categories[$currentParentId]['level'] > 0) {
+                        $url = $categories[$idsToParent[$currentParentId]]['url'] . $categories[$currentParentId]['key'] . '/';
+                        $categories[$currentParentId]['url'] = ltrim($url, '/');
+                    } else {
+                        $categories[$currentParentId]['url'] = '/';
+                    }
+                }
+                $parentQueue[] = $currentParentId;
+                $currentParentId = array_pop($parentToIds[$currentParentId]);
+            } else {
+                if (isset($categories[$currentParentId])) {
+                    if (!isset($categories[$currentParentId]['left_key'])) {
+                        $categories[$currentParentId]['left_key'] = ++$currentNodeIndex;
+                        $categories[$currentParentId]['level'] = count($parentQueue)-1;
+                        if ($categories[$currentParentId]['level'] > 0) {
+                            $url = $categories[$idsToParent[$currentParentId]]['url'] . $categories[$currentParentId]['key'] . '/';
+                            $categories[$currentParentId]['url'] = ltrim($url, '/');
+                        } else {
+                            $categories[$currentParentId]['url'] = '/';
+                        }
+                    }
+                    $categories[$currentParentId]['right_key'] = ++$currentNodeIndex;
+                }
+                $currentParentId = array_pop($parentQueue);
+            }
+        } while (!empty($parentQueue));
+        $stmt = sql::prepare("INSERT INTO prname_tree_tmp SET
+            left_key = ?,
+            right_key = ?,
+            level = ?,
+            id = ?,
+            name = ?,
+            parent = ?,
+            sort = ?,
+            `key` = ?,
+            template = ?,
+            visible = ?,
+            url = ?");
+        mysqli_stmt_bind_param($stmt, 'iiiisiissis',
+            $left_key,
+            $right_key,
+            $level,
+            $id,
+            $name,
+            $parent,
+            $sort,
+            $key,
+            $template,
+            $visible,
+            $url
+        );
+        foreach ($categories as $category) {
+            $right_key = $category['right_key'];
+            $left_key = $category['left_key'];
+            $level = $category['level'];
+            $id = $category['id'];
+            $name = $category['name'];
+            $parent = $category['parent'];
+            $sort = $category['sort'];
+            $key = $category['key'];
+            $template = $category['template'];
+            $visible = $category['visible'];
+            $url = $category['url'];
+            if (!mysqli_stmt_execute($stmt)){
+//                var_dump(mysqli_stmt_error($stmt));
+            }
+        }
+        mysqli_stmt_close($stmt);
+        echo microtime(true) - $time;
+//        $this->writeUrlTree();
+
+        sql::query("TRUNCATE TABLE prname_tree");
+        sql::query('INSERT INTO prname_tree SELECT * FROM prname_tree_tmp');
         sql::query("COMMIT");
 	}
 
@@ -51,7 +159,7 @@ class Tree {
 		global $control;
 		global $config;
 		$q = sql::query("select p2.* from prname_tree p1, prname_tree p2 where p2.left_key<=p1.left_key and p2.right_key>=p1.right_key and p1.id='".($parent ? $parent : $control->cid)."' ORDER BY p2.left_key");
-		while ($arr = mysql_fetch_assoc($q)) {
+		while ($arr = mysqli_fetch_assoc($q)) {
 			$array[$arr['level']]->id = $arr['id'];
 			$array[$arr['level']]->name = $arr['name'];
 			$array[$arr['level']]->url = $arr['url'] == '/' ? $config['server_url'] : $config['server_url'].$arr['url'];
@@ -68,7 +176,7 @@ class Tree {
 	function writeUrlTree() {
 		global $sql;
 
-		$q = "SELECT id, `key`, left_key, right_key FROM prname_tree ORDER BY id";
+		$q = "SELECT id, `key`, level, left_key, right_key FROM prname_tree_tmp ORDER BY id";
 		$res = sql::query($q);
 		while ($str = sql::fetch_array($res)) {
 			$id = $str['id'];
@@ -76,66 +184,65 @@ class Tree {
 			$left_key = $str['left_key'];
 			$right_key = $str['right_key'];
 
-			$url = '';
-
-			$q = "SELECT id, `key`, level FROM prname_tree WHERE left_key <= '$left_key' AND right_key >= '$right_key' ORDER BY left_key ";
-			$res2 = sql::query($q);
-			$i = 0;
-			while ($str2 = sql::fetch_array($res2)) {
-				$tmp_id = $str2['id'];
-				$tmp_key = $str2['key'];
-				if ($i > 1)
-					$url .= '/';
-				if ($tmp_key <> '') {
-					$url .= $tmp_key;
-				}
-				else {
-					$url .= $tmp_id;
-				}
-				$i++;
-			}
-			$url .= '/';
-			$url = substr($url, 4);
-			$q = "UPDATE prname_tree SET url = '$url' WHERE id = '$id' ";
+            $url = '';
+            $q = "SELECT id, `key`, level FROM prname_tree_tmp WHERE left_key <= '$left_key' AND right_key >= '$right_key' ORDER BY left_key ";
+            $res2 = sql::query($q);
+            $i = 0;
+            while ($str2 = sql::fetch_array($res2)) {
+                $tmp_id = $str2['id'];
+                if ($str2['level'] > 0) {
+                    $tmp_key = $str2['key'];
+                    if ($i > 1)
+                        $url .= '/';
+                    if ($tmp_key <> '') {
+                        $url .= $tmp_key;
+                    }
+                    else {
+                        $url .= $tmp_id;
+                    }
+                }
+                $i++;
+            }
+            $url .= '/';
+//            $url = substr($url, 4);
+			$q = "UPDATE prname_tree_tmp SET url = '$url' WHERE id = '$id' ";
 			sql::query($q);
 		}
 	}
 
 	/**
-	 *
-	 * @param type $parent
+	 * @param array $categories
+	 * @param array $tree
+	 * @param int $nodeIndex
+	 * @param int $parent
 	 */
-	function getTree($parent) {
-		$q = "SELECT * FROM prname_categories WHERE parent = '$parent' ORDER BY sort ";
-		$res = sql::query($q);
-		if (sql::num_rows($res) > 0) {
-			while ($str = sql::fetch_array($res)) {
-				$id = $str['id'];
-				$name = $str['name'];
-				$sort = $str['sort'];
-				$key = $str['key'];
-				$template = $str['template'];
-				$visible = $str['visible'];
+	function getTree(&$categories, &$tree, &$nodeIndex, $parent) {
+        foreach ($categories[$parent] as $str) {
+            $id = $str['id'];
+            $name = $str['name'];
+            $sort = $str['sort'];
+            $key = $str['key'];
+            $template = $str['template'];
+            $visible = $str['visible'];
 
-				$q = "SELECT level, left_key, right_key FROM prname_tree WHERE id = '$parent' ";
-				$str1 = sql::fetch_array(sql::query($q));
-				$level = $str1['level'];
-				$left_key = $str1['left_key'];
-				$right_key = $str1['right_key'];
+//            $q = "SELECT level, right_key FROM prname_tree_tmp WHERE id = '$parent' ";
+//            $str1 = sql::fetch_array(sql::query($q));
+            $str1 = $tree[$parent];
+            $level = $str1['level'];
+//				$left_key = $str1['left_key'];
+            $right_key = $str1['right_key'];
 
-				$q = "UPDATE prname_tree SET left_key = left_key + 2, right_key = right_key + 2 WHERE left_key > $right_key ";
-				sql::query($q);
+            $q = "UPDATE prname_tree_tmp SET left_key = left_key + 2, right_key = right_key + 2 WHERE left_key > $right_key ";
+            sql::query($q);
 
-				$q = " UPDATE prname_tree SET right_key = right_key + 2 WHERE right_key >= '$right_key' AND left_key < '$right_key' ";
-				sql::query($q);
+            $q = " UPDATE prname_tree_tmp SET right_key = right_key + 2 WHERE right_key >= '$right_key' AND left_key < '$right_key' ";
+            sql::query($q);
 
-				$q = "INSERT INTO prname_tree SET left_key = $right_key, right_key = $right_key + 1, level = $level + 1, id = '$id', name = '".sql::escape_string($name)."', parent = '$parent', sort = '$sort', `key` = '$key', template = '$template', visible = '$visible' ";
-				sql::query($q);
+            $q = "INSERT INTO prname_tree_tmp SET left_key = $right_key, right_key = $right_key + 1, level = $level + 1, id = '$id', name = '".sql::escape_string($name)."', parent = '$parent', sort = '$sort', `key` = '$key', template = '$template', visible = '$visible' ";
+            sql::query($q);
 
-
-				$this->getTree($id, $parent);
-			}
-		}
+            $this->getTree($categories, $id);
+        }
 	}
 
 	/**
@@ -153,7 +260,7 @@ class Tree {
 
 		$i = 0;
 
-		while ($b = mysql_fetch_assoc($q)) {
+		while ($b = mysqli_fetch_assoc($q)) {
 			if ($b['level'] == $b['parent_level'] + 1) {
 				if ($control->cid == $b['id'])
 					$a->item[$b['id']]->link = 'nolink'; else
@@ -402,7 +509,7 @@ class Tree {
 
 		$i = 0;
 
-		while ($b = mysql_fetch_assoc($q)) {
+		while ($b = mysqli_fetch_assoc($q)) {
 
 			if ($b['level'] < 1) {
 				$a->item[$i]->name = $b['name'];
@@ -412,6 +519,8 @@ class Tree {
 				$a->item[$i]->id = $b['id'];
 				$a->item[$i]->key = $b['key'];
 				$a->item[$i]->level = $b['level'];
+				$a->item[$i]->left_key = $b['left_key'];
+				$a->item[$i]->right_key = $b['right_key'];
 				$a->item[$i]->hs = $b['hs'];
 				$a->item[$i]->url = $b['url'];
 				$a->item[$i]->virtual = $b['virtual'];
@@ -437,6 +546,8 @@ class Tree {
 				$c[$b['level'] - 1]->item[$i]->id = $b['id'];
 				$c[$b['level'] - 1]->item[$i]->key = $b['key'];
 				$c[$b['level'] - 1]->item[$i]->level = $b['level'];
+				$c[$b['level'] - 1]->item[$i]->left_key = $b['left_key'];
+				$c[$b['level'] - 1]->item[$i]->right_key = $b['right_key'];
 				$c[$b['level'] - 1]->item[$i]->hs = $b['hs'];
 				$c[$b['level'] - 1]->item[$i]->url = $b['url'];
 				$c[$b['level'] - 1]->item[$i]->virtual = $b['virtual'];
@@ -472,7 +583,7 @@ class Tree {
 
 		$i = 0;
 
-		while ($b = mysql_fetch_assoc($q)) {
+		while ($b = mysqli_fetch_assoc($q)) {
 
 			if ($b['level'] < 1) {
 				$a->item[$i]->name = $b['name'];

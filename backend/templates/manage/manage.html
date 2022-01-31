@@ -13,7 +13,7 @@
 
 	<!--admin scripts AND TinyMce-->
 	<script src="/admin/scripts/jquery-1.11.1.min.js"></script>
-	<script src="/admin/scripts/adminNew.js"></script>
+	<script src="/admin/scripts/adminNew.js?v1"></script>
 	<script src="/admin/tinymce/js/tinymce/tinymce.min.js"></script>
 
 	<!--right click and cookie-->
@@ -191,7 +191,7 @@
 
 {mask:item}
 
-	<tr class="trtree{mis:no} trtree-click{/mis}{set:no} trtree-no{/set}" style="cursor: pointer;" id="tr{id}" onclick="window.location.href = '/manage/blockedit/_alist_parent{id}/';">
+	<tr class="trtree{mis:no} trtree-click{/mis}{set:no} trtree-no{/set}" style="cursor: pointer;" id="tr{id}" data-left-key="{left_key}" data-right-key="{right_key}" onclick="window.location.href = '/manage/blockedit/_alist_parent{id}/';">
 		{mask:td}
 			<td class="{class}">
 				{if:{class}!="none" && {../hs}==1 && {_last}}{set:../item}<div id="openclose_{id}" class="plus"></div>{/set}{/if}

@@ -82,7 +82,7 @@ class first
             $send .= "<table style='font-size: 12px;' cellpadding='1' cellspacing='0'>";
             foreach ($_POST as $key => $val) {
 
-                $data[$key] = mysql_escape_string($val);
+                $data[$key] = sql::escape_string($val);
                 if (strlen($val)) {
                     $send .= "<tr>";
                     $send .= "<td>" . $artranslit[$key] . "<td>";
@@ -99,11 +99,11 @@ class first
 
             while ($row = sql::fetch_assoc($res2)) {
                 if (!empty($good[$row['id']])) {
-                    $count = (int)mysql_escape_string($good[$row['id']]);
+                    $count = (int)sql::escape_string($good[$row['id']]);
                 } else if(!empty($good['P' . $row['id']])) {
-                    $count = (int)mysql_escape_string($good['P' . $row['id']]);
+                    $count = (int)sql::escape_string($good['P' . $row['id']]);
                 }else{
-                    $count = (int)mysql_escape_string($good['C' . $row['id']]);
+                    $count = (int)sql::escape_string($good['C' . $row['id']]);
                 }
 
                 $write = array(
@@ -130,11 +130,11 @@ class first
             $good = $_POST['goood'];
             while ($row = sql::fetch_assoc($res)) {
                 if (!empty($good[$row['id']])) {
-                    $count = (int)mysql_escape_string($good[$row['id']]);
+                    $count = (int)sql::escape_string($good[$row['id']]);
                 }  else if(!empty($good['P' . $row['id']])) {
-                    $count = (int)mysql_escape_string($good['P' . $row['id']]);
+                    $count = (int)sql::escape_string($good['P' . $row['id']]);
                 }else{
-                    $count = (int)mysql_escape_string($good['C' . $row['id']]);
+                    $count = (int)sql::escape_string($good['C' . $row['id']]);
                 }
 
                 $pdfGoods[] = array(
@@ -300,11 +300,11 @@ class first
             $pdfGoods = array();
             while ($row = sql::fetch_assoc($res3)) {
                 if (!empty($good[$row['id']])) {
-                    $count = (int)mysql_escape_string($good[$row['id']]);
+                    $count = (int)sql::escape_string($good[$row['id']]);
                 }  else if(!empty($good['P' . $row['id']])) {
-                    $count = (int)mysql_escape_string($good['P' . $row['id']]);
+                    $count = (int)sql::escape_string($good['P' . $row['id']]);
                 }else{
-                    $count = (int)mysql_escape_string($good['C' . $row['id']]);
+                    $count = (int)sql::escape_string($good['C' . $row['id']]);
                 }
 
                 $pdfGoods[] = array(
@@ -385,7 +385,7 @@ class first
         } elseif ($_POST['name'] && $_POST['phone'] && !$_REQUEST['edit_profile'] && !$_REQUEST['cart'] && !$_POST['fast-order']) {
 
             foreach ($_POST as $key => $val) {
-                $data[$key] = mysql_escape_string($val);
+                $data[$key] = sql::escape_string($val);
             }
 
             if (!isset($data['personal'])) {
@@ -414,7 +414,7 @@ class first
 
         } elseif ($_POST['login']) {
             foreach ($_POST as $key => $val) {
-                $data[$key] = mysql_escape_string($val);
+                $data[$key] = sql::escape_string($val);
             }
 
             $pwd = md5($data['password']);
@@ -433,7 +433,7 @@ class first
 
         } elseif ($_POST['add_garage'] == "Y") {
             foreach ($_POST as $key => $val) {
-                $data[$key] = mysql_escape_string($val);
+                $data[$key] = sql::escape_string($val);
             }
             $id = sql::one_record("SELECT id FROM `prname_b_user3` WHERE `email` = '" . $_SESSION['login'] . "'");
             $data['blockparent'] = $id;
@@ -452,7 +452,7 @@ class first
             if ($id = sql::one_record("SELECT id FROM `prname_b_user3` WHERE email = '" . $_SESSION['login'] . "'")) {
                 unset($_POST['edit_profile']);
                 foreach ($_POST as $key => $val) {
-                    $val = trim(mysql_escape_string(htmlspecialchars($val)));
+                    $val = trim(sql::escape_string(htmlspecialchars($val)));
                     $preSql[] = "`{$key}` = '{$val}'";
                 }
                 $preSql = implode(', ', $preSql);
@@ -466,17 +466,17 @@ class first
         } elseif ($_REQUEST['remove_garage'] == 1) {
             $parentId = $id = sql::one_record("SELECT id FROM `prname_b_user3` WHERE email = '" . $_SESSION['login'] . "'");
             if ($_POST['id'] && $parentId) {
-                $id = mysql_escape_string($_POST['id']);
+                $id = sql::escape_string($_POST['id']);
                 sql::query("delete from prname_b_garage WHERE `id` = '{$id}' AND `blockparent` = '{$parentId}'");
             }
             die();
         } elseif ($_REQUEST['change-pass'] == 1) {
-            $pas = md5(mysql_escape_string($_POST["old-password"]));
+            $pas = md5(sql::escape_string($_POST["old-password"]));
             if ($id = sql::one_record("SELECT id FROM `prname_b_user3` WHERE email = '" . $_SESSION['login'] . "' and password = '{$pas}'")) {
 
                 unset($_POST['edit_profile']);
                 if ($_POST['new-password'] == $_POST['password']) {
-                    $password = md5(mysql_escape_string($_POST['password']));
+                    $password = md5(sql::escape_string($_POST['password']));
                     $_SESSION['password'] = $password;
                     sql::query("UPDATE `prname_b_user3` SET `password` = '{$password}' WHERE `id` = {$id}");
                     echo "Данные изменены";
@@ -521,9 +521,9 @@ class first
                 }
                 while ($row = sql::fetch_assoc($res)) {
                     if (!empty($good[$row['id']])) {
-                        $count = (int)mysql_escape_string($_POST['items'][$row['id']]);
+                        $count = (int)sql::escape_string($_POST['items'][$row['id']]);
                     } else {
-                        $count = (int)mysql_escape_string($_POST['items']['P' . $row['id']]);
+                        $count = (int)sql::escape_string($_POST['items']['P' . $row['id']]);
                     }
 
                     $pdfGoods[] = array(
@@ -541,7 +541,7 @@ class first
 
             }
             foreach ($_POST as $key => $val) {
-                $data[$key] = mysql_escape_string($val);
+                $data[$key] = sql::escape_string($val);
             }
             if (empty($data['page-url'])) {
                 $msg = "Сообщение отправлено, с Вами свяжется менеджер";

@@ -44,7 +44,7 @@ class xml extends manage
 
 
                     $sql = "INSERT INTO it_suppliers (supplier, data) VALUES('" . $_POST['supplier'] . "', '" . serialize($data) . "');";
-                    mysql_query($sql);
+                    mysqli_query(Sql::$connection, $sql);
                     header("Location: /manage/xml/?read=1&page=0&update=0&crete=0");
                 }
             }
