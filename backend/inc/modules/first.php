@@ -3,9 +3,9 @@
 
 use Dompdf\Dompdf;
 
-include_once '/home/c26864/specinter.ru/www/libs/dompdf/autoload.inc.php';
-include_once '/home/c26864/specinter.ru/www/mailtemplates/pdf/mail.php';
-include_once '/home/c26864/specinter.ru/www/mailtemplates/pdf/bill.php';
+require_once __DIR__ . '/../../libs/dompdf/autoload.inc.php';
+require_once __DIR__ . '/../../mailtemplates/pdf/mail.php';
+require_once __DIR__ . '/../../mailtemplates/pdf/bill.php';
 
 class first
 {

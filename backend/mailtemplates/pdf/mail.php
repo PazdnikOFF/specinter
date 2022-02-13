@@ -1,5 +1,5 @@
 <?
-require_once('/home/c26864/specinter.ru/www/libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
+require_once(__DIR__ . '/../../libs/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
 
 function format_price($value)
 {
@@ -306,7 +306,7 @@ function saveXls($from, $to, $items, $id)
 {
     //error_reporting( E_ALL );
     global $ar_mon;
-    $xls = PHPExcel_IOFactory::load('/home/c26864/specinter.ru/www/mailtemplates/pdf/bill.xlsx');
+    $xls = PHPExcel_IOFactory::load('/home/c26864/specinter.ru/www/backend/mailtemplates/pdf/bill.xlsx');
     $xls->setActiveSheetIndex(0);
     $sheet = $xls->getActiveSheet();
 

@@ -1,5 +1,5 @@
 <?php
-include_once '/home/c26864/specinter.ru/www/libs/PHPExcel-1.8/Classes/PHPExcel.php';
+include_once __DIR__ . '/../../libs/PHPExcel-1.8/Classes/PHPExcel.php';
 
 class xml extends manage
 {
