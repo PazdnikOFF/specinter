@@ -8,8 +8,9 @@ foreach($_POST as $k=>$v)$$k=$v;
 
 //Дебаг
 function debug($var) {
-	echo "<pre>";
-	var_dump($var);
+    echo "<pre>";
+    var_dump((new Exception())->getTraceAsString());
+    var_dump($var);
 	echo "</pre>";
 }
 

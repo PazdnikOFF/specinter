@@ -22,5 +22,5 @@
 	require_once("inc/helpers/helper_items.php");
 
 	// Admin Triggers
-	require_once("admin/triggers.php");
+	require_once(__DIR__ . "/../admin/triggers.php");
 ?>

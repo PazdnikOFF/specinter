@@ -347,18 +347,40 @@ class All {
 						$page->item[$i]->{$qarr[$i].'_1'} = all::getDate($arr[$qarr[$i]], 1);
 						$page->item[$i]->{$qarr[$i].'_2'} = all::getDate($arr[$qarr[$i]], 2);
 						break;
-					case 'file':$page->$qarr[$i] = $arr[$qarr[$i]];
+					case 'file':
                         $page->fields[$qarr[$i]] =$fields[$qarr[$i]];
-						if (($n = strpos($page->fields[$qarr[$i]]->comment, 'resize:')) !== false) {
-							$fn1 = explode('resize:', $page->fields[$qarr[$i]]->comment);
-							$fs = explode(',', $fn1[1]);
-							for ($if = 0; $if < count($fs); $if++){
-                                if (!is_file('files/'.($if + 1).'/'.$arr[$qarr[$i]]) && is_file('files/0/'.$arr[$qarr[$i]])){
-                                    resize_image($arr[$qarr[$i]], $fs[$if], $if + 1, '');
+                        $comment = $page->fields[$qarr[$i]]->comment;
+                        if (in_array('multi', explode(',',$comment),true)) {
+                            if ($arr[$qarr[$i]]) {
+                                $files = explode(',',$arr[$qarr[$i]]);
+                                $page->$qarr[$i] = [];
+                                if (($n = strpos($comment, 'resize:')) !== false) {
+                                    $fn1 = explode('resize:', $page->fields[$qarr[$i]]->comment);
+                                    $fs = explode(',', $fn1[1]);
+                                    foreach ($files as $filename_) {
+                                        for ($if = 0; $if < count($fs); $if++) {
+                                            if (!is_file('files/' . ($if + 1) . '/' . $filename_) && is_file('files/0/' . $filename_)) {
+                                                resize_image($filename_, $fs[$if], $if + 1, '');
+                                            }
+                                        }
+                                        $page->{$qarr[$i]}[] = (object)['item'=>$filename_];
+                                    }
                                 }
-                            }
+                            };
+                        } else {
+                            $page->$qarr[$i] = $arr[$qarr[$i]];
+                            $page->fields[$qarr[$i]] =$fields[$qarr[$i]];
+                            if (($n = strpos($comment, 'resize:')) !== false) {
+                                $fn1 = explode('resize:', $page->fields[$qarr[$i]]->comment);
+                                $fs = explode(',', $fn1[1]);
+                                for ($if = 0; $if < count($fs); $if++){
+                                    if (!is_file('files/'.($if + 1).'/'.$arr[$qarr[$i]]) && is_file('files/0/'.$arr[$qarr[$i]])){
+                                        resize_image($arr[$qarr[$i]], $fs[$if], $if + 1, '');
+                                    }
+                                }
+                            };
+                        }
 
-						};
 						break;
 					default:$page->$qarr[$i] = $arr[$qarr[$i]];
 						break;

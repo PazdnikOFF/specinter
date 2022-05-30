@@ -34,7 +34,13 @@ class type_file
         global $config;
 
         if (strpos($comment, "resize") > -1) {
-            $aspectRatio = str_replace("resize:", "", $comment);
+            $comments = explode(',', $comment);
+            foreach ($comments as $c) {
+                if (strpos($c, 'resize:') !== false) {
+                    break;
+                }
+            }
+            $aspectRatio = str_replace("resize:", "", $c);
             $aspectRatio = explode("x", $aspectRatio);
             $aspectRatio = $aspectRatio[0] . "/" . $aspectRatio[1];
         } else {
@@ -42,8 +48,9 @@ class type_file
         }
         $attribyte = ' ';
         $name = $_dataName = htmlspecialchars($name);
-
+        $multiple = false;
         if (in_array('multi', explode(',', $comment))) {
+            $multiple = true;
             $attribyte .= 'multiple';
             $_dataName .= '[]';
         }
@@ -51,13 +58,26 @@ class type_file
         $s .= "<input name=\"" . htmlspecialchars($name) . "_wasuploaded\" type=\"hidden\" value=\"" . bin2hex($data) . "\">";
         $s .= "<input name=\"" . htmlspecialchars($name) . "_comment\" type=\"hidden\" value=\"" . htmlspecialchars($comment) . "\">";
         if ($data != '') {
-            $n = strpos($data, ' ');
-            $fn = substr($data, 0, $n);
-            if ($fn == '') {
-                $fn = trim($data);
+            if ($multiple) {
+                $items = explode(',', $data);
+                foreach ($items as $i=>$item) {
+                    $n = strpos($item, ' ');
+                    $fn = substr($item, 0, $n);
+                    if ($fn == '') {
+                        $fn = trim($item);
+                    }
+                    $s .= "<br><a href=\"" . $config['server_url'] . "files/0/$fn\" target=\"_blank\"><img src=\"" . $config['server_url'] . "files/3/$fn\"></a>";
+                    $s .= "&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" name=\"" . htmlspecialchars($name) . "_remove[]\" value=\"1:$i\"> удалить";
+                }
+            } else {
+                $n = strpos($data, ' ');
+                $fn = substr($data, 0, $n);
+                if ($fn == '') {
+                    $fn = trim($data);
+                }
+                $s .= "<br><a href=\"" . $config['server_url'] . "files/0/$fn\" target=\"_blank\"><img src=\"" . $config['server_url'] . "files/3/$fn\"></a>";
+                $s .= "&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" name=\"" . htmlspecialchars($name) . "_remove\" value=1> удалить";
             }
-            $s .= "<br><a href=\"" . $config['server_url'] . "files/0/$fn\" target=\"_blank\">просмотр..</a>";
-            $s .= "&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" name=\"" . htmlspecialchars($name) . "_remove\" value=1> удалить";
         }
 
         /*Если файл - изображение и оно уже загружено, при условии атрибута realcrop - выводим кроппер*/
@@ -106,7 +126,7 @@ class type_file
 				};
 
 
-				$('#cropDataButton').live('click', function() {
+				$('#cropDataButton').on('click', function() {
 					$('#crop-target').show();
 					initCrop();
 					$('#cropDataButton').hide();
@@ -115,7 +135,7 @@ class type_file
 
 				});
 
-				$('#cropDataCancel').live('click', function() {
+				$('#cropDataCancel').on('click', function() {
 					api.destroy();
 					$('#crop-target').hide();
 
@@ -145,14 +165,25 @@ class type_file
         global $error;
 
         if (is_array($_FILES[$name]['tmp_name'])) {
+            $data = [];
+            if (${"$name" . "_wasuploaded"} != '') {
+                $data = explode(',', pack("H*", stripslashes(${"$name" . "_wasuploaded"})));
+                if (${"$name" . "_remove"} != '' && is_array(${"$name" . "_remove"})) {
+                    foreach (${"$name" . "_remove"} as $key) {
+                        list($i,$k) = explode(':', $key);
+                        unset($data[$k]);
+                    }
+                }
+            }
+
             foreach ($_FILES[$name]['tmp_name'] as $key => $value) {
 
                 $fn = $_FILES[$name]['name'][$key];
                 $comment = $_POST[$name . '_comment'];
                 $data[] = $this->__save($name, $comment, $fn, $key);
             }
-            
-            return $data;
+
+            return implode(',',$data);
         } else {
 
             $comment = $_POST[$name . '_comment'];
@@ -296,13 +327,12 @@ class type_file
                             imageAlphaBlending($thumb, false);
                             imageSaveAlpha($thumb, true);
                             imagecopyresampled($thumb, $watermark, 0, 0, 0, 0, $size[0], $size[0] * $dsada, $watermark_width, $watermark_height);
-                            imagepng($thumb);
+//                            imagepng($thumb);
                             $watermark_width = $size[0];
                             $watermark_height = $size[0] * $dsada;
                         }
                         $dest_x = ($size[0] - $watermark_width) / 2;
                         $dest_y = ($size[1] - $watermark_height) / 2;
-
 
                         imagealphablending($image, true);
                         imagealphablending($watermark, true);
@@ -371,7 +401,17 @@ class type_file
 
             if (${"$name" . "_wasuploaded"} != '') {
                 if (${"$name" . "_remove"} != '') {
-                    $data = '';
+                    if (is_array(${"$name" . "_remove"})) {
+                        $data = pack("H*", stripslashes(${"$name" . "_wasuploaded"}));
+                        $d = explode(',',$data);
+                        foreach (${"$name" . "_remove"} as $key) {
+                            list($i,$k) = explode(':', $key);
+                            unset($d[$k]);
+                        }
+                        $data = implode(',',$d);
+                    } else {
+                        $data = '';
+                    }
                 } else {
                     $data = pack("H*", stripslashes(${"$name" . "_wasuploaded"}));
                 }
