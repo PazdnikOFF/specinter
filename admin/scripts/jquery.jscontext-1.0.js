@@ -50,8 +50,50 @@
 
                 switch (settings.bind) {
                     case "right-click":
-                        $(elm).bind("dblclick contextmenu", function (e) {
 
+
+                        $(elm).on('mousedown touchstart', function(){
+                            
+                            pressTimer = new Date().getTime();
+                           
+                          return false;         
+                        });
+
+
+                        $(elm).on('mouseup touchend', function(event){
+                           
+                            if(event.which == 0 || event.which == 1){
+                              
+                                if(((new Date().getTime()) - pressTimer) < 1000){
+                                  
+                                    window.location.href = $(elm).attr('data-loc'); 
+                                }
+                                else {
+                                  
+                                    pressTimer = 0;
+                                    $(elm).addClass("click");
+                                    var elementcurrent = $("#" + elm.id + "jscontext");
+                                    if (elementcurrent.length == 0) {
+                                        methods.openMenu(elm, settings);
+                                        jscontextElm(elm);
+                                        if (settings.show != null)
+                                            settings.show.call();
+                                        element.moveit = false;
+                                        return false;
+                                    }
+                                }
+                            }
+                            
+                            
+                           
+                            return false;
+                        });
+
+                       
+
+
+                        $(elm).bind("dblclick contextmenu", function (e) {
+                            
 							$(this).addClass("click");
                             var elementcurrent = $("#" + elm.id + "jscontext");
                             if (elementcurrent.length == 0) {

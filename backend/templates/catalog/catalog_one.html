@@ -29,7 +29,7 @@
                 <tr class="detal-list-one" data-url="{url}" data-item="#num{nnum}">
                     <td>{nnum}</td>
                     <td><a href="javascript:void(0);" class="detal-art">{art}</a></td>
-                    <td><span title="{name_rus}">{name_rus}</span></td>
+                    <td><span title="{name_rus_title}">{name_rus}</span></td>
                     <td><span>{name_eng}</span></td>
                     <td>
                         <div class="detal-price">Цена</div>
@@ -155,19 +155,58 @@
         </div>
         {set:img}
         <div class="detal-img">
-            <img class="detal-image" src="/files/0/{img}" alt="" >
-            <div class="center">
-                <a href="#" class="detal-img-open-trigger">На весь экран</a>
+            <div class="detal-img__slider">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img class="detal-image" src="/files/0/{img}" alt="" >
+                            <div class="center">
+                                <a href="#" class="detal-img-open-trigger">На весь экран</a>
+                            </div>    
+                        </div>
+                        <div class="swiper-slide">
+                            <img class="detal-image" src="/files/0/{img}" alt="" >
+                            <div class="center">
+                                <a href="#" class="detal-img-open-trigger">На весь экран</a>
+                            </div>    
+                        </div>
+                        <div class="swiper-slide">
+                            <img class="detal-image" src="/files/0/{img}" alt="" >
+                            <div class="center">
+                                <a href="#" class="detal-img-open-trigger">На весь экран</a>
+                            </div>    
+                        </div>
+                        <div class="swiper-slide">
+                            <img class="detal-image" src="/files/0/{img}" alt="" >
+                            <div class="center">
+                                <a href="#" class="detal-img-open-trigger">На весь экран</a>
+                            </div>    
+                        </div>
+                        <div class="swiper-slide">
+                            <img class="detal-image" src="/files/0/{img}" alt="" >
+                            <div class="center">
+                                <a href="#" class="detal-img-open-trigger">На весь экран</a>
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+                <div class="detal-img__panel">
+                    <div class="detal-img__arrow detal-img__arrow_prev swiper-button-prev"></div>
+                    <div class="detal-img__pagination swiper-pagination"></div>
+                    <div class="detal-img__arrow detal-img__arrow_next swiper-button-next"></div>       
+                </div>
             </div>
+            
         </div>
+
 
         
         <script type="text/javascript">
-
-            $('.detal-img-open-trigger').click(function(e) {
+            $(document).on('click', '.detal-img-open-trigger', function(e){
                 e.preventDefault();
-                $('.detal-image').click();
-              });
+                $(this).closest('.swiper-slide').find('.detal-image').click();   
+            });
+            
         	/*if($('html').width() > 992) {
 		       $('.detal-img').zoom({
                    magnify: 0.8,

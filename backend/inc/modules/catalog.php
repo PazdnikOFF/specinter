@@ -203,6 +203,48 @@ class catalog
 
                 $value->asot = end($arSort[$value->id]);
                 unset($arSort[$value->id][count($arSort[$value->id]) - 1]);
+
+
+                $art = $value->art;
+                if(strlen($art) > 25 && strripos($art, '/') !== false){
+ 
+                  $artParts = explode('/', $art, 3);
+                  $delimeterCount = count($artParts)-1;
+                  if($delimeterCount){
+                    $art = $artParts[0].'/<br>'.$artParts[1];
+                  }
+                  else {
+                    $art = $artParts[0].'/'.$artParts[1].'<br>'.$artParts[2];
+                  }
+                  
+
+                  $value->art = $art;
+                }
+
+                $name_rus = $value->name_rus;
+                $value->name_rus_title = $name_rus;
+                if(strlen($name_rus) > 30){
+                    $res = preg_split('##u', $name_rus, -1, PREG_SPLIT_NO_EMPTY);
+
+                    $newstr = '';
+                    $brokeTrigger = true;
+                    foreach($res as $k => $v){
+
+                        if($k >= 15 && $brokeTrigger && trim($v) == ''){
+
+                            $newstr .= $v.'<br>';
+                            $brokeTrigger = false;
+                        }
+                        else {
+                            $newstr .= $v;
+                        }
+                    }
+
+                    $value->name_rus = $newstr;
+                  
+                }
+               
+                
             }
 
             usort($page->items, function ($a, $b) {

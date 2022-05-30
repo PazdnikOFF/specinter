@@ -3705,3 +3705,49 @@ td.order-table-quintity {
 body .viewer-backdrop {
     background-color: rgba(0, 0, 0, 0.2);
 }
+
+.detal-list .detal-list-one td:nth-child(2) {
+    max-width: 190px;
+}
+
+.detal-img__panel {
+    display: flex;  
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+}
+.detal-img__arrow {
+    position: static;
+    margin: 0;
+    background-image: none;
+} 
+.detal-img__arrow:after {
+    color: #23a2cb;
+    font-size: 22px;
+}  
+.detal-img__arrow_prev {
+
+}
+.detal-img__arrow_next {
+
+}
+.detal-img__pagination {
+    display: block !important;
+    position: static;
+    width: auto !important;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.detal-img__pagination .swiper-pagination-bullet {
+    background: transparent;
+    border: 2px solid #23a2cb;
+    width: 14px;
+    height: 14px;
+    opacity: 1;
+}
+.detal-img__pagination .swiper-pagination-bullet-active {
+    background: #23a2cb;
+}
+.detal-img img {
+    cursor: pointer;
+}
