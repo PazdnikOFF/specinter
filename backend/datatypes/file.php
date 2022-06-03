@@ -69,7 +69,7 @@ class type_file
                         $fn = trim($item);
                     }
                     $idx = file_exists('files/3/' . $fn) ? 3 : 0;
-                    $s .= "<br><a href=\"" . $config['server_url'] . "files/0/$fn\" target=\"_blank\"><img src=\"" . $config['server_url'] . "files/'.$idx.'/$fn\" style='max-width:200px;max-height:200px;'></a>";
+                    $s .= "<br><a href=\"" . $config['server_url'] . "files/0/$fn\" target=\"_blank\"><img src=\"" . $config['server_url'] . "files/{$idx}/$fn\" style='max-width:200px;max-height:200px;'></a>";
                     $s .= "&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" name=\"" . htmlspecialchars($name) . "_remove[]\" value=\"1:$i\"> удалить";
                 }
             } else {
