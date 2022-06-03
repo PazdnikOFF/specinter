@@ -134,7 +134,8 @@
 
 			});
 
-			$(".plus").click(function() {
+			$(document).on('click touchstart', '.plus', function() {
+				console.log('plus');
 				var id = $(this).attr("id").substr(10);
 				$.cookie("hs_"+id, 1);
 				window.location.href = '/manage/#'+id;
@@ -142,7 +143,8 @@
 				return false;
 			});
 
-			$(".minus").click(function() {
+			$(document).on('click touchstart', '.minus', function() {
+				console.log('minus');
 				var id = $(this).attr("id").substr(10);
 				$.cookie("hs_"+id, 0);
                 window.location.href = '/manage/#'+id;

@@ -56,7 +56,7 @@
                             
                             pressTimer = new Date().getTime();
                            
-                          return false;         
+                          //return false;         
                         });
 
 
@@ -65,8 +65,14 @@
                             if(event.which == 0 || event.which == 1){
                               
                                 if(((new Date().getTime()) - pressTimer) < 1000){
-                                  
-                                    window.location.href = $(elm).attr('data-loc'); 
+                                    console.log(event.target);
+                                    if(!$(event.target).hasClass('minus') && !$(event.target).hasClass('plus') && !$(event.target).hasClass('ext')){
+                                        
+                                        if($(elm).attr('data-loc')){
+                                            window.location.href = $(elm).attr('data-loc'); 
+                                        }
+                                    }
+                                    
                                 }
                                 else {
                                   
@@ -86,7 +92,7 @@
                             
                             
                            
-                            return false;
+                            //return false;
                         });
 
                        
@@ -193,9 +199,10 @@
                     jscontextElement.style.display = 'none';
 
                     if (mouse.y == undefined)
-                        mouse.y = 0;
+                        mouse.y = $(elm).offset().top;
                     if (mouse.x == undefined)
-                        mouse.x = 0;
+                        mouse.x = $(elm).offset().left;
+
                     jscontextElement.style.top = (mouse.y - (settings.sticky == true ? 0 : 15)) + 'px';
                     jscontextElement.style.left = (mouse.x - (settings.sticky == true ? 0 : 15)) + 'px';
                     jscontextElement.style.zIndex = '9999';
