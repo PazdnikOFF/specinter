@@ -213,8 +213,8 @@ class Listing
 			$sql = "select * from prname_b_$this->template where $this->parent $this->critery $this->on $this->groupBy " . "order by " . ($this->sortfield && $this->sortfield !== 'sort' ? ($this->sortfield) : 'sort') . " $this->sortby" . "" . ($this->limit ? ' limit ' . ($this->start ? $this->start : '0') . ', ' . $this->limit : '') . "";
 
 			$this->items = sql::query($sql);
-		
-			
+
+
 			// if (isset($_COOKIE['vas-vas'])) {
 			// 	var_dump(	$this->items);
 			// }

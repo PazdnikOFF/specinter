@@ -54,38 +54,37 @@ $(document).ready(function () {
 
     });
 
+    var prevSearchTimeout = null;
+    var prevSearchRequest = null;
 
     $(document).on('keyup', '.search-input', function () {
-
         var val = $(this).val();
-
         if (val.length >= 3) {
-
+            if (prevSearchTimeout !== null) {
+                clearTimeout(prevSearchTimeout);
+                prevSearchTimeout = null;
+            }
+            if (prevSearchRequest !== null) {
+                prevSearchRequest.abort();
+                prevSearchRequest = null;
+            }
             data = {'ajax': 'Y', 'query': val};
-
-            $.ajax({
-
-                url: '/search/',
-
-                type: "POST",
-
-                dataType: "html",
-
-                data: data,
-
-                success: function (data) {
-
-                    $('.ajax__searcher').show();
-
-                    $('.ajax__searcher').html(data);
-
-                }
-
-            });
-
+            prevSearchTimeout = setTimeout(function () {
+                prevSearchRequest = $.ajax({
+                    url: '/search/',
+                    type: "POST",
+                    dataType: "html",
+                    data: data,
+                    success: function (data) {
+                        $('.ajax__searcher').show();
+                        $('.ajax__searcher').html(data);
+                    }
+                }).always(function() {
+                    prevSearchRequest = null;
+                });
+                prevSearchTimeout = null;
+            }, 150);
         }
-
-
     });
 
     $("#fast-order-form").validate({
