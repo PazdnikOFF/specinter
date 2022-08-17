@@ -498,4 +498,3 @@ function splstr($ss, $delim) {
 	return $s;
 }
 
-?>
