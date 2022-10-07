@@ -125,7 +125,9 @@
 }
 
 .swiper-button-next,
-.swiper-button-prev {
+.swiper-button-prev,
+.swiper-button-prev-st,
+.swiper-button-next-st {
     position: absolute;
     top: 50%;
     width: 27px;
@@ -177,6 +179,15 @@
 .swiper-button-next.swiper-button-white,
 .swiper-container-rtl .swiper-button-prev.swiper-button-white {
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E");
+}
+
+.swiper-button-prev-st {
+	left: 10px;
+    right: auto;
+}
+.swiper-button-next-st {
+	right: 10px;
+    left: auto;
 }
 
 .swiper-pagination {
@@ -1692,7 +1703,7 @@ body {
     background: #23a2cb;
 }
 
-.slider .swiper-button-prev {
+.slider .swiper-button-prev-st {
     background-image: url(../img/sprite.png);
     background-position: -63px 0;
     width: 17px;
@@ -1701,14 +1712,14 @@ body {
     top: -220px;
 }
 
-.slider .swiper-button-prev:hover {
+.slider .swiper-button-prev-st:hover {
     background-image: url(../img/sprite.png);
     background-position: -63px -30px;
     width: 17px;
     height: 30px;
 }
 
-.slider .swiper-button-next {
+.slider .swiper-button-next-st {
     background-image: url(../img/sprite.png);
     background-position: -63px 0;
     width: 17px;
@@ -1719,7 +1730,7 @@ body {
     top: -220px;
 }
 
-.slider .swiper-button-next:hover {
+.slider .swiper-button-next-st:hover {
     background-image: url(../img/sprite.png);
     background-position: -63px -30px;
     width: 17px;

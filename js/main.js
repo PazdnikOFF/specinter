@@ -205,8 +205,11 @@ $(document).ready(function() {
 });
 $(document).ready(function() {
   new window.Swiper('.slider-inn', {
-    nextButton: '.swiper-button-next',
-    prevButton: '.swiper-button-prev',
+	loop: true,
+    navigation: {
+		nextEl: '.swiper-button-next-st',
+		prevEl: '.swiper-button-prev-st',
+	},
     pagination: '.swiper-pagination',
     spaceBetween: 10,
     paginationClickable: true,
@@ -382,16 +385,21 @@ $(document).ready(function() {
     slidesPerView: 3,
     spaceBetween: 20,
     paginationClickable: true,
-    nextButton: '.card-button-next',
-    prevButton: '.card-button-prev',
+
+	navigation: {
+		nextEl: document.querySelector('.card-right-inn .card-button-next'),
+		prevEl: document.querySelector('.card-right-inn .card-button-prev'),
+	},
   });
 
   var recomended = new Swiper('.recomended-inn', {
     slidesPerView: 5,
     spaceBetween: 50,
-    paginationClickable: true,
-    nextButton: '.recomended-button-next',
-    prevButton: '.recomended-button-prev',
+
+	navigation: {
+		nextEl: '.recomended-button-next',
+		prevEl: '.recomended-button-prev',
+	},
   });
 
   var $images = $('.card-right-gallery a, .card-left a').not('.detal-one__video');
@@ -450,7 +458,10 @@ $(document).ready(function() {
       var detalImg = new Swiper('.detal-img__slider .swiper-container', {
         slidesPerView: 1,
 
-
+		autoplay: {
+			delay: 3000,
+			pauseOnMouseEnter: true,
+		},
 
         navigation: {
           nextEl: '.detal-img__slider .swiper-button-next',
