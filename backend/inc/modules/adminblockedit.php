@@ -802,7 +802,11 @@ class adminblockedit extends manage
             $class = "type_" . $_POST['dkey'][$i];
             $obj = new $class();
 
-            $_genValue = $obj->save('data' . $i);
+            if ($obj instanceof type_file) {
+                $_genValue = $obj->save('data' . $i, true);
+            } else {
+                $_genValue = $obj->save('data' . $i);
+            }
             if (is_array($_genValue)) {
                 foreach ($_genValue as $k => $v) {
                     $genValue[$k] = mysqli_real_escape_string(Sql::$connection, $v);

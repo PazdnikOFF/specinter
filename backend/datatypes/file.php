@@ -157,7 +157,7 @@ class type_file
         return $s;
     }
 
-    public function save($name)
+    public function save($name, $return_as_array = false)
     {
         global ${"$name"};
         global ${"$name" . "_wasuploaded"};
@@ -187,7 +187,7 @@ class type_file
                 $data[] = $this->__save($name, $comment, $fn, $key);
             }
 
-            return implode(',',$data);
+            return $return_as_array ? $data : implode(',',$data);
         } else {
 
             $comment = $_POST[$name . '_comment'];
