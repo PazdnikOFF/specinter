@@ -35,6 +35,8 @@ $(document).ready(function() {
     } */
   });
 
+  
+
   $(containersList).each(function(i, className) {
     var imageCollection = [];
     $(className)
@@ -76,7 +78,26 @@ $(document).ready(function() {
         },
       });
     }
+
   });
+
+   var card = new Swiper('.card-right-gallery', {
+		slidesPerView: 3,
+		spaceBetween: 20,
+		paginationClickable: true,
+		loop: true,
+
+		autoplay: {
+			delay: 3000,
+			disableOnInteraction: false,
+			pauseOnMouseEnter: true,
+		},
+
+		navigation: {
+			nextEl: document.querySelector('.card-right-inn .card-button-next'),
+			prevEl: document.querySelector('.card-right-inn .card-button-prev'),
+		}
+  	});
 });
 
 $(document).ready(function() {
@@ -381,20 +402,18 @@ $(document).ready(function() {
     });
   });
 
-  var card = new Swiper('.card-right-gallery', {
-    slidesPerView: 3,
-    spaceBetween: 20,
-    paginationClickable: true,
-
-	navigation: {
-		nextEl: document.querySelector('.card-right-inn .card-button-next'),
-		prevEl: document.querySelector('.card-right-inn .card-button-prev'),
-	},
-  });
+ 
 
   var recomended = new Swiper('.recomended-inn', {
     slidesPerView: 5,
     spaceBetween: 50,
+	loop:true,
+
+	autoplay: {
+			delay: 3000,
+			disableOnInteraction: false,
+			pauseOnMouseEnter: true,
+		},
 
 	navigation: {
 		nextEl: '.recomended-button-next',
@@ -457,9 +476,11 @@ $(document).ready(function() {
     if($('.detal-img__slider').length > 0){
       var detalImg = new Swiper('.detal-img__slider .swiper-container', {
         slidesPerView: 1,
+		loop:true,
 
 		autoplay: {
 			delay: 3000,
+			disableOnInteraction: false,
 			pauseOnMouseEnter: true,
 		},
 
