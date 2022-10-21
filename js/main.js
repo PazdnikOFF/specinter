@@ -25,79 +25,72 @@ window.photoViewerConfig = {
   },
 };
 
-$(document).ready(function() {
-  // Image search containers
-  //var containersList = ['.content .card-top', '.content .detal-image'];
-  var containersList = ['.content .card-top'];
-  $(document).on('click', function(e) {
-    /* if (e.target && e.target.className.contains('photoviewer-stage')) {
-      $('.photoviewer-button-close').click();
-    } */
-  });
+var globalViewer, globalViewerShown;
 
-  
-
-  $(containersList).each(function(i, className) {
-    var imageCollection = [];
-    $(className)
-      .find('img')
-      .each(function(ii, img) {
-        // if is not placeholder image and this image not hidden
-        if (!img.src.match(/\/placeholderbig\.png$/gi) && $(img).is(':visible')) {
-          var selectorElem = $(img).parent('a').length
-            ? $(img)
-                .parent('a')
-                .get(0)
-            : img;
-
-          // init viewer
-          $(selectorElem).click(function(e) {
-            e.preventDefault();
-          });
-        }
-      });
-
-    var container = document.querySelector(className);
-  
-    if (container) {
-      new Viewer(container, {
-        minZoomRatio: 0.1,
-        maxZoomRatio: 100,
-        toolbar: {
-          zoomIn: 4,
-          zoomOut: 4,
-          oneToOne: 4,
-          reset: 4,
-          prev: 1,
-          play: 4,
-          next: 1,
-          rotateLeft: 1,
-          rotateRight: 1,
-          flipHorizontal: 1,
-          flipVertical: 1,
-        },
-      });
+function viewerInitialize() {
+  var container = document.querySelector('.content .card-top');
+  if (container) {
+    if (globalViewer) {
+      globalViewer.destroy();
     }
+    globalViewer = new Viewer(container, {
+      minZoomRatio: 0.1,
+      maxZoomRatio: 100,
+      toolbar: {
+        zoomIn: 4,
+        zoomOut: 4,
+        oneToOne: 4,
+        reset: 4,
+        prev: 1,
+        play: 4,
+        next: 1,
+        rotateLeft: 1,
+        rotateRight: 1,
+        flipHorizontal: 1,
+        flipVertical: 1,
+      },
+      filter: function (img) {
+        var parentClassList = img.parentNode.classList;
+        return !img.parentNode.classList.contains('swiper-slide') || parentClassList.contains('swiper-slide-visible');
+      },
+      show: function () {
+        globalViewerShown = true;
+      },
+      hidden: function () {
+        globalViewerShown = false;
+      }
+    });
+  }
+}
 
+$(document).ready(function () {
+  var card = new Swiper('.card-right-gallery', {
+    slidesPerView: 3,
+    spaceBetween: 20,
+    paginationClickable: true,
+    loop: true,
+    watchSlidesProgress: true,
+
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+    },
+
+    on: {
+      slideChange: function (){
+        if (!globalViewerShown) {
+          viewerInitialize();
+        }
+      }
+    },
+
+    navigation: {
+      nextEl: document.querySelector('.card-right-inn .card-button-next'),
+      prevEl: document.querySelector('.card-right-inn .card-button-prev'),
+    }
   });
-
-   var card = new Swiper('.card-right-gallery', {
-		slidesPerView: 3,
-		spaceBetween: 20,
-		paginationClickable: true,
-		loop: true,
-
-		autoplay: {
-			delay: 3000,
-			disableOnInteraction: false,
-			pauseOnMouseEnter: true,
-		},
-
-		navigation: {
-			nextEl: document.querySelector('.card-right-inn .card-button-next'),
-			prevEl: document.querySelector('.card-right-inn .card-button-prev'),
-		}
-  	});
+  viewerInitialize();
 });
 
 $(document).ready(function() {
