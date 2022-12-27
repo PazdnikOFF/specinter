@@ -33,6 +33,10 @@
 
                 <div class="swiper-wrapper">
 
+                    {set:video_file}
+                    <a href="#video-popup" class="swiper-slide card-video"></a>
+                    {/}
+
                     {mask:images}
 
                     <a href="/files/0/{img}" class="swiper-slide" onclick="event.preventDefault();"><img src="/files/0/{img}"></a>
@@ -69,6 +73,9 @@
             <div class="card-button-next"></div>
 
         </div>
+            {set:video_file}
+            <div id="video-popup" class="white-popup mfp-hide"><video src="/files/0/{video_file}" controls autoplay></video></div>
+            {/}
         {/}
         {set:num}
         <div class="card-right__descr">

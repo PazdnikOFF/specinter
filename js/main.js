@@ -369,6 +369,23 @@ $(document).ready(function() {
     fixedContentPos: false,
   });
 
+  $('.card-video').magnificPopup({
+    disableOn: 700,
+    type: 'inline',
+    mainClass: 'mfp-fade',
+    removalDelay: 160,
+    preloader: true,
+    fixedContentPos: true,
+
+    callbacks: {
+      open: function () {
+      },
+      close: function () {
+        $('#video-popup video').eq(0)[0].pause();
+      }
+    }
+  });
+
   $('.detal-one-slider').each(function() {
     $(this).magnificPopup({
       delegate: 'a',

@@ -492,6 +492,7 @@ class catalog
             || !empty($page->img_2)
             || !empty($page->img_3)
             || !empty($page->img_4)
+            || !empty($page->video_file)
             || !empty($page->video) || !empty($page->catalog_img);
         $page->recomend_items = $tmp;
         $control->titleSeo = $page->name_rus . ' ' . $page->art . ' для ' . all::get_name($control->parents[2]) . ' на specinter.ru';
