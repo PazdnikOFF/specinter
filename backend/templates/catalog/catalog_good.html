@@ -39,12 +39,15 @@
 
                     {mask:images}
 
-                    <a href="/files/0/{img}" class="swiper-slide" onclick="event.preventDefault();"><img src="/files/0/{img}"></a>
+                    
 
                     {/}
+                   
                     {set://catalog_img}
                     <a href="/files/0/{//catalog_img}" class="swiper-slide" onclick="event.preventDefault();"><img src="/files/0/{//catalog_img}"></a>
                     {/}
+
+                     {set:img}<a href="/files/0/{img}" class="swiper-slide" onclick="event.preventDefault();"><img src="/files/0/{img}"></a>{/}
 
                     {set:img_1}
 
