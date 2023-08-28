@@ -219,8 +219,8 @@ class adminusers extends manage {
 
 
 
-		$password = preg_replace("/[\W]/i", "", $_POST['password']);
-		$passwordrep = preg_replace("/[\W]/i", "", $_POST['passwordrep']);
+		$password = preg_replace("/[\S]/i", "", $_POST['password']);
+		$passwordrep = preg_replace("/[\S]/i", "", $_POST['passwordrep']);
 
 		if ($passwordrep != $password) {
 			header("Location: /manage/users/_aerror_b2/");

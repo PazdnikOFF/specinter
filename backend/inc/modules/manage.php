@@ -213,8 +213,8 @@ class manage {
 
 		//Если пришел пост - пробуем авотризоваться
 		if (isset($_POST['authlogin']) && $_POST['authlogin'] != "") {
-			$authlogin = trim(addslashes($_POST['authlogin']));
-			$authpass = trim(addslashes($_POST['authpass']));
+			$authlogin = trim(sql::escape_string($_POST['authlogin']));
+			$authpass = trim(sql::escape_string($_POST['authpass']));
 			$authpass = md5(base64_encode($config['md5'].$authpass));
 
 			$sql = "SELECT prname_sadmin.*, prname_rt.* FROM prname_sadmin, prname_rt WHERE aid = prname_sadmin.admin_id AND enabled='1' AND admin_name='".$authlogin."' AND admin_password='".$authpass."'";
