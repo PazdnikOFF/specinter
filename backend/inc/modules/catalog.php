@@ -291,7 +291,16 @@ class catalog
         $list = new Listing("goodimage", "items", $_data->good_id);
         $list->getList();
         $list->getItem();
-        $page->images = $list->item;
+        $page->images = [];
+        $images = $list->item;
+        foreach ($images as $img) {
+            $urls = explode(',', $img->img);
+            foreach ($urls as $url) {
+                $obj = new stdClass();
+                $obj->img = $url;
+                $page->images[] = $obj;
+            }
+        }
 
         $list = new Listing("variant", "items", $_data->good_id);
 
