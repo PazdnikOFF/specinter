@@ -13,16 +13,35 @@ class search
         die();
     }
 
-    private function getWords($string) {
+    private function getWords($string)
+    {
         $string = urldecode($string);
         $words  = $string;
-        $words  = preg_replace('/[^a-z0-9а-яё]/iu',' ', $words);
         $words  = explode(' ', $words);
-        $words  = array_filter($words, function ($w) {
-            return mb_strlen($w) >= 2;
+        $words  = array_map('trim', $words);
+        $words  = array_filter($words, function ($word) {
+            return preg_match('/^[a-zа-яё]+$/iu', $word, $m) && mb_strlen($word) >= 2;
         });
+//        $words  = preg_replace('/[^a-z0-9а-яё]/iu',' ', $words);
+//        $words  = explode(' ', $words);
+//        $words  = array_filter($words, function ($w) {
+//            return mb_strlen($w) >= 2;
+//        });
 
         return $words;
+    }
+
+    private function getNumbers($string)
+    {
+        $string  = urldecode($string);
+        $numbers = $string;
+        $numbers   = explode(' ', $numbers);
+        $numbers  = array_map('trim', $numbers);
+        $numbers = array_filter($numbers, function ($number) {
+            return preg_match('/[^a-zа-яё]/iu', $number) && mb_strlen($number) >= 2;
+        });
+
+        return $numbers;
     }
 
     private function getStemmedWords($words) {
@@ -40,31 +59,34 @@ class search
             }, $words));
         };
         $results = [];
-        $results[] = ">(>({$wordsWith('+', '')}))";
-        $results[] = ">({$wordsWith('+', '*')})";
-        $results[] = "({$wordsWith('', '')})";
-        $results[] = "<({$wordsWith('', '*')})";
+//        $results[] = ">(>({$wordsWith('+', '')}))";
+//        $results[] = ">({$wordsWith('+', '*')})";
+//        $results[] = "({$wordsWith('', '')})";
+//        $results[] = "<({$wordsWith('', '*')})";
+        $results[] = $wordsWith('+', '*');
 
         return implode(' ', $results);
     }
 
     private function getLike($fields, $words) {
-        return $words ? implode(' OR ', array_map(function ($word) use ($fields, $field) {
+        return $words ? '(' . implode(' OR ', array_map(function ($word) use ($fields) {
             return implode(' OR ', array_map(function($field) use ($word) {
                 return sprintf('%s LIKE \'%%%s%%\'', $field, sql::escape_string($word));
             }, $fields));
-        }, $words)) : 'FALSE';
+        }, $words)) . ')' : 'FALSE';
     }
 
     private function highlightWords($words, $text) {
         $stemmedWords = $this->getStemmedWords($words);
         foreach ($words as $i => $word) {
             $originalText = $text;
-            $text = preg_replace('/' . preg_quote($word, '/') . '/ui', '<span style="color:black;font-weight:bold">$0</span>', $text);
+            $text = preg_replace('/' . preg_quote($word, '/') . '/ui', "\x00$0\x01", $text);
             if ($text === $originalText) {
-                $text = preg_replace('/' . preg_quote($stemmedWords[$i], '/') . '/ui', '<span style="color:black;font-weight:bold">$0</span>', $text);
+                $text = preg_replace('/' . preg_quote($stemmedWords[$i], '/') . '/ui', "\x00$0\x01", $text);
             }
         }
+        $text = str_replace("\x00", '<span style="color:black;font-weight:bold">', $text);
+        $text = str_replace("\x01", '</span>', $text);
         return $text;
     }
 
@@ -141,18 +163,26 @@ class search
             $word = sql::escape_string(trim($_REQUEST['search-request']));
             $page = new stdClass();
             $words = $this->getWords($word);
-            $against = $this->getAgainst($words);
+            $numbers = $this->getNumbers($word);
+//            $against = $this->getAgainst($words);
+
+            $criteria = '';
+            if ($words) {
+                $criteria .= "MATCH (art, name_rus, name_eng) AGAINST ('{$this->getAgainst($words)}' IN BOOLEAN MODE) AND ";
+            }
+            if ($numbers) {
+                $criteria .= $this->getLike(['art', 'name_rus'], $numbers) . ' AND ';
+            }
+            if (!$numbers && !$words) {
+                $criteria .= 'FALSE AND ';
+            }
 
             $page->word = $word;
             $list = new Listing(
                 "ablock",
                 "blocks",
                 'all',
-                sprintf(
-                    '(%s OR %s) AND',
-                    "MATCH (art, name_rus, name_eng) AGAINST ('{$this->getAgainst($words)}' IN BOOLEAN MODE)",
-                    $this->getLike(['art', 'name_rus'], $words)
-                )
+                $criteria
             );
 //            $list->sortfield = "if (parent = 451, 1, 0) ASC, MATCH (art, name_rus, name_eng) AGAINST ('{$this->getAgainst($words)}' IN BOOLEAN MODE)";
 //            $list->sortby='DESC';
@@ -162,6 +192,7 @@ class search
             $page->items = [];
 //            $existent_goods = [];
             $this->sortItems($list->item, $words);
+            $words = array_merge($words, $numbers);
             foreach ($list->item as &$item) {
 //                    if (isset($existent_goods[$item->good_id]) || !$item->good_id) {
 //                        continue;
@@ -186,61 +217,72 @@ class search
 
     private function searchAjax($q)
     {
-
-
-        // if (isset($_COOKIE['vas-vas'])) {
-        //     global $sql;
-        //     echo "select * from it_b_ablock  where name_eng like '%".sql::escape_string($q)."%' or name_rus like '%".sql::escape_string($q)."%'";
-        //     $res = sql::query("select * from it_b_ablock  where name_eng like '%".sql::escape_string($q)."%' or name_rus like '%".sql::escape_string($q)."%'");
-        //    var_dump($res);
-        //     var_dump(sql::fetch_assoc($res));
-        //     die();
+        if (strlen($q) > 2) {
+            $word = sql::escape_string(trim($q));
+            // if (isset($_COOKIE['vas-vas'])) {
+            //     global $sql;
+            //     echo "select * from it_b_ablock  where name_eng like '%".sql::escape_string($q)."%' or name_rus like '%".sql::escape_string($q)."%'";
+            //     $res = sql::query("select * from it_b_ablock  where name_eng like '%".sql::escape_string($q)."%' or name_rus like '%".sql::escape_string($q)."%'");
+            //    var_dump($res);
+            //     var_dump(sql::fetch_assoc($res));
+            //     die();
             // die("ablock", "blocks", 'all', " (name_eng like '%{$q}%' or name_rus like '%{$q}%'   or art like '%{$q}%') AND");
-        // }
-        $words = $this->getWords($q);
-        $against = $this->getAgainst($words);
-        $q = sql::escape_string(trim($q));
-        $list = new Listing(
-            "ablock",
-            "blocks",
-            'all',
-            sprintf(
-                '(%s OR %s) AND',
-                "MATCH (art, name_rus, name_eng) AGAINST ('{$this->getAgainst($words)}' IN BOOLEAN MODE)",
-                $this->getLike(['art', 'name_rus'], $words)
-            )
-        );
+            // }
+            $words   = $this->getWords($word);
+            $numbers = $this->getNumbers($word);
+//        $against = $this->getAgainst($words);
+//        $q = sql::escape_string(trim($q));
+
+            $criteria = '';
+            if ($words) {
+                $criteria .= "MATCH (art, name_rus, name_eng) AGAINST ('{$this->getAgainst($words)}' IN BOOLEAN MODE) AND ";
+            }
+            if ($numbers) {
+                $criteria .= $this->getLike(['art', 'name_rus'], $numbers) . ' AND ';
+            }
+            if (!$numbers && !$words) {
+                $criteria .= 'FALSE AND ';
+            }
+
+            $list = new Listing(
+                "ablock",
+                "blocks",
+                'all',
+                $criteria
+            );
 //        $list->sortfield = "if (parent = 451, 1, 0) ASC, MATCH (art, name_rus, name_eng) AGAINST ('{$this->getAgainst($words)}' IN BOOLEAN MODE)";
 //        $list->sortby='DESC';
-        $list->getList();
-        $list->getItem();
-        $list->limit = 9999999;
-        $page = new stdClass();
-        $page->count = $list->count;
-        $page->items = [];
-        $existent_goods = [];
-        $this->sortItems($list->item, $words);
-        foreach ($list->item as &$item) {
-            if (isset($existent_goods[$item->good_id]) || !$item->good_id) {
-                continue;
-            }
-            $page->items[] = $item;
-            $existent_goods[$item->good_id] = 1;
-            if ($item->uurl) {
-                $item->url = '/'.$item->uurl;
-            } else {
-                $item->url = all::getUrl($item->parent) . '_aview_b'.$item->id;
-            }
-            $item->art = $this->highlightWords($words, $item->art);
-            $item->name_rus = $this->highlightWords($words, $item->name_rus);
+            $list->getList();
+            $list->getItem();
+            $list->limit    = 9999999;
+            $page           = new stdClass();
+            $page->count    = $list->count;
+            $page->items    = [];
+            $existent_goods = [];
+            $this->sortItems($list->item, $words);
+            $words = array_merge($words, $numbers);
+            foreach ($list->item as &$item) {
+                if (isset($existent_goods[$item->good_id]) || !$item->good_id) {
+                    continue;
+                }
+                $page->items[]                  = $item;
+                $existent_goods[$item->good_id] = 1;
+                if ($item->uurl) {
+                    $item->url = '/' . $item->uurl;
+                } else {
+                    $item->url = all::getUrl($item->parent) . '_aview_b' . $item->id;
+                }
+                $item->art      = $this->highlightWords($words, $item->art);
+                $item->name_rus = $this->highlightWords($words, $item->name_rus);
 //            $item->parents = implode(' - ', tree::getParentsItems($item->parent, 2, 2));
-        }
+            }
 
-        //        $list = new Listing("variant", "items", 'all', " (name like '%{$q}%' or art like '%{$q}%') AND");
-        //        $list->getList();
-        //        $list->getItem();
-        //        $page->variant = $list->item;
-        echo sprintt($page, 'templates/search/ajax.html');
+            //        $list = new Listing("variant", "items", 'all', " (name like '%{$q}%' or art like '%{$q}%') AND");
+            //        $list->getList();
+            //        $list->getItem();
+            //        $page->variant = $list->item;
+            echo sprintt($page, 'templates/search/ajax.html');
+        }
         die();
     }
 }
