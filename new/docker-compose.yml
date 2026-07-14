@@ -68,6 +68,10 @@ services:
       DIADOC_BOX_ID: ${DIADOC_BOX_ID:-}
     ports:
       - "${API_PORT:-8010}:8000"
+    # Dev: правки кода применяются на лету (без пересборки образа).
+    volumes:
+      - ./api/app:/app/app
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
   # --- Воркер приёма прайсов с почты (IMAP) --------------------------------
   worker:
@@ -139,6 +143,12 @@ services:
       NEXT_PUBLIC_MEDIA_URL: http://localhost:${MEDIA_PORT:-8081}
     ports:
       - "${WEB_PORT:-3000}:3000"
+    # Dev: hot-reload правок витрины (next dev следит за исходниками хоста).
+    # Анонимные тома сохраняют node_modules и .next из образа.
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
 
   # --- Legacy БД: нужна ТОЛЬКО для ETL/анализа. Профиль etl → в обычном
   #     `docker compose up` не поднимается (не ест память в проде). -----------
