@@ -22,8 +22,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="container nav-inner">
             <Link href="/" className="brand">СПЕЦИНТЕР</Link>
             <Link href="/catalog" className="link">Каталог</Link>
-            <Link href="/" className="link">Оплата и доставка</Link>
-            <Link href="/" className="link">О нас</Link>
+            <Link href="/oplata" className="link">Оплата и доставка</Link>
+            <Link href="/o-nas" className="link">О нас</Link>
             <CartLink />
             <span style={{ flex: 1 }} />
             <a href="tel:+73434547788" className="link">+7 (343) 454-77-88</a>

@@ -11,7 +11,11 @@ export default async function ProductPage({ params }: { params: { id: string } }
   if (!p) {
     return <main className="container"><div className="empty">Товар не найден.</div></main>;
   }
-  const trail = p.applicability?.[0]?.trail || [];
+  // Для крошек берём САМУЮ ГЛУБОКУЮ применимость (полный путь до позиции в каталоге),
+  // приоритет — записям с позицией на схеме.
+  const bestAppl = (p.applicability || []).slice().sort((a: any, b: any) =>
+    (b.position ? 1 : 0) - (a.position ? 1 : 0) || (b.trail?.length || 0) - (a.trail?.length || 0))[0];
+  const trail = bestAppl?.trail || [];
 
   return (
     <main className="container">
