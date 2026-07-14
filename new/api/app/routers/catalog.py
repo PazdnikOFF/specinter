@@ -6,8 +6,8 @@ router = APIRouter(prefix="/api", tags=["catalog"])
 
 # Разрешённые сортировки витрины (защита от инъекций в ORDER BY).
 _SORTS = {
-    # По умолчанию — всегда по цене от меньшего к большему (без цены — в конце).
-    "default":    "(min_price IS NULL), min_price ASC, name",
+    # По умолчанию — по ПОЗИЦИИ на схеме (узлы каталога), а без позиций — по алфавиту.
+    "default":    "(position_num IS NULL), position_num ASC, name ASC",
     "price_asc":  "(min_price IS NULL), min_price ASC, name",
     "price_desc": "min_price DESC NULLS LAST, name",
     "stock":      "in_stock DESC NULLS LAST, (min_price IS NULL), min_price ASC",
@@ -20,6 +20,7 @@ _DIRECT_AGG = """
   WITH agg AS (
     SELECT p.id, p.manufacturer_article, p.name, p.brand, p.primary_image,
            MAX(pc.position) AS position,
+           MAX(nullif(regexp_replace(coalesce(pc.position,''), '[^0-9]', '', 'g'), '')::int) AS position_num,
            MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
            BOOL_OR(o.in_stock) AS in_stock
     FROM product_categories pc

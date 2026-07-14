@@ -207,10 +207,10 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
 .scheme-img img { width: 100%; height: 360px; object-fit: contain; display: block; }
 .scheme-cap { font-size: 14px; margin-top: 8px; }
 .scheme-cap .pos { font-weight: 600; color: var(--accent); font-size: 15px; }
-/* Схема узла в подкаталоге — крупно */
-.node-scheme { display: block; max-width: 640px; margin: 8px 0 20px; border: 1px solid var(--line);
-  border-radius: 14px; overflow: hidden; background: #fff; cursor: zoom-in; }
-.node-scheme img { width: 100%; max-height: 460px; object-fit: contain; display: block; }
+/* Схема узла в подкаталоге — крупно (во всю ширину контента) */
+.node-scheme { display: block; width: 100%; max-width: 960px; margin: 10px 0 24px; border: 1px solid var(--line);
+  border-radius: 16px; overflow: hidden; background: #fff; cursor: zoom-in; }
+.node-scheme img { width: 100%; max-height: 680px; object-fit: contain; display: block; }
 /* Позиция на схеме у плитки товара */
 .card-pos { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 980px; padding: 1px 8px; }
