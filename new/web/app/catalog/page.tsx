@@ -112,7 +112,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
 
       {data.category.image && (
         <span className="node-scheme" title="Схема узла — увеличить">
-          <ZoomImage thumb={thumbUrl(data.category.image)!} full={imgUrl(data.category.image)!}
+          <ZoomImage thumb={imgUrl(data.category.image)!} full={imgUrl(data.category.image)!}
             alt={`Схема — ${data.category.name}`} />
         </span>
       )}

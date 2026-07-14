@@ -87,7 +87,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                 {p.schemes.map((s: any) => (
                   <div className="scheme" key={s.category_id}>
                     <span className="scheme-img">
-                      <ZoomImage thumb={thumbUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
+                      <ZoomImage thumb={imgUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
                     </span>
                     <div className="scheme-cap">
                       {s.position && <span className="pos">Позиция на схеме: {s.position}</span>}
@@ -127,11 +127,16 @@ export default async function ProductPage({ params }: { params: { id: string } }
               <h2 className="section">Аналоги ({p.analogs.length})</h2>
               {p.analogs.map((a: any, i: number) => (
                 <div className="analog" key={i}>
-                  <span>
+                  <span className="analog-info">
                     {a.linked_product_id
-                      ? <Link href={`/product/${a.linked_product_id}`} style={{ color: "var(--accent)" }}>{a.analog_article}</Link>
+                      ? <Link href={`/product/${a.linked_product_id}`} className="art" style={{ textDecoration: "none" }}>{a.analog_article}</Link>
                       : <span className="art">{a.analog_article}</span>}
-                    {a.analog_name && <span className="muted" style={{ marginLeft: 8 }}>{a.analog_name}</span>}
+                    {a.analog_name && <span className="analog-name">{a.analog_name}</span>}
+                    <span className="analog-meta">
+                      {a.brand && <span className="tag">{a.brand}</span>}
+                      {a.group_name && <span className="muted">{a.group_name}</span>}
+                      {!a.linked_product_id && <span className="muted">кросс-номер</span>}
+                    </span>
                   </span>
                   {a.min_price != null && (
                     <span className="offer-buy" style={{ gap: 10 }}>

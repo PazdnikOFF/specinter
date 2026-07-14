@@ -65,7 +65,12 @@ async def get_product(product_id: int):
     # ИСКЛЮЧАЕМ саму карточку (self-link и совпадение артикула) и дубли (по норм. артикулу).
     p["analogs"] = await db.fetch(
         """SELECT DISTINCT ON (a.normalized_article)
-                  a.analog_article, a.analog_name, a.linked_product_id,
+                  a.analog_article, a.linked_product_id,
+                  COALESCE(lp.name, a.analog_name) AS analog_name,
+                  lp.brand AS brand,
+                  (SELECT c.name FROM product_categories pc JOIN categories c ON c.id=pc.category_id
+                     WHERE pc.product_id=a.linked_product_id
+                     ORDER BY c.level DESC LIMIT 1) AS group_name,
                   (SELECT MIN(price) FROM offers o
                      WHERE o.product_id=a.linked_product_id AND o.price IS NOT NULL) AS min_price,
                   (SELECT BOOL_OR(in_stock) FROM offers o
@@ -73,6 +78,7 @@ async def get_product(product_id: int):
                   (SELECT MIN(s.delivery_days) FROM offers o JOIN suppliers s ON s.id=o.supplier_id
                      WHERE o.product_id=a.linked_product_id AND o.source='price') AS eta_days
            FROM analogs a
+           LEFT JOIN products lp ON lp.id = a.linked_product_id
            WHERE a.product_id = %(pid)s
              AND a.linked_product_id IS DISTINCT FROM %(pid)s
              AND a.normalized_article IS DISTINCT FROM
