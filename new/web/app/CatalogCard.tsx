@@ -39,11 +39,11 @@ export default function CatalogCard({ p }: { p: P }) {
         <div className="thumb">
           {p.primary_image ? <img src={thumbUrl(p.primary_image)!} alt={p.name || ""} loading="lazy" decoding="async" /> : <span>нет фото</span>}
         </div>
-        <div className="art">{p.manufacturer_article || "—"}</div>
-        <div className="name">
-          {p.name || "Без названия"}
-          {p.position && <span className="card-pos" style={{ marginLeft: 6 }}>поз. {p.position}</span>}
+        <div className="art">
+          {p.manufacturer_article || "—"}
+          {p.position && <span className="card-pos" style={{ marginLeft: 8 }}>поз. {p.position}</span>}
         </div>
+        <div className="name">{p.name || "Без названия"}</div>
       </Link>
       {/* Низ карточки — всегда на своём месте: цена и кнопка */}
       <div className="card-foot">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SearchBox from "../SearchBox";
 import CatalogCard from "../CatalogCard";
+import PositionCard from "../PositionCard";
 import CatalogFilters from "../CatalogFilters";
 import ZoomImage from "../ZoomImage";
 import BackButton from "../BackButton";
@@ -30,6 +31,22 @@ function GroupTile({ id, name, count, image }: { id: number; name: string; count
       <span className="group-count">{count.toLocaleString("ru-RU")} позиций</span>
     </Link>
   );
+}
+
+// Группировка по позиции на схеме: повторяющиеся позиции (>1 товара) — в одну карточку.
+function groupByPosition(products: any[]) {
+  const out: any[] = [];
+  let i = 0;
+  while (i < products.length) {
+    const pos = products[i].position;
+    if (pos == null || pos === "") { out.push({ single: products[i] }); i++; continue; }
+    const grp = [products[i]];
+    let j = i + 1;
+    while (j < products.length && products[j].position === pos) { grp.push(products[j]); j++; }
+    out.push(grp.length > 1 ? { position: pos, products: grp } : { single: grp[0] });
+    i = j;
+  }
+  return out;
 }
 
 const SECTIONS: [string, string][] = [
@@ -131,7 +148,11 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
           {hasGroups && <h2 className="sec-head" style={{ marginTop: 34 }}>Позиции в этом разделе</h2>}
           <CatalogFilters total={data.total} />
           <div className="grid">
-            {data.products.map((p: any) => <CatalogCard key={p.id} p={p} />)}
+            {groupByPosition(data.products).map((g: any, idx: number) =>
+              g.products
+                ? <PositionCard key={`pos-${g.position}-${idx}`} position={g.position} products={g.products} />
+                : <CatalogCard key={g.single.id} p={g.single} />
+            )}
           </div>
           {pages > 1 && (
             <div className="pager">

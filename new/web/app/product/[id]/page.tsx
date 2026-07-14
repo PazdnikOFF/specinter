@@ -133,28 +133,38 @@ export default async function ProductPage({ params }: { params: { id: string } }
           {p.analogs?.length > 0 && (
             <>
               <h2 className="section">Аналоги ({p.analogs.length})</h2>
-              {p.analogs.map((a: any, i: number) => (
-                <div className="analog" key={i}>
-                  <span className="analog-info">
-                    {a.linked_product_id
-                      ? <Link href={`/product/${a.linked_product_id}`} className="art" style={{ textDecoration: "none" }}>{a.analog_article}</Link>
-                      : <span className="art">{a.analog_article}</span>}
+              {p.analogs.map((a: any, i: number) => {
+                const info = (
+                  <>
+                    <span className="art">{a.analog_article}</span>
                     {a.analog_name && <span className="analog-name">{a.analog_name}</span>}
                     <span className="analog-meta">
                       {a.brand && <span className="tag">{a.brand}</span>}
                       {a.group_name && <span className="muted">{a.group_name}</span>}
                       {!a.linked_product_id && <span className="muted">кросс-номер</span>}
                     </span>
-                  </span>
-                  {a.min_price != null && (
+                  </>
+                );
+                return (
+                  <div className="analog" key={i}>
+                    {/* кликабельно и артикул, и наименование */}
+                    {a.linked_product_id
+                      ? <Link href={`/product/${a.linked_product_id}`} className="analog-info analog-link">{info}</Link>
+                      : <span className="analog-info">{info}</span>}
                     <span className="offer-buy" style={{ gap: 10 }}>
                       {a.eta_days != null && <span className="muted" style={{ fontSize: 12 }}>~{a.eta_days} дн.</span>}
-                      <span className={`badge ${a.in_stock ? "in" : "out"}`}>{a.in_stock ? "в наличии" : "под заказ"}</span>
-                      <span className="price">от {Math.round(a.min_price).toLocaleString("ru-RU")} ₽</span>
+                      {a.min_price != null ? (
+                        <>
+                          <span className={`badge ${a.in_stock ? "in" : "out"}`}>{a.in_stock ? "в наличии" : "под заказ"}</span>
+                          <span className="price">от {Math.round(a.min_price).toLocaleString("ru-RU")} ₽</span>
+                        </>
+                      ) : (
+                        <span className="badge out">под заказ</span>
+                      )}
                     </span>
-                  )}
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </>
           )}
         </div>

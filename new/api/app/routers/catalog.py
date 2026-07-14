@@ -22,7 +22,9 @@ _DIRECT_AGG = """
            MAX(pc.position) AS position,
            MAX(nullif(regexp_replace(coalesce(pc.position,''), '[^0-9]', '', 'g'), '')::int) AS position_num,
            MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
-           BOOL_OR(o.in_stock) AS in_stock
+           BOOL_OR(o.in_stock) AS in_stock,
+           (SELECT MIN(s.delivery_days) FROM offers o2 JOIN suppliers s ON s.id=o2.supplier_id
+              WHERE o2.product_id=p.id AND o2.source='price') AS eta_days
     FROM product_categories pc
     JOIN products p ON p.id = pc.product_id
     LEFT JOIN offers o ON o.product_id = p.id
