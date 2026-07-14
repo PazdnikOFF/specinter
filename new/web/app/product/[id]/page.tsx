@@ -24,7 +24,29 @@ export default async function ProductPage({ params }: { params: { id: string } }
         ]} />
       </div>
       <div className="pwrap">
-        <ProductGallery primary={p.primary_image} images={p.images} name={p.name} />
+        <div className="pcol-left">
+          <ProductGallery primary={p.primary_image} images={p.images} name={p.name} />
+          {p.schemes?.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <h2 className="section" style={{ marginTop: 0 }}>Схема узла</h2>
+              <div className="schemes">
+                {p.schemes.map((s: any) => (
+                  <div className="scheme" key={s.category_id}>
+                    <span className="scheme-img">
+                      <ZoomImage thumb={thumbUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
+                    </span>
+                    <div className="scheme-cap">
+                      {s.position && <span className="pos">Позиция на схеме: {s.position}</span>}
+                      <Link href={`/catalog?cat=${s.category_id}`} className="link" style={{ display: "block", marginTop: 4 }}>
+                        {s.name} →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         <div>
           <div className="art" style={{ color: "var(--accent)", fontWeight: 600 }}>
             {p.manufacturer_article}
@@ -85,27 +107,6 @@ export default async function ProductPage({ params }: { params: { id: string } }
                   name: p.name, price: 0 }} quote />
               </span>
             </div>
-          )}
-
-          {p.schemes?.length > 0 && (
-            <>
-              <h2 className="section">Схема узла</h2>
-              <div className="schemes">
-                {p.schemes.map((s: any) => (
-                  <div className="scheme" key={s.category_id}>
-                    <span className="scheme-img">
-                      <ZoomImage thumb={thumbUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
-                    </span>
-                    <div className="scheme-cap">
-                      {s.position && <span className="pos">Позиция на схеме: {s.position}</span>}
-                      <Link href={`/catalog?cat=${s.category_id}`} className="link" style={{ display: "block", marginTop: 4 }}>
-                        {s.name} →
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
           )}
 
           {p.applicability?.length > 0 && (
