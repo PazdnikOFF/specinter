@@ -157,8 +157,9 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; }
 .card .thumb img { width: 100%; height: 100%; object-fit: contain; }
 .card .art { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: .01em; }
-.card .name { font-size: 15px; font-weight: 500; }
-.card .meta { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; }
+.card .name { font-size: 15px; font-weight: 500; line-height: 1.3; min-height: 2.6em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card .meta { display: flex; justify-content: space-between; align-items: center; }
 .price { font-weight: 600; font-size: 17px; }
 .badge { font-size: 12px; padding: 4px 10px; border-radius: 980px; white-space: nowrap; display: inline-block; }
 .badge.in { background: #e3f7e8; color: #1d7a33; }
@@ -190,27 +191,27 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
 .offer-buy .price { white-space: nowrap; font-size: 17px; }
 .offer-cart { width: 128px; display: inline-block; flex: none; }
 /* Лайтбокс (просмотр изображения во фрейме) */
-.lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.85);
-  display: flex; align-items: center; justify-content: center; padding: 32px; cursor: zoom-out; }
-.lightbox img { max-width: 96vw; max-height: 92vh; object-fit: contain; border-radius: 8px;
+.lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.9);
+  display: flex; align-items: center; justify-content: center; padding: 12px; cursor: zoom-out; }
+.lightbox img { max-width: 98vw; max-height: 96vh; object-fit: contain; border-radius: 6px;
   box-shadow: 0 10px 60px rgba(0,0,0,.6); cursor: default; background: #fff; }
 .lb-close { position: fixed; top: 16px; right: 20px; z-index: 201; width: 44px; height: 44px;
   border: none; border-radius: 50%; background: rgba(255,255,255,.15); color: #fff; font-size: 26px;
   line-height: 1; cursor: pointer; }
 .lb-close:hover { background: rgba(255,255,255,.28); }
 
-/* Схема узла в карточке — крупные изображения */
-.schemes { display: flex; flex-wrap: wrap; gap: 16px; }
-.scheme { width: 100%; max-width: 460px; }
-.scheme-img { display: block; border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+/* Схема узла в карточке (миниатюра — крупно открывается в лайтбоксе) */
+.schemes { display: flex; flex-wrap: wrap; gap: 14px; }
+.scheme { width: 220px; }
+.scheme-img { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
   background: #fff; cursor: zoom-in; }
-.scheme-img img { width: 100%; height: 360px; object-fit: contain; display: block; }
-.scheme-cap { font-size: 14px; margin-top: 8px; }
-.scheme-cap .pos { font-weight: 600; color: var(--accent); font-size: 15px; }
-/* Схема узла в подкаталоге — крупно (во всю ширину контента) */
-.node-scheme { display: block; width: 100%; max-width: 960px; margin: 10px 0 24px; border: 1px solid var(--line);
-  border-radius: 16px; overflow: hidden; background: #fff; cursor: zoom-in; }
-.node-scheme img { width: 100%; max-height: 680px; object-fit: contain; display: block; }
+.scheme-img img { width: 100%; height: 160px; object-fit: contain; display: block; }
+.scheme-cap { font-size: 13px; margin-top: 6px; }
+.scheme-cap .pos { font-weight: 600; color: var(--accent); }
+/* Схема узла в подкаталоге (миниатюра — крупно в лайтбоксе) */
+.node-scheme { display: block; max-width: 440px; margin: 8px 0 18px; border: 1px solid var(--line);
+  border-radius: 14px; overflow: hidden; background: #fff; cursor: zoom-in; }
+.node-scheme img { width: 100%; max-height: 300px; object-fit: contain; display: block; }
 /* Позиция на схеме у плитки товара */
 .card-pos { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 980px; padding: 1px 8px; }
@@ -225,6 +226,20 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
 .applic-trail .sep { color: var(--muted); }
 .muted { color: var(--muted); }
 .crumbs { color: var(--muted); font-size: 13px; padding: 20px 0 0; }
+
+/* Кнопка «Назад» и хлебные крошки — стиль Apple */
+.navrow { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 18px 0 6px; }
+.back-btn { display: inline-flex; align-items: center; gap: 3px; border: none; background: none;
+  color: var(--accent); font-size: 15px; font-weight: 500; cursor: pointer; padding: 4px 6px 4px 0;
+  border-radius: 8px; transition: opacity .15s; }
+.back-btn:hover { opacity: .7; }
+.back-btn span { font-size: 20px; line-height: 1; margin-top: -1px; }
+.bcrumbs { display: flex; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--muted); }
+.bcrumb { display: inline-flex; align-items: center; }
+.bc-sep { color: color-mix(in srgb, var(--muted) 60%, transparent); margin: 0 8px; font-size: 14px; }
+.bcrumbs a { color: var(--muted); transition: color .15s; }
+.bcrumbs a:hover { color: var(--accent); }
+.bc-current { color: var(--text); font-weight: 500; }
 .tag { display:inline-block; font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:980px; padding:3px 10px; }
 .empty { text-align: center; padding: 80px 0; color: var(--muted); }
 /* Buttons & fields */
@@ -314,7 +329,9 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
   border-radius: 980px; padding: 8px 14px; cursor: pointer; outline: none; }
 
 /* Card add-to-cart */
-.card-body { display: flex; flex-direction: column; gap: 8px; }
+.card-body { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+/* Низ карточки всегда на месте: цена + кнопка */
+.card-foot { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 .cart-btn { border: none; background: var(--accent); color: #fff; font-size: 14px; font-weight: 500;
   padding: 10px; border-radius: 12px; cursor: pointer; transition: background .2s; }
 .cart-btn:hover { background: var(--accent-hover); }

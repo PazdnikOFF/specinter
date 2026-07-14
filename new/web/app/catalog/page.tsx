@@ -3,6 +3,8 @@ import SearchBox from "../SearchBox";
 import CatalogCard from "../CatalogCard";
 import CatalogFilters from "../CatalogFilters";
 import ZoomImage from "../ZoomImage";
+import BackButton from "../BackButton";
+import Breadcrumbs from "../Breadcrumbs";
 import { apiCatalogRoots, apiCatalogBrowse, imgUrl, thumbUrl } from "../../lib/api";
 
 export const metadata = { title: "Каталог запчастей — СПЕЦИНТЕР" };
@@ -97,22 +99,18 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
 
   return (
     <main className="container">
-      <nav className="crumbs" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-        <Link href="/catalog">Каталог</Link>
-        {data.breadcrumbs.map((b: any, i: number) => (
-          <span key={b.id}>
-            {" / "}
-            {i === data.breadcrumbs.length - 1
-              ? <span style={{ color: "var(--text)" }}>{splitName(b.name).main}</span>
-              : <Link href={`/catalog?cat=${b.id}`}>{splitName(b.name).main}</Link>}
-          </span>
-        ))}
-      </nav>
+      <div className="navrow">
+        <BackButton />
+        <Breadcrumbs items={[
+          { name: "Каталог", href: "/catalog" },
+          ...data.breadcrumbs.map((b: any) => ({ name: splitName(b.name).main, href: `/catalog?cat=${b.id}` })),
+        ]} />
+      </div>
       <h1 className="cat-title">{splitName(data.category.name).main}</h1>
 
       {data.category.image && (
         <span className="node-scheme" title="Схема узла — увеличить">
-          <ZoomImage thumb={imgUrl(data.category.image)!} full={imgUrl(data.category.image)!}
+          <ZoomImage thumb={thumbUrl(data.category.image)!} full={imgUrl(data.category.image)!}
             alt={`Схема — ${data.category.name}`} />
         </span>
       )}

@@ -3,18 +3,25 @@ import { apiProduct, imgUrl, thumbUrl } from "../../../lib/api";
 import CartStepper from "../../CartStepper";
 import ProductGallery from "./ProductGallery";
 import ZoomImage from "../../ZoomImage";
+import BackButton from "../../BackButton";
+import Breadcrumbs from "../../Breadcrumbs";
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
   const p = await apiProduct(params.id);
   if (!p) {
     return <main className="container"><div className="empty">Товар не найден.</div></main>;
   }
-  const crumbs = p.categories?.map((c: any) => c.name).join(" · ");
+  const trail = p.applicability?.[0]?.trail || [];
 
   return (
     <main className="container">
-      <div className="crumbs">
-        <Link href="/catalog">Каталог</Link>{crumbs ? ` · ${crumbs}` : ""}
+      <div className="navrow">
+        <BackButton />
+        <Breadcrumbs items={[
+          { name: "Каталог", href: "/catalog" },
+          ...trail.map((t: any) => ({ name: t.name, href: `/catalog?cat=${t.id}` })),
+          { name: p.name || p.manufacturer_article },
+        ]} />
       </div>
       <div className="pwrap">
         <ProductGallery primary={p.primary_image} images={p.images} name={p.name} />
@@ -87,7 +94,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                 {p.schemes.map((s: any) => (
                   <div className="scheme" key={s.category_id}>
                     <span className="scheme-img">
-                      <ZoomImage thumb={imgUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
+                      <ZoomImage thumb={thumbUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
                     </span>
                     <div className="scheme-cap">
                       {s.position && <span className="pos">Позиция на схеме: {s.position}</span>}

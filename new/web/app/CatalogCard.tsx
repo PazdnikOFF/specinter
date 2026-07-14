@@ -34,35 +34,39 @@ export default function CatalogCard({ p }: { p: P }) {
 
   return (
     <div className="card">
+      {/* Изображение → артикул → наименование + позиция (кликабельно) */}
       <Link href={`/product/${p.id}`} className="card-body">
         <div className="thumb">
           {p.primary_image ? <img src={thumbUrl(p.primary_image)!} alt={p.name || ""} loading="lazy" decoding="async" /> : <span>нет фото</span>}
         </div>
-        <div className="art">
-          {p.manufacturer_article || "—"}
-          {p.position && <span className="card-pos" style={{ marginLeft: 8 }}>поз. {p.position}</span>}
+        <div className="art">{p.manufacturer_article || "—"}</div>
+        <div className="name">
+          {p.name || "Без названия"}
+          {p.position && <span className="card-pos" style={{ marginLeft: 6 }}>поз. {p.position}</span>}
         </div>
-        <div className="name">{p.name || "Без названия"}</div>
       </Link>
-      <div className="meta">
-        <span className="price">
-          {p.min_price ? `${price.toLocaleString("ru-RU")} ₽` : "по запросу"}
-        </span>
-        <span className={`badge ${p.in_stock ? "in" : "out"}`}>
-          {p.in_stock ? "в наличии" : "под заказ"}
-        </span>
-      </div>
-      {qty === 0 ? (
-        <button className={`cart-btn${noPrice ? " cart-btn-quote" : ""}`} onClick={add}>
-          {noPrice ? "Запросить" : "В корзину"}
-        </button>
-      ) : (
-        <div className="stepper">
-          <button onClick={() => step(-1)} aria-label="убрать">−</button>
-          <span>{qty}</span>
-          <button onClick={() => step(1)} aria-label="добавить">+</button>
+      {/* Низ карточки — всегда на своём месте: цена и кнопка */}
+      <div className="card-foot">
+        <div className="meta">
+          <span className="price">
+            {p.min_price ? `${price.toLocaleString("ru-RU")} ₽` : "по запросу"}
+          </span>
+          <span className={`badge ${p.in_stock ? "in" : "out"}`}>
+            {p.in_stock ? "в наличии" : "под заказ"}
+          </span>
         </div>
-      )}
+        {qty === 0 ? (
+          <button className={`cart-btn${noPrice ? " cart-btn-quote" : ""}`} onClick={add}>
+            {noPrice ? "Запросить" : "В корзину"}
+          </button>
+        ) : (
+          <div className="stepper">
+            <button onClick={() => step(-1)} aria-label="убрать">−</button>
+            <span>{qty}</span>
+            <button onClick={() => step(1)} aria-label="добавить">+</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
