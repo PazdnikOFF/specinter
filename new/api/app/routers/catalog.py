@@ -62,15 +62,23 @@ async def get_product(product_id: int):
            FROM offers o LEFT JOIN suppliers s ON s.id=o.supplier_id
            WHERE o.product_id=%s ORDER BY o.price NULLS LAST""", (product_id,))
     # Аналоги + (если у аналога есть карточка) его минимальная цена, наличие и срок.
+    # ИСКЛЮЧАЕМ саму карточку (self-link и совпадение артикула) и дубли (по норм. артикулу).
     p["analogs"] = await db.fetch(
-        """SELECT a.analog_article, a.analog_name, a.linked_product_id,
+        """SELECT DISTINCT ON (a.normalized_article)
+                  a.analog_article, a.analog_name, a.linked_product_id,
                   (SELECT MIN(price) FROM offers o
                      WHERE o.product_id=a.linked_product_id AND o.price IS NOT NULL) AS min_price,
                   (SELECT BOOL_OR(in_stock) FROM offers o
                      WHERE o.product_id=a.linked_product_id) AS in_stock,
                   (SELECT MIN(s.delivery_days) FROM offers o JOIN suppliers s ON s.id=o.supplier_id
                      WHERE o.product_id=a.linked_product_id AND o.source='price') AS eta_days
-           FROM analogs a WHERE a.product_id=%s""", (product_id,))
+           FROM analogs a
+           WHERE a.product_id = %(pid)s
+             AND a.linked_product_id IS DISTINCT FROM %(pid)s
+             AND a.normalized_article IS DISTINCT FROM
+                 (SELECT normalized_article FROM products WHERE id = %(pid)s)
+           ORDER BY a.normalized_article, a.linked_product_id NULLS LAST""",
+        {"pid": product_id})
     for a in p["analogs"]:
         a["min_price"] = float(a["min_price"]) if a["min_price"] is not None else None
     cats = await db.fetch(

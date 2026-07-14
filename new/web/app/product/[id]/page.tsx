@@ -2,6 +2,7 @@ import Link from "next/link";
 import { apiProduct, imgUrl, thumbUrl } from "../../../lib/api";
 import CartStepper from "../../CartStepper";
 import ProductGallery from "./ProductGallery";
+import ZoomImage from "../../ZoomImage";
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
   const p = await apiProduct(params.id);
@@ -85,9 +86,9 @@ export default async function ProductPage({ params }: { params: { id: string } }
               <div className="schemes">
                 {p.schemes.map((s: any) => (
                   <div className="scheme" key={s.category_id}>
-                    <a href={imgUrl(s.scheme_image)!} target="_blank" rel="noopener noreferrer" className="scheme-img">
-                      <img src={thumbUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} loading="lazy" />
-                    </a>
+                    <span className="scheme-img">
+                      <ZoomImage thumb={thumbUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
+                    </span>
                     <div className="scheme-cap">
                       {s.position && <span className="pos">Позиция на схеме: {s.position}</span>}
                       <Link href={`/catalog?cat=${s.category_id}`} className="link" style={{ display: "block", marginTop: 4 }}>
