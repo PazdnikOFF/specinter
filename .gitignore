@@ -1,0 +1,8 @@
+.env
+scripts/*.tar.gz
+scripts/needed_images.txt
+scripts/needed_delta.txt
+web/node_modules
+web/.next
+__pycache__/
+*.pyc
