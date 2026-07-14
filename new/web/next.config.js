@@ -1,8 +1,18 @@
 /** @type {import('next').NextConfig} */
+const API_INTERNAL = process.env.API_INTERNAL_URL || "http://api:8000";
+const MEDIA_INTERNAL = process.env.MEDIA_INTERNAL_URL || "http://media:80";
+
 module.exports = {
   reactStrictMode: true,
-  // Внутренний URL API (server components) и публичный (браузер)
   env: {
-    API_INTERNAL_URL: process.env.API_INTERNAL_URL || "http://api:8000",
+    API_INTERNAL_URL: API_INTERNAL,
+  },
+  // Прокси через сам Next.js → всё с ТОГО ЖЕ origin (работает по LAN/интернету,
+  // без зависимости от localhost). /api/* → бэкенд, /media/* → контейнер изображений.
+  async rewrites() {
+    return [
+      { source: "/api/:path*", destination: `${API_INTERNAL}/api/:path*` },
+      { source: "/media/:path*", destination: `${MEDIA_INTERNAL}/:path*` },
+    ];
   },
 };

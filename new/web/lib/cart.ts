@@ -1,6 +1,10 @@
 "use client";
 // Простая корзина в localStorage (без бэкенда до оформления).
-export type CartItem = { product_id: number; article: string; name: string; price: number; qty: number };
+// kind: "order" — есть цена, оформляем заказ; "quote" — цены нет, запрашиваем.
+export type CartKind = "order" | "quote";
+export type CartItem = {
+  product_id: number; article: string; name: string; price: number; qty: number; kind?: CartKind;
+};
 
 const KEY = "specinter_cart";
 
@@ -16,8 +20,10 @@ export function saveCart(items: CartItem[]) {
 
 export function addToCart(item: CartItem) {
   const cart = getCart();
-  const ex = cart.find((c) => c.product_id === item.product_id);
-  if (ex) ex.qty += item.qty; else cart.push(item);
+  const it = { kind: "order" as CartKind, ...item };
+  const ex = cart.find((c) => c.product_id === it.product_id);
+  if (ex) { ex.qty += it.qty; ex.kind = it.kind; ex.price = it.price; }
+  else cart.push(it);
   saveCart(cart);
 }
 

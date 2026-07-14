@@ -1,9 +1,17 @@
 const BASE = process.env.API_INTERNAL_URL || "http://api:8000";
-export const MEDIA = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8081";
+// Картинки отдаём через прокси Next (/media/*) — тот же origin, работает по LAN/интернету,
+// не зависит от localhost. См. rewrites в next.config.js.
+export const MEDIA = "/media";
+// Клиентские запросы идут относительным путём — Next.js проксирует /api/* на бэкенд
+// (next.config.js). Работает при любом адресе доступа, без CORS. "" = тот же origin.
+export const API_PUBLIC = "";
 export const imgUrl = (name?: string | null) => (name ? `${MEDIA}/${name}` : null);
+// Миниатюра (≤400px) для сеток/плиток каталога; если её нет — nginx отдаёт оригинал.
+// На карточке товара (крупное фото) используем полноразмерный imgUrl.
+export const thumbUrl = (name?: string | null) => (name ? `${MEDIA}/thumbs/${name}` : null);
 
-export async function apiSearch(q: string, limit = 24) {
-  const url = `${BASE}/api/search?q=${encodeURIComponent(q)}&limit=${limit}`;
+export async function apiSearch(q: string, limit = 24, offset = 0) {
+  const url = `${BASE}/api/search?q=${encodeURIComponent(q)}&limit=${limit}&offset=${offset}`;
   const r = await fetch(url, { cache: "no-store" });
   if (!r.ok) return { query: q, total: 0, hits: [] };
   return r.json();

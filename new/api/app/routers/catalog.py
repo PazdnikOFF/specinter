@@ -6,7 +6,8 @@ router = APIRouter(prefix="/api", tags=["catalog"])
 
 # Разрешённые сортировки витрины (защита от инъекций в ORDER BY).
 _SORTS = {
-    "default":    "in_stock DESC NULLS LAST, (min_price IS NULL), min_price ASC, name",
+    # По умолчанию — всегда по цене от меньшего к большему (без цены — в конце).
+    "default":    "(min_price IS NULL), min_price ASC, name",
     "price_asc":  "(min_price IS NULL), min_price ASC, name",
     "price_desc": "min_price DESC NULLS LAST, name",
     "stock":      "in_stock DESC NULLS LAST, (min_price IS NULL), min_price ASC",
@@ -52,17 +53,57 @@ async def get_product(product_id: int):
         raise HTTPException(404, "product not found")
     p["images"] = await db.fetch(
         "SELECT url, sort FROM product_images WHERE product_id=%s ORDER BY sort", (product_id,))
+    # В каталоге НЕ раскрываем поставщика — только цену, наличие и срок поставки
+    # (срок фиксируется в карточке поставщика: delivery_days / delivery_note).
     p["offers"] = await db.fetch(
-        """SELECT o.id, o.article, o.price, o.qty, o.in_stock, s.name AS supplier, s.city
+        """SELECT o.id, o.article, o.price, o.qty, o.in_stock,
+                  s.delivery_days, s.delivery_note
            FROM offers o LEFT JOIN suppliers s ON s.id=o.supplier_id
            WHERE o.product_id=%s ORDER BY o.price NULLS LAST""", (product_id,))
+    # Аналоги + (если у аналога есть карточка) его минимальная цена, наличие и срок.
     p["analogs"] = await db.fetch(
-        """SELECT analog_article, analog_name, linked_product_id
-           FROM analogs WHERE product_id=%s""", (product_id,))
-    p["categories"] = await db.fetch(
-        """SELECT c.id, c.name, c.path FROM categories c
+        """SELECT a.analog_article, a.analog_name, a.linked_product_id,
+                  (SELECT MIN(price) FROM offers o
+                     WHERE o.product_id=a.linked_product_id AND o.price IS NOT NULL) AS min_price,
+                  (SELECT BOOL_OR(in_stock) FROM offers o
+                     WHERE o.product_id=a.linked_product_id) AS in_stock,
+                  (SELECT MIN(s.delivery_days) FROM offers o JOIN suppliers s ON s.id=o.supplier_id
+                     WHERE o.product_id=a.linked_product_id AND o.source='price') AS eta_days
+           FROM analogs a WHERE a.product_id=%s""", (product_id,))
+    for a in p["analogs"]:
+        a["min_price"] = float(a["min_price"]) if a["min_price"] is not None else None
+    cats = await db.fetch(
+        """SELECT c.id, c.name, c.path, pc.position, pc.sort
+           FROM categories c
            JOIN product_categories pc ON pc.category_id=c.id
-           WHERE pc.product_id=%s""", (product_id,))
+           WHERE pc.product_id=%s
+           ORDER BY pc.sort, c.name""", (product_id,))
+    p["categories"] = cats
+
+    # Применимость: для каждой схемы строим хлебную тропу от корня витрины
+    # (модель → узел → подгруппа) + позиция детали на схеме.
+    all_ids = {int(x) for c in cats for x in (c["path"] or "").strip("/").split("/") if x}
+    names = {}
+    if all_ids:
+        for r in await db.fetch("SELECT id, name FROM categories WHERE id = ANY(%s)", (list(all_ids),)):
+            names[r["id"]] = r["name"]
+    applicability = []
+    for c in cats:
+        ids = [int(x) for x in (c["path"] or "").strip("/").split("/") if x]
+        trail, seen = [], False
+        for cid in ids:
+            if cid == CATALOG_ROOT_ID:
+                seen = True
+                continue
+            if seen and cid in names:
+                trail.append({"id": cid, "name": names[cid]})
+        applicability.append({
+            "category_id": c["id"],
+            "name": c["name"],
+            "position": c["position"],
+            "trail": trail,
+        })
+    p["applicability"] = applicability
     return p
 
 
@@ -98,10 +139,10 @@ async def product_eta(product_id: int, city: str | None = Query(None, descriptio
 async def list_categories(parent_id: int | None = None):
     if parent_id is None:
         rows = await db.fetch(
-            "SELECT id, name, slug, level FROM categories WHERE parent_id IS NULL AND visible ORDER BY sort")
+            "SELECT id, name, slug, level, image FROM categories WHERE parent_id IS NULL AND visible ORDER BY sort")
     else:
         rows = await db.fetch(
-            "SELECT id, name, slug, level FROM categories WHERE parent_id=%s AND visible ORDER BY sort",
+            "SELECT id, name, slug, level, image FROM categories WHERE parent_id=%s AND visible ORDER BY sort",
             (parent_id,))
     return rows
 
@@ -111,7 +152,7 @@ async def list_categories(parent_id: int | None = None):
 async def _children(parent_id: int):
     """Подкатегории с числом товаров в поддереве (по материализованному пути)."""
     return await db.fetch(
-        """SELECT c.id, c.name, c.slug,
+        """SELECT c.id, c.name, c.slug, c.image,
                   (SELECT count(DISTINCT pc.product_id)
                      FROM categories d JOIN product_categories pc ON pc.category_id = d.id
                      WHERE d.path = c.path OR d.path LIKE c.path || '/%%') AS product_count
@@ -151,7 +192,7 @@ async def catalog_browse(
 ):
     """Товары внутри категории (по всему поддереву) + подкатегории + хлебные крошки."""
     cat = await db.fetchone(
-        "SELECT id, name, slug, path, level FROM categories WHERE id=%s AND visible", (category,))
+        "SELECT id, name, slug, path, level, image FROM categories WHERE id=%s AND visible", (category,))
     if not cat:
         raise HTTPException(404, "category not found")
 
@@ -183,7 +224,7 @@ async def catalog_browse(
         p["min_price"] = float(p["min_price"]) if p["min_price"] is not None else None
 
     return {
-        "category": {"id": cat["id"], "name": cat["name"], "path": cat["path"]},
+        "category": {"id": cat["id"], "name": cat["name"], "path": cat["path"], "image": cat["image"]},
         "breadcrumbs": crumbs,
         "children": await _children(category),
         "total": total_row["n"],

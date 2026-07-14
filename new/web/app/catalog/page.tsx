@@ -2,7 +2,7 @@ import Link from "next/link";
 import SearchBox from "../SearchBox";
 import CatalogCard from "../CatalogCard";
 import CatalogFilters from "../CatalogFilters";
-import { apiCatalogRoots, apiCatalogBrowse } from "../../lib/api";
+import { apiCatalogRoots, apiCatalogBrowse, thumbUrl } from "../../lib/api";
 
 export const metadata = { title: "Каталог запчастей — СПЕЦИНТЕР" };
 
@@ -15,10 +15,13 @@ function splitName(name: string): { main: string; sub?: string } {
   return { main: name.trim() };
 }
 
-function GroupTile({ id, name, count }: { id: number; name: string; count: number }) {
+function GroupTile({ id, name, count, image }: { id: number; name: string; count: number; image?: string | null }) {
   const { main, sub } = splitName(name);
   return (
     <Link href={`/catalog?cat=${id}`} className="group-tile">
+      <span className="group-thumb">
+        {image ? <img src={thumbUrl(image)!} alt="" loading="lazy" decoding="async" /> : <span className="thumb-ph">нет фото</span>}
+      </span>
       <span className="group-name">{main}</span>
       {sub && <span className="group-sub">{sub}</span>}
       <span className="group-count">{count.toLocaleString("ru-RU")} позиций</span>
@@ -56,6 +59,9 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
               <div className="tiles">
                 {list.map((c: any) => (
                   <Link key={c.id} href={`/catalog?cat=${c.id}`} className="tile-cat">
+                    <span className="tile-thumb">
+                      {c.image ? <img src={thumbUrl(c.image)!} alt="" loading="lazy" decoding="async" /> : <span className="thumb-ph">нет фото</span>}
+                    </span>
                     <span className="tile-name">{splitName(c.name).main}</span>
                     <span className="tile-count">{c.product_count.toLocaleString("ru-RU")} позиций</span>
                   </Link>
@@ -108,7 +114,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
           <h2 className="sec-head">Узлы и группы</h2>
           <div className="tiles">
             {data.children.map((c: any) => (
-              <GroupTile key={c.id} id={c.id} name={c.name} count={c.product_count} />
+              <GroupTile key={c.id} id={c.id} name={c.name} count={c.product_count} image={c.image} />
             ))}
           </div>
         </>

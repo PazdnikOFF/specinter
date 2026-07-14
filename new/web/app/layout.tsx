@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import CartLink from "./CartLink";
 import ThemeToggle from "./ThemeToggle";
+import ChatWidget from "./ChatWidget";
+import SocialLinks from "./SocialLinks";
 
 export const metadata: Metadata = {
   title: "СПЕЦИНТЕР — запчасти для китайской спецтехники",
@@ -29,9 +31,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         {children}
+        <ChatWidget />
         <footer>
           <div className="container">
-            ООО «СПЕЦИНТЕР» · Екатеринбург, пер. Шоферов 11 · info@specinter.ru
+            ООО «СПЕЦИНТЕР» · Екатеринбург, пер. Шофёров 11 · info@specinter.ru
+            <SocialLinks />
           </div>
         </footer>
       </body>

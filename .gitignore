@@ -9,3 +9,6 @@
 /backend/libs/cache/cache.storage/files/
 /backend/libs/cache/cache.storage/*.ini
 images
+# supplier price files (not for repo)
+/prices/
+new/scratch_out/

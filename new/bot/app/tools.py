@@ -85,14 +85,16 @@ async def delivery_estimate(product_id: int, city: str) -> dict:
 @tool
 async def create_order(product_id: int, quantity: int, customer_name: str,
                        phone: str, is_legal: bool = False, inn: str = "",
-                       org_name: str = "") -> dict:
+                       org_name: str = "", channel: str = "telegram", contact_ref: str = "") -> dict:
     """Оформить заказ. ВЫЗЫВАЙ ТОЛЬКО ПОСЛЕ явного подтверждения клиентом состава и суммы.
-    Для юрлица укажи is_legal=true, inn и org_name (для счёта из 1С)."""
+    Для юрлица укажи is_legal=true, inn и org_name (для счёта из 1С). channel/contact_ref —
+    канал связи клиента (telegram|whatsapp|max|email|phone) для обратной связи."""
     payload = {
         "customer": {"name": customer_name, "phone": phone,
                      "kind": "legal" if is_legal else "person",
-                     "inn": inn or None, "org_name": org_name or None},
-        "channel": "telegram",
+                     "inn": inn or None, "org_name": org_name or None,
+                     "contact_channel": channel, "contact_ref": contact_ref or phone},
+        "channel": channel,
         "items": [{"product_id": product_id, "qty": quantity}],
     }
     r = await _client.post("/api/orders", json=payload)
@@ -104,15 +106,30 @@ async def create_order(product_id: int, quantity: int, customer_name: str,
 
 
 @tool
-async def request_quote(query: str, customer_name: str, phone: str, comment: str = "") -> dict:
-    """Оставить заявку на подбор, если детали НЕТ в каталоге. Захватывает контакт клиента,
-    чтобы менеджер подобрал и связался. Используй вместо отказа, когда поиск ничего не дал."""
+async def request_quote(query: str, customer_name: str, phone: str, comment: str = "",
+                        channel: str = "telegram", contact_ref: str = "") -> dict:
+    """Оформить заявку на подбор/запрос цены (позиции нет в каталоге ИЛИ нет цены).
+    Заявка обрабатывается АВТОМАТИЧЕСКИ: возвращается готовый ответ клиенту с наличием,
+    ценой и сроком (если нашли) — сразу озвучь его клиенту. contact_ref — ник/номер канала."""
     r = await _client.post("/api/quote-requests", json={
-        "query": query, "name": customer_name, "phone": phone,
-        "comment": comment, "channel": "bot"})
+        "query": query, "name": customer_name, "phone": phone, "comment": comment,
+        "channel": channel, "contact_ref": contact_ref or phone, "auto_process": True})
     if r.status_code != 200:
         return {"error": "не удалось оформить заявку"}
-    return {"accepted": True, "message": "Заявка принята — подберём и свяжемся с вами."}
+    d = r.json()
+    return {"accepted": True, "quote_id": d.get("id"), "status": d.get("status"),
+            "reply_to_client": d.get("response") or "Заявка принята — подберём и свяжемся с вами."}
+
+
+@tool
+async def process_quote(quote_id: int) -> dict:
+    """Пересчитать/обновить ответ по ранее созданной заявке (актуальные наличие/цена/срок).
+    Возвращает текст для клиента."""
+    r = await _client.post(f"/api/quote-requests/{quote_id}/process")
+    if r.status_code != 200:
+        return {"error": "заявка не найдена"}
+    d = r.json()
+    return {"quote_id": quote_id, "status": d.get("status"), "reply_to_client": d.get("response")}
 
 
 @tool
@@ -125,4 +142,4 @@ async def request_operator(reason: str) -> dict:
 
 
 ALL_TOOLS = [search_catalog, find_by_article, product_details,
-             delivery_estimate, create_order, request_quote, request_operator]
+             delivery_estimate, create_order, request_quote, process_quote, request_operator]

@@ -1,3 +1,4 @@
+import psycopg
 from fastapi import APIRouter, HTTPException, Response, Request
 from pydantic import BaseModel
 from .. import db, unf, payments
@@ -18,6 +19,8 @@ class CustomerIn(BaseModel):
     org_name: str | None = None
     inn: str | None = None
     kpp: str | None = None
+    contact_channel: str | None = None   # telegram | whatsapp | max | email | phone
+    contact_ref: str | None = None       # ник/номер/почта для обратной связи
 
 
 class OrderIn(BaseModel):
@@ -25,6 +28,7 @@ class OrderIn(BaseModel):
     items: list[OrderItemIn]
     channel: str = "web"           # web | telegram | whatsapp | max
     comment: str | None = None
+    delivery: dict | None = None   # {self, city, carrier, cost_rub, term_label}
 
 
 @router.get("/unf/status")
@@ -57,15 +61,21 @@ async def create_order(payload: OrderIn):
     # --- клиент ---
     c = payload.customer
     cust = await db.fetchone(
-        """INSERT INTO customers (kind, name, phone, email, org_name, inn, kpp)
-           VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING *""",
-        (c.kind, c.name, c.phone, c.email, c.org_name, c.inn, c.kpp))
+        """INSERT INTO customers (kind, name, phone, email, org_name, inn, kpp,
+                                  contact_channel, contact_ref)
+           VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *""",
+        (c.kind, c.name, c.phone, c.email, c.org_name, c.inn, c.kpp,
+         c.contact_channel, c.contact_ref))
 
     # --- заказ ---
+    # доставка за свой счёт — прибавляем к сумме; самовывоз — бесплатно
+    if payload.delivery and payload.delivery.get("mode") == "delivery" and payload.delivery.get("cost_rub"):
+        total += float(payload.delivery["cost_rub"])
     order = await db.fetchone(
-        """INSERT INTO orders (customer_id, status, total, channel)
-           VALUES (%s,'new',%s,%s) RETURNING *""",
-        (cust["id"], total, payload.channel))
+        """INSERT INTO orders (customer_id, status, total, channel, delivery)
+           VALUES (%s,'new',%s,%s,%s) RETURNING *""",
+        (cust["id"], total, payload.channel,
+         psycopg.types.json.Json(payload.delivery) if payload.delivery else None))
     async with db.pool.connection() as conn:
         for i in items:
             await conn.execute(

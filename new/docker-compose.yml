@@ -49,6 +49,11 @@ services:
       PG_DSN: postgresql://${PG_USER:-specinter}:${PG_PASSWORD:-specinter}@postgres:5432/${PG_DB:-specinter}
       MEILI_URL: http://meilisearch:7700
       MEILI_KEY: ${MEILI_KEY:-specinter_dev_key}
+      # Доступ в админку (логин/пароль) + секрет подписи cookie-сессии
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-specinter}
+      ADMIN_SECRET: ${ADMIN_SECRET:-specinter-dev-secret}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       # Прямая интеграция 1С:УНФ (пусто = dry-run)
       UNF_BASE_URL: ${UNF_BASE_URL:-}
       UNF_USER: ${UNF_USER:-}
@@ -66,11 +71,17 @@ services:
       DIADOC_API_CLIENT_ID: ${DIADOC_API_CLIENT_ID:-}
       DIADOC_TOKEN: ${DIADOC_TOKEN:-}
       DIADOC_BOX_ID: ${DIADOC_BOX_ID:-}
+      # DaData (реквизиты по ИНН, геолокация) и Деловые Линии (расчёт доставки) — пусто = dry-run
+      DADATA_TOKEN: ${DADATA_TOKEN:-}
+      DADATA_SECRET: ${DADATA_SECRET:-}
+      DELLIN_APPKEY: ${DELLIN_APPKEY:-}
+      WAREHOUSE_CITY: ${WAREHOUSE_CITY:-Екатеринбург}
     ports:
       - "${API_PORT:-8010}:8000"
     # Dev: правки кода применяются на лету (без пересборки образа).
     volumes:
       - ./api/app:/app/app
+      - mediadata:/media            # запись загруженных фото товаров (админка)
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
   # --- Воркер приёма прайсов с почты (IMAP) --------------------------------
@@ -115,6 +126,9 @@ services:
       # Автопостинг Instagram (рилсы/реклама)
       IG_USER_ID: ${IG_USER_ID:-}
       IG_AD_ACCOUNT_ID: ${IG_AD_ACCOUNT_ID:-}
+      # YouTube (публикация Shorts): OAuth токен + id канала
+      YOUTUBE_ACCESS_TOKEN: ${YOUTUBE_ACCESS_TOKEN:-}
+      YOUTUBE_CHANNEL_ID: ${YOUTUBE_CHANNEL_ID:-}
       MARKETING_ENABLED: ${MARKETING_ENABLED:-0}
       MARKETING_INTERVAL: ${MARKETING_INTERVAL:-86400}
       REEL_LIBRARY: ${REEL_LIBRARY:-}
@@ -128,6 +142,7 @@ services:
     mem_limit: 128m
     volumes:
       - mediadata:/usr/share/nginx/html:ro
+      - ./media/default.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "${MEDIA_PORT:-8081}:80"
 
@@ -141,6 +156,10 @@ services:
       API_INTERNAL_URL: http://api:8000
       NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8010}
       NEXT_PUBLIC_MEDIA_URL: http://localhost:${MEDIA_PORT:-8081}
+      # Ссылки для подключения каналов связи (публичные)
+      NEXT_PUBLIC_TG_BOT: ${NEXT_PUBLIC_TG_BOT:-}
+      NEXT_PUBLIC_WA_NUMBER: ${NEXT_PUBLIC_WA_NUMBER:-}
+      NEXT_PUBLIC_MAX_BOT: ${NEXT_PUBLIC_MAX_BOT:-}
     ports:
       - "${WEB_PORT:-3000}:3000"
     # Dev: hot-reload правок витрины (next dev следит за исходниками хоста).

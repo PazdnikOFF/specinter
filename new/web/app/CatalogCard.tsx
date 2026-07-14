@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { imgUrl } from "../lib/api";
+import { thumbUrl } from "../lib/api";
 import { getCart, addToCart, setQty } from "../lib/cart";
 
 type P = {
@@ -17,6 +17,7 @@ type P = {
 export default function CatalogCard({ p }: { p: P }) {
   const [qty, setQtyState] = useState(0);
   const price = p.min_price ? Math.round(p.min_price) : 0;
+  const noPrice = !(p.min_price && p.min_price > 0);   // нет цены → запрос
 
   useEffect(() => {
     const sync = () => setQtyState(getCart().find((c) => c.product_id === p.id)?.qty ?? 0);
@@ -27,14 +28,14 @@ export default function CatalogCard({ p }: { p: P }) {
 
   const add = () =>
     addToCart({ product_id: p.id, article: p.manufacturer_article || String(p.id),
-      name: p.name || "", price, qty: 1 });
+      name: p.name || "", price, qty: 1, kind: noPrice ? "quote" : "order" });
   const step = (d: number) => setQty(p.id, qty + d);
 
   return (
     <div className="card">
       <Link href={`/product/${p.id}`} className="card-body">
         <div className="thumb">
-          {p.primary_image ? <img src={imgUrl(p.primary_image)!} alt={p.name || ""} /> : <span>нет фото</span>}
+          {p.primary_image ? <img src={thumbUrl(p.primary_image)!} alt={p.name || ""} loading="lazy" decoding="async" /> : <span>нет фото</span>}
         </div>
         <div className="art">{p.manufacturer_article || "—"}</div>
         <div className="name">{p.name || "Без названия"}</div>
@@ -48,7 +49,9 @@ export default function CatalogCard({ p }: { p: P }) {
         </span>
       </div>
       {qty === 0 ? (
-        <button className="cart-btn" onClick={add}>В корзину</button>
+        <button className={`cart-btn${noPrice ? " cart-btn-quote" : ""}`} onClick={add}>
+          {noPrice ? "Запросить" : "В корзину"}
+        </button>
       ) : (
         <div className="stepper">
           <button onClick={() => step(-1)} aria-label="убрать">−</button>

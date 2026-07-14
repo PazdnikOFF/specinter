@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { apiProduct, imgUrl } from "../../../lib/api";
-import AddToCart from "../../AddToCart";
+import { apiProduct } from "../../../lib/api";
+import CartStepper from "../../CartStepper";
+import ProductGallery from "./ProductGallery";
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
   const p = await apiProduct(params.id);
@@ -15,9 +16,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
         <Link href="/catalog">Каталог</Link>{crumbs ? ` · ${crumbs}` : ""}
       </div>
       <div className="pwrap">
-        <div className="pimg">
-          {p.primary_image ? <img src={imgUrl(p.primary_image)!} alt={p.name} /> : "нет фото"}
-        </div>
+        <ProductGallery primary={p.primary_image} images={p.images} name={p.name} />
         <div>
           <div className="art" style={{ color: "var(--accent)", fontWeight: 600 }}>
             {p.manufacturer_article}
@@ -28,36 +27,77 @@ export default async function ProductPage({ params }: { params: { id: string } }
           {p.brand && <span className="tag">{p.brand}</span>}
 
           {(() => {
-            const best = (p.offers || []).filter((o: any) => o.price != null)
-              .sort((a: any, b: any) => a.price - b.price)[0];
+            const priced = (p.offers || []).filter((o: any) => o.price != null)
+              .sort((a: any, b: any) => a.price - b.price);
+            const min = priced[0];
             return (
-              <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "16px 0" }}>
-                <span className="price" style={{ fontSize: 24 }}>
-                  {best ? `${Math.round(best.price).toLocaleString("ru-RU")} ₽` : "Цена по запросу"}
+              <div style={{ margin: "16px 0" }}>
+                <span className="price" style={{ fontSize: 26 }}>
+                  {min
+                    ? `${priced.length > 1 ? "от " : ""}${Math.round(min.price).toLocaleString("ru-RU")} ₽`
+                    : "Цена по запросу"}
                 </span>
-                <AddToCart product={{ product_id: p.id, article: p.manufacturer_article,
-                  name: p.name, price: best ? Math.round(best.price) : 0 }} />
               </div>
             );
           })()}
 
           <h2 className="section">Предложения</h2>
           {p.offers?.length ? (
-            p.offers.map((o: any) => (
-              <div className="offer" key={o.id}>
-                <span>
-                  {o.supplier || "Поставщик"}{o.city ? `, ${o.city}` : ""}
-                  <span className={`badge ${o.in_stock ? "in" : "out"}`} style={{ marginLeft: 10 }}>
-                    {o.in_stock ? "в наличии" : "под заказ"}
-                  </span>
-                </span>
-                <span className="price">
-                  {o.price ? `${Math.round(o.price).toLocaleString("ru-RU")} ₽` : "по запросу"}
-                </span>
-              </div>
-            ))
+            p.offers.map((o: any) => {
+              const delivery = o.delivery_note
+                || (o.delivery_days != null ? `срок поставки ~${o.delivery_days} раб. дн.` : "срок уточняется");
+              return (
+                <div className="offer" key={o.id}>
+                  <div className="offer-info">
+                    <span className={`badge ${o.in_stock ? "in" : "out"}`}>
+                      {o.in_stock ? "в наличии" : "под заказ"}
+                    </span>
+                    <span className="muted offer-delivery">{delivery}</span>
+                  </div>
+                  <div className="offer-buy">
+                    <span className="price">
+                      {o.price ? `${Math.round(o.price).toLocaleString("ru-RU")} ₽` : "по запросу"}
+                    </span>
+                    <span className="offer-cart">
+                      {o.price != null
+                        ? <CartStepper product={{ product_id: p.id, article: p.manufacturer_article,
+                            name: p.name, price: Math.round(o.price) }} />
+                        : <CartStepper product={{ product_id: p.id, article: p.manufacturer_article,
+                            name: p.name, price: 0 }} quote />}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
           ) : (
-            <p className="muted">Цена по запросу — уточните у оператора.</p>
+            <div className="offer">
+              <span className="muted">Цена по запросу — укажите количество и запросите:</span>
+              <span className="offer-cart">
+                <CartStepper product={{ product_id: p.id, article: p.manufacturer_article,
+                  name: p.name, price: 0 }} quote />
+              </span>
+            </div>
+          )}
+
+          {p.applicability?.length > 0 && (
+            <>
+              <h2 className="section">Применимость ({p.applicability.length})</h2>
+              <div className="applic">
+                {p.applicability.map((a: any) => (
+                  <div className="applic-row" key={a.category_id}>
+                    {a.position && <span className="pos" title="Позиция на схеме">поз. {a.position}</span>}
+                    <span className="applic-trail">
+                      {a.trail.map((t: any, i: number) => (
+                        <span key={t.id}>
+                          {i > 0 && <span className="sep"> › </span>}
+                          <Link href={`/catalog?cat=${t.id}`}>{t.name}</Link>
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
 
           {p.analogs?.length > 0 && (
@@ -69,8 +109,15 @@ export default async function ProductPage({ params }: { params: { id: string } }
                     {a.linked_product_id
                       ? <Link href={`/product/${a.linked_product_id}`} style={{ color: "var(--accent)" }}>{a.analog_article}</Link>
                       : <span className="art">{a.analog_article}</span>}
+                    {a.analog_name && <span className="muted" style={{ marginLeft: 8 }}>{a.analog_name}</span>}
                   </span>
-                  <span className="muted">{a.analog_name}</span>
+                  {a.min_price != null && (
+                    <span className="offer-buy" style={{ gap: 10 }}>
+                      {a.eta_days != null && <span className="muted" style={{ fontSize: 12 }}>~{a.eta_days} дн.</span>}
+                      <span className={`badge ${a.in_stock ? "in" : "out"}`}>{a.in_stock ? "в наличии" : "под заказ"}</span>
+                      <span className="price">от {Math.round(a.min_price).toLocaleString("ru-RU")} ₽</span>
+                    </span>
+                  )}
                 </div>
               ))}
             </>

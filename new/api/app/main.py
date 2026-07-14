@@ -1,9 +1,10 @@
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from . import db, search, prices, unf, payments
-from .routers import catalog, admin_prices, orders, edo, admin_metrics, quotes
+from . import auth, db, search, prices, unf, payments, settings as app_settings
+from .routers import catalog, admin_prices, orders, edo, admin_metrics, quotes, integrations
+from .routers import admin as admin_router
 
 
 @asynccontextmanager
@@ -14,6 +15,8 @@ async def lifespan(app: FastAPI):
         await unf.ensure_migrated()
         await payments.ensure_migrated()
         await quotes.ensure_migrated()
+        await app_settings.ensure_migrated()
+        await app_settings.load()
     except Exception as e:
         print("migration warning:", e)
     try:
@@ -25,17 +28,23 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="specinter API", version="0.1.0", lifespan=lifespan)
+# С cookie-сессией админки нужен конкретный origin (не '*') и allow_credentials.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(","),
+    allow_credentials=True,
     allow_methods=["*"], allow_headers=["*"],
 )
 app.include_router(catalog.router)
-app.include_router(admin_prices.router)
 app.include_router(orders.router)
 app.include_router(edo.router)
-app.include_router(admin_metrics.router)
 app.include_router(quotes.router)
+app.include_router(integrations.router)
+# Админка: логин/логаут открыты, остальные админ-роуты — под require_admin.
+app.include_router(admin_router.auth_router)
+app.include_router(admin_router.router)
+app.include_router(admin_prices.router, dependencies=[Depends(auth.require_admin)])
+app.include_router(admin_metrics.router, dependencies=[Depends(auth.require_admin)])
 
 
 @app.get("/health")
@@ -45,6 +54,6 @@ async def health():
 
 
 @app.post("/api/admin/reindex", tags=["admin"])
-async def reindex():
+async def reindex(_: bool = Depends(auth.require_admin)):
     n = await search.reindex()
     return {"indexed": n}

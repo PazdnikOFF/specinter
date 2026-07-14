@@ -17,6 +17,8 @@ def ensure_index():
         "searchableAttributes": ["manufacturer_article", "name", "brand", "analog_articles"],
         "filterableAttributes": ["brand", "in_stock", "category_ids"],
         "sortableAttributes": ["min_price"],
+        # sort первым правилом → результаты ВСЕГДА по цене (возрастающе), затем релевантность
+        "rankingRules": ["sort", "words", "typo", "proximity", "attribute", "exactness"],
         "typoTolerance": {"minWordSizeForTypos": {"oneTypo": 4, "twoTypos": 8}},
     })
     return idx
@@ -54,7 +56,8 @@ async def reindex() -> int:
 
 def search(q: str, limit: int = 20, offset: int = 0, in_stock: bool | None = None):
     idx = client.index(PRODUCTS_INDEX)
-    params = {"limit": limit, "offset": offset}
+    # Всегда по цене от меньшего к большему (позиции без цены — в конце).
+    params = {"limit": limit, "offset": offset, "sort": ["min_price:asc"]}
     if in_stock is not None:
         params["filter"] = f"in_stock = {str(in_stock).lower()}"
     return idx.search(q, params)

@@ -64,8 +64,10 @@ async def process_once():
             if name.lower().endswith((".xlsx", ".xls")):
                 payload = part.get_payload(decode=True)
                 try:
-                    rows = prices.parse_xlsx(payload, profile or {})
+                    rows = prices.parse(payload, name, profile or {})
                     res = await prices.ingest(sup["id"], rows)
+                    await prices.backfill_brands()
+                    await prices.backfill_dimensions()
                     try:
                         await search.reindex()
                     except Exception as e:

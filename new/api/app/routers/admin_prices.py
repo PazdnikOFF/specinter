@@ -51,12 +51,14 @@ async def upload_price(supplier_id: int = Query(...), file: UploadFile = File(..
     data = await file.read()
     profile = await _profile_for(supplier_id)
     try:
-        rows = prices.parse_xlsx(data, profile)
+        rows = prices.parse(data, file.filename or "", profile)
     except Exception as e:
         raise HTTPException(400, f"parse error: {e}")
     result = await prices.ingest(supplier_id, rows)
+    await prices.backfill_brands()       # производитель из maker прайса
+    await prices.backfill_dimensions()   # вес/объём для расчёта доставки
     try:
-        await search.reindex()   # чтобы поиск сразу видел новые цены/наличие
+        await search.reindex()   # чтобы поиск сразу видел новые цены/наличие/производителя
     except Exception as e:
         print("reindex after price ingest failed:", e)
     return {"supplier_id": supplier_id, "file": file.filename, **result}

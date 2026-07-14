@@ -43,8 +43,27 @@ def main():
     pg = psycopg.connect(os.environ["PG_DSN"], row_factory=dict_row, autocommit=False)
     stats = {}
     try:
+        # ETL_ONLY=images — перенести ТОЛЬКО изображения (категории + галерея товаров)
+        # поверх уже наполненной БД, не трогая analogs/offers/prices (там INSERT без
+        # ON CONFLICT — повторный полный прогон их бы задублировал). Идемпотентно.
+        only = os.environ.get("ETL_ONLY", "").strip().lower()
+        steps = {s.strip() for s in only.split(",") if s.strip()}
         with my.cursor() as mc, pg.cursor() as pc:
+            if steps:
+                # Идемпотентные шаги, безопасные для повторного прогона поверх наполненной БД
+                # (в отличие от analogs/supplier_prices, где INSERT без ON CONFLICT).
+                if "images" in steps:
+                    migrate_category_images(mc, pc, stats)
+                    migrate_images(mc, pc, stats)
+                if "links" in steps:
+                    migrate_product_categories(mc, pc, stats)
+                pc.execute("INSERT INTO etl_runs (finished_at, stats) VALUES (now(), %s)",
+                           (psycopg.types.json.Json(stats),))
+                pg.commit()
+                print(f"ETL ({only}) OK:", stats)
+                return
             migrate_categories(mc, pc, stats)
+            migrate_category_images(mc, pc, stats)
             migrate_products(mc, pc, stats)
             migrate_product_categories(mc, pc, stats)
             migrate_analogs(mc, pc, stats)
@@ -112,15 +131,29 @@ def migrate_products(mc, pc, stats):
 
 
 def migrate_product_categories(mc, pc, stats):
-    # it_b_ablock: good_id -> catitem, parent -> категория дерева
-    mc.execute("SELECT DISTINCT good_id, parent FROM it_b_ablock WHERE good_id IS NOT NULL")
-    n = 0
+    # it_b_ablock: good_id -> catitem, parent -> категория; num -> позиция на схеме.
+    # На случай уже поднятой БД без новых колонок.
+    pc.execute("ALTER TABLE product_categories ADD COLUMN IF NOT EXISTS position text")
+    pc.execute("ALTER TABLE product_categories ADD COLUMN IF NOT EXISTS sort int DEFAULT 0")
+    # На пару (good_id,parent) может быть несколько строк — берём с минимальным sort.
+    mc.execute("""SELECT good_id, parent, num, sort FROM it_b_ablock
+                  WHERE good_id IS NOT NULL ORDER BY sort""")
+    seen = {}
     for r in mc.fetchall():
-        pc.execute("""INSERT INTO product_categories (product_id, category_id)
-                      SELECT p.id, c.id FROM products p, categories c
+        key = (r["good_id"], r["parent"])
+        if key not in seen:
+            seen[key] = r
+    n = 0
+    for (good_id, parent), r in seen.items():
+        pos = clean(r["num"])
+        if pos in ("0", ""):
+            pos = None
+        pc.execute("""INSERT INTO product_categories (product_id, category_id, position, sort)
+                      SELECT p.id, c.id, %s, %s FROM products p, categories c
                       WHERE p.legacy_id=%s AND c.legacy_id=%s
-                      ON CONFLICT DO NOTHING""",
-                   (r["good_id"], r["parent"]))
+                      ON CONFLICT (product_id, category_id)
+                      DO UPDATE SET position=EXCLUDED.position, sort=EXCLUDED.sort""",
+                   (pos, r["sort"] or 0, good_id, parent))
         n += pc.rowcount
     stats["product_categories"] = n
 
@@ -182,14 +215,73 @@ def migrate_customers(mc, pc, stats):
     stats["customers"] = n
 
 
-def migrate_images(mc, pc, stats):
-    mc.execute("SELECT blockparent, img, sort FROM it_b_goodimage WHERE img IS NOT NULL")
+def migrate_category_images(mc, pc, stats):
+    # Изображения категорий (групп/подгрупп) лежат в it_c_catalog.img
+    # (+ additional_images как fallback), связь it_c_catalog.parent = it_tree.id.
+    pc.execute("ALTER TABLE categories ADD COLUMN IF NOT EXISTS image text")
+    mc.execute("""SELECT parent, img, additional_images FROM it_c_catalog
+                  WHERE (img IS NOT NULL AND img<>'')
+                     OR (additional_images IS NOT NULL AND additional_images<>'')""")
     n = 0
     for r in mc.fetchall():
-        pc.execute("""INSERT INTO product_images (product_id, url, sort)
-                      SELECT p.id, %s, %s FROM products p WHERE p.legacy_id=%s""",
-                   (clean(r["img"]), r["sort"] or 0, r["blockparent"]))
+        # additional_images может быть CSV — берём первый файл как fallback
+        img = clean(r["img"]) or clean((r["additional_images"] or "").split(",")[0])
+        if not img or not r["parent"]:
+            continue
+        pc.execute("""UPDATE categories SET image=%s
+                      WHERE legacy_id=%s AND (image IS NULL OR image='')""",
+                   (img, r["parent"]))
         n += pc.rowcount
+    stats["category_images"] = n
+
+
+def migrate_images(mc, pc, stats):
+    # Карта товаров: legacy_id -> {id, уже присвоенные url} (primary + галерея),
+    # чтобы не плодить дубли между источниками и внутри CSV-поля images.
+    pc.execute("SELECT id, legacy_id, primary_image FROM products WHERE legacy_id IS NOT NULL")
+    prod = {}
+    for row in pc.fetchall():
+        urls = set()
+        pi = clean(row["primary_image"])
+        if pi:
+            urls.add(pi)
+        prod[row["legacy_id"]] = {"id": row["id"], "urls": urls}
+
+    # Учитываем уже вставленные картинки, чтобы повторный прогон был идемпотентным.
+    id_to_legacy = {info["id"]: lid for lid, info in prod.items()}
+    pc.execute("SELECT product_id, url FROM product_images")
+    for row in pc.fetchall():
+        lid = id_to_legacy.get(row["product_id"])
+        if lid is not None:
+            prod[lid]["urls"].add(clean(row["url"]))
+
+    def add(legacy_id, url, sort):
+        info = prod.get(legacy_id)
+        if not info:
+            return 0
+        u = clean(url)
+        if not u or u in info["urls"]:
+            return 0
+        info["urls"].add(u)
+        pc.execute("INSERT INTO product_images (product_id, url, sort) VALUES (%s,%s,%s)",
+                   (info["id"], u, sort))
+        return 1
+
+    n = 0
+    # 1) галерея из it_b_goodimage (главный источник, идёт первым)
+    mc.execute("SELECT blockparent, img, sort FROM it_b_goodimage WHERE img IS NOT NULL")
+    for r in mc.fetchall():
+        n += add(r["blockparent"], r["img"], r["sort"] or 0)
+
+    # 2) доп. фото из самой карточки: img_1..img_4 и CSV-поле images
+    mc.execute("SELECT id, img_1, img_2, img_3, img_4, images FROM it_b_catitem")
+    for r in mc.fetchall():
+        extras = [r["img_1"], r["img_2"], r["img_3"], r["img_4"]]
+        if r["images"]:
+            extras += str(r["images"]).split(",")
+        for i, u in enumerate(extras):
+            n += add(r["id"], u, 100 + i)
+
     stats["product_images"] = n
 
 

@@ -1,31 +1,38 @@
 #!/usr/bin/env bash
 # Выполняется НА СТАРОМ СЕРВЕРЕ (c26864@80.87.104.50).
-# Берёт манифест нужных имён файлов (из БД нового портала), находит их в
-# бакетах files/{2,0,1,3} (2 — оригинал, дальше ресайзы) и пакует ТОЛЬКО их.
+# Готовит СИМЛИНК-стадию нужных изображений в ПОЛНОМ размере, НЕ копируя файлы
+# (экономит диск: архив потом стримится наружу через `tar -hcz`, см. fetch_and_load_images.sh).
+#
+# ВАЖНО про бакеты files/{0,1,2,3}: одно имя лежит во всех бакетах РАЗНЫМИ размерами.
+# Бакет 2 — МИНИАТЮРА (напр. 41x56!), полноразмер обычно в 0 или 3, порядок НЕ единообразен.
+# Поэтому выбираем НАИБОЛЬШИЙ по размеру файл — это гарантированно оригинал/полноразмер.
 #
 # Использование:
-#   ./collect_images_remote.sh /tmp/needed_images.txt /tmp/specinter_images.tar.gz
+#   ./collect_images_remote.sh /tmp/needed_images.txt /tmp/imgstage
 set -euo pipefail
 
 MANIFEST="${1:-/tmp/needed_images.txt}"
-OUT="${2:-/tmp/specinter_images.tar.gz}"
-WWW="/home/c26864/specinter.ru/www"
-BUCKETS=(2 0 1 3)                 # порядок предпочтения: сначала оригинал
-STAGE="$(mktemp -d)"
+STAGE="${2:-/tmp/imgstage}"
+WWW="/home/c26864/specinter.ru/www/files"
+BUCKETS=(0 1 2 3)
 
 [ -f "$MANIFEST" ] || { echo "нет манифеста: $MANIFEST" >&2; exit 1; }
-cd "$WWW/files"
+rm -rf "$STAGE"; mkdir -p "$STAGE"
 
 found=0; missing=0
 : > /tmp/images_missing.txt
 while IFS= read -r name; do
   [ -z "$name" ] && continue
-  src=""
+  best=""; bestsize=0
   for b in "${BUCKETS[@]}"; do
-    if [ -f "$b/$name" ]; then src="$b/$name"; break; fi
+    f="$WWW/$b/$name"
+    if [ -f "$f" ]; then
+      sz=$(stat -c%s "$f" 2>/dev/null || wc -c < "$f")
+      if [ "$sz" -gt "$bestsize" ]; then bestsize=$sz; best="$f"; fi
+    fi
   done
-  if [ -n "$src" ]; then
-    cp -n "$src" "$STAGE/$name"
+  if [ -n "$best" ]; then
+    ln -sf "$best" "$STAGE/$name"          # симлинк, не копия
     found=$((found+1))
   else
     echo "$name" >> /tmp/images_missing.txt
@@ -33,7 +40,5 @@ while IFS= read -r name; do
   fi
 done < "$MANIFEST"
 
-echo "найдено: $found, не найдено: $missing (список: /tmp/images_missing.txt)"
-tar -czf "$OUT" -C "$STAGE" .
-echo "архив: $OUT ($(du -h "$OUT" | cut -f1))"
-rm -rf "$STAGE"
+echo "staged: $found, не найдено: $missing (список: /tmp/images_missing.txt)"
+echo "стадия: $STAGE ($(du -sh "$STAGE" | cut -f1) симлинков)"
