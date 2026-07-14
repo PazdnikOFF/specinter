@@ -185,6 +185,21 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
 .offer-buy { display: flex; align-items: center; gap: 14px; margin-left: auto; }
 .offer-buy .price { white-space: nowrap; font-size: 17px; }
 .offer-cart { width: 128px; display: inline-block; flex: none; }
+/* Схема узла в карточке */
+.schemes { display: flex; flex-wrap: wrap; gap: 14px; }
+.scheme { width: 200px; }
+.scheme-img { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.scheme-img img { width: 100%; height: 150px; object-fit: contain; display: block; }
+.scheme-cap { font-size: 13px; margin-top: 6px; }
+.scheme-cap .pos { font-weight: 600; color: var(--accent); }
+/* Схема узла в подкаталоге */
+.node-scheme { display: block; max-width: 420px; margin: 8px 0 18px; border: 1px solid var(--line);
+  border-radius: 14px; overflow: hidden; background: var(--surface); }
+.node-scheme img { width: 100%; max-height: 300px; object-fit: contain; display: block; }
+/* Позиция на схеме у плитки товара */
+.card-pos { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 980px; padding: 1px 8px; }
+
 .applic { display: flex; flex-direction: column; }
 .applic-row { display: flex; align-items: baseline; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .applic .pos { flex: none; font-size: 12px; font-weight: 600; color: var(--accent);

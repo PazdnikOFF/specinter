@@ -12,6 +12,7 @@ type P = {
   primary_image: string | null;
   min_price: number | null;
   in_stock: boolean | null;
+  position?: string | null;   // позиция на схеме узла
 };
 
 export default function CatalogCard({ p }: { p: P }) {
@@ -37,7 +38,10 @@ export default function CatalogCard({ p }: { p: P }) {
         <div className="thumb">
           {p.primary_image ? <img src={thumbUrl(p.primary_image)!} alt={p.name || ""} loading="lazy" decoding="async" /> : <span>нет фото</span>}
         </div>
-        <div className="art">{p.manufacturer_article || "—"}</div>
+        <div className="art">
+          {p.manufacturer_article || "—"}
+          {p.position && <span className="card-pos" style={{ marginLeft: 8 }}>поз. {p.position}</span>}
+        </div>
         <div className="name">{p.name || "Без названия"}</div>
       </Link>
       <div className="meta">

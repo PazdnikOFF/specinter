@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { apiProduct } from "../../../lib/api";
+import { apiProduct, imgUrl, thumbUrl } from "../../../lib/api";
 import CartStepper from "../../CartStepper";
 import ProductGallery from "./ProductGallery";
 
@@ -77,6 +77,27 @@ export default async function ProductPage({ params }: { params: { id: string } }
                   name: p.name, price: 0 }} quote />
               </span>
             </div>
+          )}
+
+          {p.schemes?.length > 0 && (
+            <>
+              <h2 className="section">Схема узла</h2>
+              <div className="schemes">
+                {p.schemes.map((s: any) => (
+                  <div className="scheme" key={s.category_id}>
+                    <a href={imgUrl(s.scheme_image)!} target="_blank" rel="noopener noreferrer" className="scheme-img">
+                      <img src={thumbUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} loading="lazy" />
+                    </a>
+                    <div className="scheme-cap">
+                      {s.position && <span className="pos">Позиция на схеме: {s.position}</span>}
+                      <Link href={`/catalog?cat=${s.category_id}`} className="link" style={{ display: "block", marginTop: 4 }}>
+                        {s.name} →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
 
           {p.applicability?.length > 0 && (

@@ -2,7 +2,7 @@ import Link from "next/link";
 import SearchBox from "../SearchBox";
 import CatalogCard from "../CatalogCard";
 import CatalogFilters from "../CatalogFilters";
-import { apiCatalogRoots, apiCatalogBrowse, thumbUrl } from "../../lib/api";
+import { apiCatalogRoots, apiCatalogBrowse, imgUrl, thumbUrl } from "../../lib/api";
 
 export const metadata = { title: "Каталог запчастей — СПЕЦИНТЕР" };
 
@@ -108,6 +108,12 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
         ))}
       </nav>
       <h1 className="cat-title">{splitName(data.category.name).main}</h1>
+
+      {data.category.image && (
+        <a className="node-scheme" href={imgUrl(data.category.image)!} target="_blank" rel="noopener noreferrer" title="Схема узла — открыть">
+          <img src={thumbUrl(data.category.image)!} alt={`Схема — ${data.category.name}`} loading="lazy" />
+        </a>
+      )}
 
       {hasGroups && (
         <>

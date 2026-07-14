@@ -19,6 +19,7 @@ _SORTS = {
 _DIRECT_AGG = """
   WITH agg AS (
     SELECT p.id, p.manufacturer_article, p.name, p.brand, p.primary_image,
+           MAX(pc.position) AS position,
            MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
            BOOL_OR(o.in_stock) AS in_stock
     FROM product_categories pc
@@ -73,7 +74,7 @@ async def get_product(product_id: int):
     for a in p["analogs"]:
         a["min_price"] = float(a["min_price"]) if a["min_price"] is not None else None
     cats = await db.fetch(
-        """SELECT c.id, c.name, c.path, pc.position, pc.sort
+        """SELECT c.id, c.name, c.path, c.image, pc.position, pc.sort
            FROM categories c
            JOIN product_categories pc ON pc.category_id=c.id
            WHERE pc.product_id=%s
@@ -101,9 +102,12 @@ async def get_product(product_id: int):
             "category_id": c["id"],
             "name": c["name"],
             "position": c["position"],
+            "scheme_image": c["image"],     # изображение схемы узла (если есть)
             "trail": trail,
         })
     p["applicability"] = applicability
+    # Схемы узлов, где у детали есть позиция (для блока «Схема узла» в карточке).
+    p["schemes"] = [a for a in applicability if a["scheme_image"]]
     return p
 
 
