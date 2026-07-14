@@ -1,0 +1,7 @@
+.env
+scripts/specinter_images.tar.gz
+scripts/needed_images.txt
+web/node_modules
+web/.next
+__pycache__/
+*.pyc

@@ -1,0 +1,185 @@
+services:
+  # --- Новое доменное ядро -------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    mem_limit: 1g
+    environment:
+      POSTGRES_DB: ${PG_DB:-specinter}
+      POSTGRES_USER: ${PG_USER:-specinter}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-specinter}
+    ports:
+      - "${PG_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-specinter}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # --- Мгновенный поиск ----------------------------------------------------
+  meilisearch:
+    image: getmeili/meilisearch:v1.10
+    mem_limit: 1g
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_KEY:-specinter_dev_key}
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MAX_INDEXING_MEMORY: 512Mb
+    ports:
+      - "${MEILI_PORT:-7700}:7700"
+    volumes:
+      - meilidata:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:7700/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # --- API нового портала --------------------------------------------------
+  api:
+    build: ./api
+    mem_limit: 512m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    environment:
+      PG_DSN: postgresql://${PG_USER:-specinter}:${PG_PASSWORD:-specinter}@postgres:5432/${PG_DB:-specinter}
+      MEILI_URL: http://meilisearch:7700
+      MEILI_KEY: ${MEILI_KEY:-specinter_dev_key}
+      # Прямая интеграция 1С:УНФ (пусто = dry-run)
+      UNF_BASE_URL: ${UNF_BASE_URL:-}
+      UNF_USER: ${UNF_USER:-}
+      UNF_PASSWORD: ${UNF_PASSWORD:-}
+      UNF_ODATA_PATH: ${UNF_ODATA_PATH:-/odata/standard.odata}
+      UNF_HTTP_SERVICE_ROOT: ${UNF_HTTP_SERVICE_ROOT:-/hs/specinter}
+      # Платежи физлиц (пусто = dry-run)
+      PAY_PROVIDER: ${PAY_PROVIDER:-yookassa}
+      PAY_RETURN_URL: ${PAY_RETURN_URL:-http://localhost:3000/order/success}
+      YOOKASSA_SHOP_ID: ${YOOKASSA_SHOP_ID:-}
+      YOOKASSA_SECRET_KEY: ${YOOKASSA_SECRET_KEY:-}
+      TINKOFF_TERMINAL_KEY: ${TINKOFF_TERMINAL_KEY:-}
+      TINKOFF_PASSWORD: ${TINKOFF_PASSWORD:-}
+      # ЭДО Контур.Диадок (пусто = dry-run)
+      DIADOC_API_CLIENT_ID: ${DIADOC_API_CLIENT_ID:-}
+      DIADOC_TOKEN: ${DIADOC_TOKEN:-}
+      DIADOC_BOX_ID: ${DIADOC_BOX_ID:-}
+    ports:
+      - "${API_PORT:-8010}:8000"
+
+  # --- Воркер приёма прайсов с почты (IMAP) --------------------------------
+  worker:
+    build: ./api
+    mem_limit: 256m
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PG_DSN: postgresql://${PG_USER:-specinter}:${PG_PASSWORD:-specinter}@postgres:5432/${PG_DB:-specinter}
+      IMAP_HOST: ${IMAP_HOST:-}
+      IMAP_USER: ${IMAP_USER:-}
+      IMAP_PASSWORD: ${IMAP_PASSWORD:-}
+      IMAP_FOLDER: ${IMAP_FOLDER:-INBOX}
+      POLL_INTERVAL: ${POLL_INTERVAL:-300}
+    command: ["python", "-m", "app.imap_worker"]
+
+  # --- ИИ-оператор (LangGraph, Grok/Hermes) + каналы -----------------------
+  bot:
+    build: ./bot
+    mem_limit: 768m
+    depends_on:
+      - api
+    environment:
+      BOT_API_URL: http://api:8000
+      # LLM (провайдер-агностично, OpenAI-совместимый). Grok по умолчанию.
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.x.ai/v1}
+      LLM_MODEL: ${LLM_MODEL:-grok-4}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.2}
+      # Каналы
+      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN:-}
+      MAX_TOKEN: ${MAX_TOKEN:-}
+      IG_ACCESS_TOKEN: ${IG_ACCESS_TOKEN:-}
+      WA_TRANSPORT: ${WA_TRANSPORT:-cloud}
+      WA_TOKEN: ${WA_TOKEN:-}
+      WA_PHONE_ID: ${WA_PHONE_ID:-}
+      WA_BRIDGE_URL: ${WA_BRIDGE_URL:-}
+      WEBHOOK_VERIFY_TOKEN: ${WEBHOOK_VERIFY_TOKEN:-specinter}
+      # Автопостинг Instagram (рилсы/реклама)
+      IG_USER_ID: ${IG_USER_ID:-}
+      IG_AD_ACCOUNT_ID: ${IG_AD_ACCOUNT_ID:-}
+      MARKETING_ENABLED: ${MARKETING_ENABLED:-0}
+      MARKETING_INTERVAL: ${MARKETING_INTERVAL:-86400}
+      REEL_LIBRARY: ${REEL_LIBRARY:-}
+      PUBLIC_MEDIA_URL: ${PUBLIC_MEDIA_URL:-}
+    ports:
+      - "${BOT_PORT:-8090}:8090"
+
+  # --- Медиа (изображения каталога со старого сайта) -----------------------
+  media:
+    image: nginx:alpine
+    mem_limit: 128m
+    volumes:
+      - mediadata:/usr/share/nginx/html:ro
+    ports:
+      - "${MEDIA_PORT:-8081}:80"
+
+  # --- Витрина (Next.js, Apple-UI) -----------------------------------------
+  web:
+    build: ./web
+    mem_limit: 1g
+    depends_on:
+      - api
+    environment:
+      API_INTERNAL_URL: http://api:8000
+      NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8010}
+      NEXT_PUBLIC_MEDIA_URL: http://localhost:${MEDIA_PORT:-8081}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+
+  # --- Legacy БД: нужна ТОЛЬКО для ETL/анализа. Профиль etl → в обычном
+  #     `docker compose up` не поднимается (не ест память в проде). -----------
+  mariadb-legacy:
+    image: mariadb:10.5
+    profiles: ["etl"]
+    mem_limit: 1g
+    command: ["--innodb-buffer-pool-size=128M", "--performance-schema=OFF"]
+    environment:
+      MARIADB_ROOT_PASSWORD: ${LEGACY_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${LEGACY_DB:-specinter_legacy}
+    ports:
+      - "${LEGACY_PORT:-3307}:3306"
+    volumes:
+      - legacydata:/var/lib/mysql
+      - ../legacy/specinter.dump.sql:/docker-entrypoint-initdb.d/legacy.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # --- Разовый ETL: MariaDB(legacy) -> Postgres(домен) ---------------------
+  etl:
+    build: ./etl
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mariadb-legacy:
+        condition: service_healthy
+    environment:
+      PG_DSN: postgresql://${PG_USER:-specinter}:${PG_PASSWORD:-specinter}@postgres:5432/${PG_DB:-specinter}
+      MY_HOST: mariadb-legacy
+      MY_PORT: 3306
+      MY_USER: root
+      MY_PASSWORD: ${LEGACY_ROOT_PASSWORD:-root}
+      MY_DB: ${LEGACY_DB:-specinter_legacy}
+    profiles: ["etl"]        # запуск: docker compose --profile etl run --rm etl
+
+volumes:
+  pgdata:
+  legacydata:
+  meilidata:
+  mediadata:
