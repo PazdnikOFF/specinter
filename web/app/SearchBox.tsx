@@ -75,8 +75,8 @@ export default function SearchBox({ initial = "", wide = false }: { initial?: st
           <button type="button" aria-pressed={scoped}
             className={`scope-btn${scoped ? " scoped" : ""}`}
             onClick={() => setScoped((s) => !s)}
-            title={scoped ? "Ищем только в текущем разделе — нажмите, чтобы искать везде" : "Ищем по всему каталогу — нажмите, чтобы искать только в разделе"}>
-            по разделу
+            title={scoped ? "Ищем только в текущем разделе — нажмите, чтобы искать по всему сайту" : "Ищем по всему сайту — нажмите, чтобы искать только в разделе"}>
+            {scoped ? "по разделу" : "по сайту"}
           </button>
         )}
         <input autoFocus={!inGroup} value={q} onChange={(e) => setQ(e.target.value)}
