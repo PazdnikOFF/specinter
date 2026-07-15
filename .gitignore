@@ -5,6 +5,7 @@ scripts/needed_delta.txt
 web/node_modules
 web/.next
 web/next-env.d.ts
+web/*.tsbuildinfo
 scratch_out/
 __pycache__/
 *.pyc

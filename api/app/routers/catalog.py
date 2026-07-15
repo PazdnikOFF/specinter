@@ -108,7 +108,34 @@ async def get_product(product_id: int):
                  (SELECT normalized_article FROM products WHERE id = %(pid)s)
            ORDER BY a.normalized_article, a.linked_product_id NULLS LAST""",
         {"pid": product_id})
-    for a in p["analogs"]:
+    # Детали, стоящие на ТОЙ ЖЕ позиции схемы узла (напр. полуось левая/правая,
+    # исполнения разных производителей). Это НЕ аналоги (левая≠правая), поэтому
+    # отдаём отдельным блоком position_variants с ценой/наличием/сроком.
+    siblings = await db.fetch(
+        """SELECT DISTINCT ON (p2.id)
+                  p2.manufacturer_article AS analog_article, p2.id AS linked_product_id,
+                  p2.name AS analog_name, p2.brand AS brand,
+                  (SELECT c.name FROM product_categories pc2 JOIN categories c ON c.id=pc2.category_id
+                     WHERE pc2.product_id=p2.id ORDER BY c.level DESC LIMIT 1) AS group_name,
+                  (SELECT MIN(price) FROM offers o
+                     WHERE o.product_id=p2.id AND o.price IS NOT NULL) AS min_price,
+                  (SELECT BOOL_OR(in_stock) FROM offers o WHERE o.product_id=p2.id) AS in_stock,
+                  (SELECT MIN(s.delivery_days) FROM offers o JOIN suppliers s ON s.id=o.supplier_id
+                     WHERE o.product_id=p2.id AND o.source='price') AS eta_days
+           FROM product_categories pcs
+           JOIN categories cc ON cc.id=pcs.category_id AND cc.path LIKE %(root)s
+           JOIN product_categories pc2
+                ON pc2.category_id=pcs.category_id AND pc2.position=pcs.position
+               AND pc2.product_id<>pcs.product_id
+           JOIN products p2 ON p2.id=pc2.product_id AND p2.visible
+           WHERE pcs.product_id=%(pid)s AND coalesce(pcs.position,'') <> ''
+           ORDER BY p2.id
+           LIMIT 100""",
+        {"pid": product_id, "root": f"%/{CATALOG_ROOT_ID}/%"})
+    # Не дублируем детали, которые уже перечислены как настоящие аналоги.
+    analog_ids = {a["linked_product_id"] for a in p["analogs"] if a["linked_product_id"] is not None}
+    p["position_variants"] = [s for s in siblings if s["linked_product_id"] not in analog_ids]
+    for a in (*p["analogs"], *p["position_variants"]):
         a["min_price"] = float(a["min_price"]) if a["min_price"] is not None else None
     cats = await db.fetch(
         """SELECT c.id, c.name, c.path, c.image, pc.position, pc.sort
