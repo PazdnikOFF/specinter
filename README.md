@@ -164,6 +164,34 @@ docker compose exec postgres psql -U specinter -d specinter -c \
 
 Legacy-БД остаётся доступной на порту `${LEGACY_PORT}` (по умолчанию 3307) для анализа.
 
+## Прод: HTTPS + nginx
+
+В проде поверх базового compose накладывается `docker-compose.prod.yml` — reverse-proxy
+**nginx** (единственная публичная точка входа, порты 80/443) + **certbot**
+(автовыпуск/автопродление сертификатов Let's Encrypt). TLS терминируется на прокси,
+весь трафик уходит в `web:3000`, который сам маршрутизирует `/api/*` и `/media/*`.
+
+Выход на боевой домен — когда DNS домена уже резолвится на сервер и порты 80/443
+доступны из интернета:
+
+```bash
+# 1. В .env задать домен, e-mail и включить прод-безопасность:
+#    DOMAIN=specinter.ru
+#    LETSENCRYPT_EMAIL=admin@specinter.ru
+#    CORS_ORIGINS=https://specinter.ru
+#    BIND_ADDR=127.0.0.1:      # порты приложения — только localhost, наружу лишь прокси
+
+# 2. Первичный выпуск сертификата (ставит заглушку, поднимает nginx, берёт cert):
+./scripts/init-letsencrypt.sh
+
+# 3. Поднять прод-стек (база + прокси + certbot):
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+Продление сертификата — автоматически (certbot renew каждые 12 ч, nginx reload каждые 6 ч).
+Для отладки без rate-limit: `LETSENCRYPT_STAGING=1`. Пока домен не переключён —
+шаги 2–3 не выполняются, стек работает по HTTP (LAN, `BIND_ADDR` пустой).
+
 ## Ключевые решения
 
 - **Матчинг по артикулу производителя** (`norm_article()` — нормализация регистра/пробелов/разделителей),
