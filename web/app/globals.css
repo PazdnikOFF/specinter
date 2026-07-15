@@ -124,11 +124,15 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--line); padding: 10px 0; }
 .topsearch .searchbar { margin: 0; }
 /* Компактная кнопка-переключатель области поиска «по разделу».
-   Нажата (scoped) → синий фон, белый текст; не нажата → контур синий, фон белый, текст синий. */
-.scope-btn { flex: none; white-space: nowrap; cursor: pointer; font-size: 12px; font-weight: 600;
+   Нажата (scoped) → синий фон, белый текст; не нажата → контур синий, фон белый, текст синий.
+   Селектор идёт через .searchbar, чтобы перебить общий стиль `.searchbar button`
+   (у него выше специфичность и он заливал кнопку синим в обоих состояниях). */
+.searchbar .scope-btn { flex: none; white-space: nowrap; cursor: pointer; font-size: 12px; font-weight: 600;
   line-height: 1; padding: 5px 10px; border-radius: 980px; transition: background .15s, color .15s;
   border: 1px solid var(--accent); background: #fff; color: var(--accent); }
-.scope-btn.scoped { background: var(--accent); color: #fff; }
+.searchbar .scope-btn:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--accent); }
+.searchbar .scope-btn.scoped { background: var(--accent); color: #fff; }
+.searchbar .scope-btn.scoped:hover { background: var(--accent-hover); color: #fff; }
 
 /* Живой поиск-автодополнение */
 .searchwrap { position: relative; }
