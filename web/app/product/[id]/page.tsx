@@ -1,22 +1,56 @@
 import Link from "next/link";
-import { apiProduct } from "../../../lib/api";
+import { apiProduct, imgUrl, thumbUrl } from "../../../lib/api";
 import CartStepper from "../../CartStepper";
 import ProductGallery from "./ProductGallery";
+import ZoomImage from "../../ZoomImage";
+import BackButton from "../../BackButton";
+import Breadcrumbs from "../../Breadcrumbs";
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
   const p = await apiProduct(params.id);
   if (!p) {
     return <main className="container"><div className="empty">Товар не найден.</div></main>;
   }
-  const crumbs = p.categories?.map((c: any) => c.name).join(" · ");
+  // Для крошек берём САМУЮ ГЛУБОКУЮ применимость (полный путь до позиции в каталоге),
+  // приоритет — записям с позицией на схеме.
+  const bestAppl = (p.applicability || []).slice().sort((a: any, b: any) =>
+    (b.position ? 1 : 0) - (a.position ? 1 : 0) || (b.trail?.length || 0) - (a.trail?.length || 0))[0];
+  const trail = bestAppl?.trail || [];
 
   return (
     <main className="container">
-      <div className="crumbs">
-        <Link href="/catalog">Каталог</Link>{crumbs ? ` · ${crumbs}` : ""}
+      <div className="navrow">
+        <BackButton />
+        <Breadcrumbs items={[
+          { name: "Каталог", href: "/catalog" },
+          ...trail.map((t: any) => ({ name: t.name, href: `/catalog?cat=${t.id}` })),
+          { name: p.name || p.manufacturer_article },
+        ]} />
       </div>
       <div className="pwrap">
-        <ProductGallery primary={p.primary_image} images={p.images} name={p.name} />
+        <div className="pcol-left">
+          <ProductGallery primary={p.primary_image} images={p.images} name={p.name} />
+          {p.schemes?.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <h2 className="section" style={{ marginTop: 0 }}>Схема узла</h2>
+              <div className="schemes">
+                {p.schemes.map((s: any) => (
+                  <div className="scheme" key={s.category_id}>
+                    <span className="scheme-img">
+                      <ZoomImage thumb={thumbUrl(s.scheme_image)!} full={imgUrl(s.scheme_image)!} alt={`Схема — ${s.name}`} />
+                    </span>
+                    <div className="scheme-cap">
+                      {s.position && <span className="pos">Позиция на схеме: {s.position}</span>}
+                      <Link href={`/catalog?cat=${s.category_id}`} className="link" style={{ display: "block", marginTop: 4 }}>
+                        {s.name} →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         <div>
           <div className="art" style={{ color: "var(--accent)", fontWeight: 600 }}>
             {p.manufacturer_article}
@@ -70,8 +104,8 @@ export default async function ProductPage({ params }: { params: { id: string } }
               );
             })
           ) : (
-            <div className="offer">
-              <span className="muted">Цена по запросу — укажите количество и запросите:</span>
+            <div className="offer offer-request">
+              <span className="muted" style={{ flex: 1, minWidth: 0 }}>Цена по запросу — укажите количество и запросите:</span>
               <span className="offer-cart">
                 <CartStepper product={{ product_id: p.id, article: p.manufacturer_article,
                   name: p.name, price: 0 }} quote />
@@ -103,23 +137,38 @@ export default async function ProductPage({ params }: { params: { id: string } }
           {p.analogs?.length > 0 && (
             <>
               <h2 className="section">Аналоги ({p.analogs.length})</h2>
-              {p.analogs.map((a: any, i: number) => (
-                <div className="analog" key={i}>
-                  <span>
+              {p.analogs.map((a: any, i: number) => {
+                const info = (
+                  <>
+                    <span className="art">{a.analog_article}</span>
+                    {a.analog_name && <span className="analog-name">{a.analog_name}</span>}
+                    <span className="analog-meta">
+                      {a.brand && <span className="tag">{a.brand}</span>}
+                      {a.group_name && <span className="muted">{a.group_name}</span>}
+                      {!a.linked_product_id && <span className="muted">кросс-номер</span>}
+                    </span>
+                  </>
+                );
+                return (
+                  <div className="analog" key={i}>
+                    {/* кликабельно и артикул, и наименование */}
                     {a.linked_product_id
-                      ? <Link href={`/product/${a.linked_product_id}`} style={{ color: "var(--accent)" }}>{a.analog_article}</Link>
-                      : <span className="art">{a.analog_article}</span>}
-                    {a.analog_name && <span className="muted" style={{ marginLeft: 8 }}>{a.analog_name}</span>}
-                  </span>
-                  {a.min_price != null && (
+                      ? <Link href={`/product/${a.linked_product_id}`} className="analog-info analog-link">{info}</Link>
+                      : <span className="analog-info">{info}</span>}
                     <span className="offer-buy" style={{ gap: 10 }}>
                       {a.eta_days != null && <span className="muted" style={{ fontSize: 12 }}>~{a.eta_days} дн.</span>}
-                      <span className={`badge ${a.in_stock ? "in" : "out"}`}>{a.in_stock ? "в наличии" : "под заказ"}</span>
-                      <span className="price">от {Math.round(a.min_price).toLocaleString("ru-RU")} ₽</span>
+                      {a.min_price != null ? (
+                        <>
+                          <span className={`badge ${a.in_stock ? "in" : "out"}`}>{a.in_stock ? "в наличии" : "под заказ"}</span>
+                          <span className="price">от {Math.round(a.min_price).toLocaleString("ru-RU")} ₽</span>
+                        </>
+                      ) : (
+                        <span className="badge out">под заказ</span>
+                      )}
                     </span>
-                  )}
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </>
           )}
         </div>

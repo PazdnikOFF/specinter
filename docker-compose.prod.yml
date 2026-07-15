@@ -1,0 +1,45 @@
+# Прод-надстройка: TLS-реверс-прокси (nginx) + автосертификаты Let's Encrypt (certbot).
+# Базовый docker-compose.yml не трогаем — накладываем поверх:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Перед первым запуском выпускаем сертификат:  ./scripts/init-letsencrypt.sh
+# Требуется в .env:  DOMAIN=example.ru  LETSENCRYPT_EMAIL=you@example.ru
+# и чтобы домен резолвился на этот сервер, а порты 80/443 были доступны из интернета.
+
+services:
+  # --- TLS-реверс-прокси: единственная публичная точка входа (80/443) --------
+  proxy:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?нужно задать DOMAIN в .env}
+    volumes:
+      - ./proxy/templates:/etc/nginx/templates:ro   # envsubst → /etc/nginx/conf.d/*.conf
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot_webroot:/var/www/certbot:ro
+    # Периодический reload — подхватить продлённый сертификат без простоя.
+    command: >
+      sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done &
+             exec nginx -g 'daemon off;'"
+
+  # --- Выпуск и автопродление сертификатов -----------------------------------
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot_webroot:/var/www/certbot
+    # Продление каждые 12ч (certbot сам обновит только близкие к истечению).
+    entrypoint: >
+      sh -c "trap exit TERM; while :; do
+             certbot renew --webroot -w /var/www/certbot --quiet;
+             sleep 12h & wait $${!}; done"
+
+volumes:
+  letsencrypt:
+  certbot_webroot:

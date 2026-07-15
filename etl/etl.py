@@ -175,6 +175,13 @@ def migrate_analogs(mc, pc, stats):
                       WHERE p.legacy_id=%s""",
                    (art, clean(r["name"]), linked, r["blockparent"]))
         n += pc.rowcount
+    # Проставить связь по совпадению артикула там, где legacy не дал good_id_arts
+    # (иначе аналог с существующей карточкой висел бы «отдельно» и некликабельным).
+    pc.execute("""UPDATE analogs a SET linked_product_id = p.id
+                  FROM products p
+                  WHERE a.linked_product_id IS NULL
+                    AND a.normalized_article IS NOT NULL
+                    AND p.normalized_article = a.normalized_article""")
     stats["analogs"] = n
 
 

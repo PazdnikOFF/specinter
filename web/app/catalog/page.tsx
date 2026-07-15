@@ -1,12 +1,15 @@
 import Link from "next/link";
-import SearchBox from "../SearchBox";
 import CatalogCard from "../CatalogCard";
+import PositionCard from "../PositionCard";
 import CatalogFilters from "../CatalogFilters";
-import { apiCatalogRoots, apiCatalogBrowse, thumbUrl } from "../../lib/api";
+import ZoomImage from "../ZoomImage";
+import BackButton from "../BackButton";
+import Breadcrumbs from "../Breadcrumbs";
+import { apiCatalogRoots, apiCatalogBrowse, imgUrl, thumbUrl } from "../../lib/api";
 
 export const metadata = { title: "Каталог запчастей — СПЕЦИНТЕР" };
 
-type SP = { cat?: string; sort?: string; stock?: string; page?: string };
+type SP = { cat?: string; sort?: string; stock?: string; page?: string; q?: string };
 
 // Разбиваем длинное имя узла на заголовок и уточнение из скобок.
 function splitName(name: string): { main: string; sub?: string } {
@@ -29,6 +32,22 @@ function GroupTile({ id, name, count, image }: { id: number; name: string; count
   );
 }
 
+// Группировка по позиции на схеме: повторяющиеся позиции (>1 товара) — в одну карточку.
+function groupByPosition(products: any[]) {
+  const out: any[] = [];
+  let i = 0;
+  while (i < products.length) {
+    const pos = products[i].position;
+    if (pos == null || pos === "") { out.push({ single: products[i] }); i++; continue; }
+    const grp = [products[i]];
+    let j = i + 1;
+    while (j < products.length && products[j].position === pos) { grp.push(products[j]); j++; }
+    out.push(grp.length > 1 ? { position: pos, products: grp } : { single: grp[0] });
+    i = j;
+  }
+  return out;
+}
+
 const SECTIONS: [string, string][] = [
   ["models", "Модели техники"],
   ["engines", "Двигатели"],
@@ -46,9 +65,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
         <div style={{ padding: "36px 0 4px" }}>
           <h1 className="cat-title">Каталог запчастей</h1>
           <p className="hint" style={{ textAlign: "left", marginTop: 6 }}>
-            Выберите модель техники, двигатель или производителя — либо найдите деталь по артикулу.
+            Выберите модель техники, двигатель или производителя — либо найдите деталь по артикулу через поиск сверху.
           </p>
-          <div style={{ maxWidth: 560, margin: "20px 0 8px" }}><SearchBox /></div>
         </div>
         {SECTIONS.map(([key, label]) => {
           const list = items.filter((i: any) => i.group === key);
@@ -79,7 +97,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
   const stock = searchParams.stock === "1";
   const page = Math.max(1, parseInt(searchParams.page || "1") || 1);
   const per_page = 30;
-  const data = await apiCatalogBrowse({ category: cat, sort, stock, page, per_page });
+  const gq = (searchParams.q || "").trim();
+  const data = await apiCatalogBrowse({ category: cat, sort, stock, page, per_page, q: gq });
 
   if (!data) {
     return <main className="container"><div className="empty">Категория не найдена. <Link className="link" href="/catalog">← в каталог</Link></div></main>;
@@ -87,27 +106,38 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
 
   const pages = Math.max(1, Math.ceil(data.total / per_page));
   const qs = (p: Record<string, string | number>) => {
-    const q = new URLSearchParams({ cat: cat!, sort, ...(stock ? { stock: "1" } : {}) });
+    const q = new URLSearchParams({ cat: cat!, sort, ...(stock ? { stock: "1" } : {}), ...(gq ? { q: gq } : {}) });
     for (const [k, v] of Object.entries(p)) q.set(k, String(v));
     return `/catalog?${q}`;
   };
-  const hasGroups = data.children.length > 0;
+  const nodeName = splitName(data.category.name).main;
+  const hasGroups = data.children.length > 0 && !gq;   // при поиске в группе подгруппы прячем
   const hasProducts = data.products.length > 0;
 
   return (
     <main className="container">
-      <nav className="crumbs" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-        <Link href="/catalog">Каталог</Link>
-        {data.breadcrumbs.map((b: any, i: number) => (
-          <span key={b.id}>
-            {" / "}
-            {i === data.breadcrumbs.length - 1
-              ? <span style={{ color: "var(--text)" }}>{splitName(b.name).main}</span>
-              : <Link href={`/catalog?cat=${b.id}`}>{splitName(b.name).main}</Link>}
-          </span>
-        ))}
-      </nav>
-      <h1 className="cat-title">{splitName(data.category.name).main}</h1>
+      <div className="navrow">
+        <BackButton />
+        <Breadcrumbs items={[
+          { name: "Каталог", href: "/catalog" },
+          ...data.breadcrumbs.map((b: any) => ({ name: splitName(b.name).main, href: `/catalog?cat=${b.id}` })),
+        ]} />
+      </div>
+      <h1 className="cat-title">{nodeName}</h1>
+
+      {/* Схема узла (крупно в лайтбоксе) */}
+      {!gq && data.category.image && (
+        <span className="node-scheme" title="Схема узла — увеличить">
+          <ZoomImage thumb={thumbUrl(data.category.image)!} full={imgUrl(data.category.image)!}
+            alt={`Схема — ${data.category.name}`} />
+        </span>
+      )}
+
+      {gq && (
+        <p className="muted" style={{ margin: "12px 0 4px" }}>
+          Найдено в разделе «{nodeName}»: {data.total.toLocaleString("ru-RU")} · <Link className="link" href={`/catalog?cat=${cat}`}>сбросить</Link>
+        </p>
+      )}
 
       {hasGroups && (
         <>
@@ -125,7 +155,11 @@ export default async function CatalogPage({ searchParams }: { searchParams: SP }
           {hasGroups && <h2 className="sec-head" style={{ marginTop: 34 }}>Позиции в этом разделе</h2>}
           <CatalogFilters total={data.total} />
           <div className="grid">
-            {data.products.map((p: any) => <CatalogCard key={p.id} p={p} />)}
+            {groupByPosition(data.products).map((g: any, idx: number) =>
+              g.products
+                ? <PositionCard key={`pos-${g.position}-${idx}`} position={g.position} products={g.products} />
+                : <CatalogCard key={g.single.id} p={g.single} />
+            )}
           </div>
           {pages > 1 && (
             <div className="pager">

@@ -6,8 +6,8 @@ router = APIRouter(prefix="/api", tags=["catalog"])
 
 # Разрешённые сортировки витрины (защита от инъекций в ORDER BY).
 _SORTS = {
-    # По умолчанию — всегда по цене от меньшего к большему (без цены — в конце).
-    "default":    "(min_price IS NULL), min_price ASC, name",
+    # По умолчанию — по ПОЗИЦИИ на схеме (узлы каталога), а без позиций — по алфавиту.
+    "default":    "(position_num IS NULL), position_num ASC, name ASC",
     "price_asc":  "(min_price IS NULL), min_price ASC, name",
     "price_desc": "min_price DESC NULLS LAST, name",
     "stock":      "in_stock DESC NULLS LAST, (min_price IS NULL), min_price ASC",
@@ -16,11 +16,35 @@ _SORTS = {
 
 # Товары, привязанные НЕПОСРЕДСТВЕННО к категории (для drill-down по узлам).
 # Дерево навигируется группами-плитками, а карточки показываются на своём уровне.
+# Поиск ВНУТРИ группы: товары всего поддерева, отфильтрованные по артикулу/названию.
+_SUBTREE_SEARCH = """
+  WITH agg AS (
+    SELECT p.id, p.manufacturer_article, p.name, p.brand, p.primary_image,
+           NULL::text AS position, NULL::int AS position_num,
+           MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
+           BOOL_OR(o.in_stock) AS in_stock,
+           (SELECT MIN(s.delivery_days) FROM offers o2 JOIN suppliers s ON s.id=o2.supplier_id
+              WHERE o2.product_id=p.id AND o2.source='price') AS eta_days
+    FROM categories d
+    JOIN product_categories pc ON pc.category_id = d.id
+    JOIN products p ON p.id = pc.product_id
+    LEFT JOIN offers o ON o.product_id = p.id
+    WHERE (d.path = %(path)s OR d.path LIKE %(path)s || '/%%')
+      AND p.visible
+      AND (p.manufacturer_article ILIKE %(q)s OR p.name ILIKE %(q)s OR p.brand ILIKE %(q)s)
+    GROUP BY p.id
+  )
+"""
+
 _DIRECT_AGG = """
   WITH agg AS (
     SELECT p.id, p.manufacturer_article, p.name, p.brand, p.primary_image,
+           MAX(pc.position) AS position,
+           MAX(nullif(regexp_replace(coalesce(pc.position,''), '[^0-9]', '', 'g'), '')::int) AS position_num,
            MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
-           BOOL_OR(o.in_stock) AS in_stock
+           BOOL_OR(o.in_stock) AS in_stock,
+           (SELECT MIN(s.delivery_days) FROM offers o2 JOIN suppliers s ON s.id=o2.supplier_id
+              WHERE o2.product_id=p.id AND o2.source='price') AS eta_days
     FROM product_categories pc
     JOIN products p ON p.id = pc.product_id
     LEFT JOIN offers o ON o.product_id = p.id
@@ -61,19 +85,33 @@ async def get_product(product_id: int):
            FROM offers o LEFT JOIN suppliers s ON s.id=o.supplier_id
            WHERE o.product_id=%s ORDER BY o.price NULLS LAST""", (product_id,))
     # Аналоги + (если у аналога есть карточка) его минимальная цена, наличие и срок.
+    # ИСКЛЮЧАЕМ саму карточку (self-link и совпадение артикула) и дубли (по норм. артикулу).
     p["analogs"] = await db.fetch(
-        """SELECT a.analog_article, a.analog_name, a.linked_product_id,
+        """SELECT DISTINCT ON (a.normalized_article)
+                  a.analog_article, a.linked_product_id,
+                  COALESCE(lp.name, a.analog_name) AS analog_name,
+                  lp.brand AS brand,
+                  (SELECT c.name FROM product_categories pc JOIN categories c ON c.id=pc.category_id
+                     WHERE pc.product_id=a.linked_product_id
+                     ORDER BY c.level DESC LIMIT 1) AS group_name,
                   (SELECT MIN(price) FROM offers o
                      WHERE o.product_id=a.linked_product_id AND o.price IS NOT NULL) AS min_price,
                   (SELECT BOOL_OR(in_stock) FROM offers o
                      WHERE o.product_id=a.linked_product_id) AS in_stock,
                   (SELECT MIN(s.delivery_days) FROM offers o JOIN suppliers s ON s.id=o.supplier_id
                      WHERE o.product_id=a.linked_product_id AND o.source='price') AS eta_days
-           FROM analogs a WHERE a.product_id=%s""", (product_id,))
+           FROM analogs a
+           LEFT JOIN products lp ON lp.id = a.linked_product_id
+           WHERE a.product_id = %(pid)s
+             AND a.linked_product_id IS DISTINCT FROM %(pid)s
+             AND a.normalized_article IS DISTINCT FROM
+                 (SELECT normalized_article FROM products WHERE id = %(pid)s)
+           ORDER BY a.normalized_article, a.linked_product_id NULLS LAST""",
+        {"pid": product_id})
     for a in p["analogs"]:
         a["min_price"] = float(a["min_price"]) if a["min_price"] is not None else None
     cats = await db.fetch(
-        """SELECT c.id, c.name, c.path, pc.position, pc.sort
+        """SELECT c.id, c.name, c.path, c.image, pc.position, pc.sort
            FROM categories c
            JOIN product_categories pc ON pc.category_id=c.id
            WHERE pc.product_id=%s
@@ -101,9 +139,28 @@ async def get_product(product_id: int):
             "category_id": c["id"],
             "name": c["name"],
             "position": c["position"],
+            "scheme_image": c["image"],     # изображение схемы узла (если есть)
             "trail": trail,
         })
-    p["applicability"] = applicability
+    # Схемы узлов, где у детали есть позиция (для блока «Схема узла» в карточке).
+    # Берём из ПОЛНОГО набора — до фильтрации применимости.
+    p["schemes"] = [a for a in applicability if a["scheme_image"]]
+
+    # Применимость для показа: убираем «пустые строки» (записи вне дерева витрины,
+    # напр. свалка «ЗАПЧАСТИ» id 451 — её путь не содержит корень каталога → trail пуст)
+    # и дубли (одинаковая хлебная тропа); при совпадении оставляем запись с позицией/схемой.
+    clean, seen_sig = [], {}
+    for a in applicability:
+        if not a["trail"]:
+            continue
+        sig = tuple(t["id"] for t in a["trail"])
+        prev = seen_sig.get(sig)
+        if prev is None:
+            seen_sig[sig] = len(clean)
+            clean.append(a)
+        elif (a["position"] or a["scheme_image"]) and not (clean[prev]["position"] or clean[prev]["scheme_image"]):
+            clean[prev] = a       # предпочитаем более информативную запись
+    p["applicability"] = clean
     return p
 
 
@@ -149,17 +206,21 @@ async def list_categories(parent_id: int | None = None):
 
 # --- Витринный каталог: просмотр по маркам техники и узлам ------------------
 
-async def _children(parent_id: int):
-    """Подкатегории с числом товаров в поддереве (по материализованному пути)."""
+async def _children(parent_id: int, include_hidden: bool = False):
+    """Подкатегории с числом товаров в поддереве (по материализованному пути).
+    В drill-down (include_hidden=True) показываем узлы с товарами даже если visible=false
+    (в legacy у части узлов флаг сброшен, иначе модель выглядит пустой)."""
     return await db.fetch(
-        """SELECT c.id, c.name, c.slug, c.image,
-                  (SELECT count(DISTINCT pc.product_id)
-                     FROM categories d JOIN product_categories pc ON pc.category_id = d.id
-                     WHERE d.path = c.path OR d.path LIKE c.path || '/%%') AS product_count
-           FROM categories c
-           WHERE c.parent_id = %s AND c.visible
-           ORDER BY product_count DESC, c.sort""",
-        (parent_id,))
+        """SELECT id, name, slug, image, product_count FROM (
+             SELECT c.id, c.name, c.slug, c.image, c.sort, c.visible,
+                    (SELECT count(DISTINCT pc.product_id)
+                       FROM categories d JOIN product_categories pc ON pc.category_id = d.id
+                       WHERE d.path = c.path OR d.path LIKE c.path || '/%%') AS product_count
+             FROM categories c WHERE c.parent_id = %s
+           ) t
+           WHERE product_count > 0 AND (visible OR %s)
+           ORDER BY product_count DESC, sort""",
+        (parent_id, include_hidden))
 
 
 def _classify(name: str) -> str:
@@ -187,23 +248,31 @@ async def catalog_browse(
     category: int = Query(..., description="id категории для просмотра"),
     sort: str = Query("default"),
     stock: bool = Query(False, description="только в наличии"),
+    q: str | None = Query(None, description="поиск внутри группы (по поддереву)"),
     page: int = Query(1, ge=1),
     per_page: int = Query(24, ge=1, le=96),
 ):
-    """Товары внутри категории (по всему поддереву) + подкатегории + хлебные крошки."""
+    """Товары внутри категории (по всему поддереву) + подкатегории + хлебные крошки.
+    q — поиск по артикулу/названию ВНУТРИ текущей группы (всё поддерево)."""
+    # без AND visible: в legacy у части узлов флаг сброшен, но товары есть — их нужно открывать
     cat = await db.fetchone(
-        "SELECT id, name, slug, path, level, image FROM categories WHERE id=%s AND visible", (category,))
+        "SELECT id, name, slug, path, level, image FROM categories WHERE id=%s", (category,))
     if not cat:
         raise HTTPException(404, "category not found")
 
     order = _SORTS.get(sort, _SORTS["default"])
     having = "WHERE in_stock" if stock else ""
     params = {"cat": category, "limit": per_page, "offset": (page - 1) * per_page}
+    q = (q or "").strip()
+    if q:
+        agg, params["path"], params["q"] = _SUBTREE_SEARCH, cat["path"], f"%{q}%"
+    else:
+        agg = _DIRECT_AGG
 
     total_row = await db.fetchone(
-        f"{_DIRECT_AGG} SELECT count(*) AS n FROM agg {having}", params)
+        f"{agg} SELECT count(*) AS n FROM agg {having}", params)
     products = await db.fetch(
-        f"{_DIRECT_AGG} SELECT * FROM agg {having} ORDER BY {order} LIMIT %(limit)s OFFSET %(offset)s",
+        f"{agg} SELECT * FROM agg {having} ORDER BY {order} LIMIT %(limit)s OFFSET %(offset)s",
         params)
 
     # хлебные крошки из материализованного пути, начиная от корня витрины
@@ -226,7 +295,7 @@ async def catalog_browse(
     return {
         "category": {"id": cat["id"], "name": cat["name"], "path": cat["path"], "image": cat["image"]},
         "breadcrumbs": crumbs,
-        "children": await _children(category),
+        "children": await _children(category, include_hidden=True),
         "total": total_row["n"],
         "page": page,
         "per_page": per_page,

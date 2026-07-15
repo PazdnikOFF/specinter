@@ -5,6 +5,7 @@ import CartLink from "./CartLink";
 import ThemeToggle from "./ThemeToggle";
 import ChatWidget from "./ChatWidget";
 import SocialLinks from "./SocialLinks";
+import HeaderSearch from "./HeaderSearch";
 
 export const metadata: Metadata = {
   title: "СПЕЦИНТЕР — запчасти для китайской спецтехники",
@@ -22,14 +23,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="container nav-inner">
             <Link href="/" className="brand">СПЕЦИНТЕР</Link>
             <Link href="/catalog" className="link">Каталог</Link>
-            <Link href="/" className="link">Оплата и доставка</Link>
-            <Link href="/" className="link">О нас</Link>
+            <Link href="/oplata" className="link">Оплата и доставка</Link>
+            <Link href="/o-nas" className="link">О нас</Link>
             <CartLink />
             <span style={{ flex: 1 }} />
             <a href="tel:+73434547788" className="link">+7 (343) 454-77-88</a>
             <ThemeToggle />
           </div>
         </header>
+        <HeaderSearch />
         {children}
         <ChatWidget />
         <footer>

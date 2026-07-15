@@ -1,5 +1,4 @@
 import Link from "next/link";
-import SearchBox from "../SearchBox";
 import { apiSearch, thumbUrl } from "../../lib/api";
 import QuoteForm from "../QuoteForm";
 

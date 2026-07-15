@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { imgUrl, thumbUrl } from "../../../lib/api";
+import Lightbox from "../../Lightbox";
 
 type Img = { url: string; sort?: number };
 
@@ -19,6 +20,7 @@ export default function ProductGallery({
     ...(images || []).map((i) => i.url).filter(Boolean),
   ];
   const [active, setActive] = useState(0);
+  const [zoom, setZoom] = useState(false);
 
   if (all.length === 0) {
     return <div className="pimg">нет фото</div>;
@@ -26,9 +28,10 @@ export default function ProductGallery({
 
   return (
     <div>
-      <div className="pimg">
+      <div className="pimg" onClick={() => setZoom(true)} style={{ cursor: "zoom-in" }} title="Увеличить">
         <img src={imgUrl(all[active])!} alt={name || ""} />
       </div>
+      {zoom && <Lightbox src={imgUrl(all[active])!} alt={name} onClose={() => setZoom(false)} />}
       {all.length > 1 && (
         <div className="pthumbs">
           {all.map((u, i) => (
