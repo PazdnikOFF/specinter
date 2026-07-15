@@ -39,6 +39,7 @@ export async function apiCatalogBrowse(params: {
   category: string | number;
   sort?: string;
   stock?: boolean;
+  q?: string;
   page?: number;
   per_page?: number;
 }) {
@@ -49,6 +50,7 @@ export async function apiCatalogBrowse(params: {
     page: String(params.page || 1),
     per_page: String(params.per_page || 24),
   });
+  if (params.q) qs.set("q", params.q);
   const r = await fetch(`${BASE}/api/catalog/browse?${qs}`, { cache: "no-store" });
   if (!r.ok) return null;
   return r.json();

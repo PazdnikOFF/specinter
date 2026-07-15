@@ -5,6 +5,7 @@ import CartLink from "./CartLink";
 import ThemeToggle from "./ThemeToggle";
 import ChatWidget from "./ChatWidget";
 import SocialLinks from "./SocialLinks";
+import HeaderSearch from "./HeaderSearch";
 
 export const metadata: Metadata = {
   title: "СПЕЦИНТЕР — запчасти для китайской спецтехники",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ThemeToggle />
           </div>
         </header>
+        <HeaderSearch />
         {children}
         <ChatWidget />
         <footer>

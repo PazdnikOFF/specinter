@@ -104,8 +104,8 @@ export default async function ProductPage({ params }: { params: { id: string } }
               );
             })
           ) : (
-            <div className="offer">
-              <span className="muted">Цена по запросу — укажите количество и запросите:</span>
+            <div className="offer offer-request">
+              <span className="muted" style={{ flex: 1, minWidth: 0 }}>Цена по запросу — укажите количество и запросите:</span>
               <span className="offer-cart">
                 <CartStepper product={{ product_id: p.id, article: p.manufacturer_article,
                   name: p.name, price: 0 }} quote />

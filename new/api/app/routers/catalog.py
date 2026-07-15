@@ -16,6 +16,26 @@ _SORTS = {
 
 # Товары, привязанные НЕПОСРЕДСТВЕННО к категории (для drill-down по узлам).
 # Дерево навигируется группами-плитками, а карточки показываются на своём уровне.
+# Поиск ВНУТРИ группы: товары всего поддерева, отфильтрованные по артикулу/названию.
+_SUBTREE_SEARCH = """
+  WITH agg AS (
+    SELECT p.id, p.manufacturer_article, p.name, p.brand, p.primary_image,
+           NULL::text AS position, NULL::int AS position_num,
+           MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
+           BOOL_OR(o.in_stock) AS in_stock,
+           (SELECT MIN(s.delivery_days) FROM offers o2 JOIN suppliers s ON s.id=o2.supplier_id
+              WHERE o2.product_id=p.id AND o2.source='price') AS eta_days
+    FROM categories d
+    JOIN product_categories pc ON pc.category_id = d.id
+    JOIN products p ON p.id = pc.product_id
+    LEFT JOIN offers o ON o.product_id = p.id
+    WHERE (d.path = %(path)s OR d.path LIKE %(path)s || '/%%')
+      AND p.visible
+      AND (p.manufacturer_article ILIKE %(q)s OR p.name ILIKE %(q)s OR p.brand ILIKE %(q)s)
+    GROUP BY p.id
+  )
+"""
+
 _DIRECT_AGG = """
   WITH agg AS (
     SELECT p.id, p.manufacturer_article, p.name, p.brand, p.primary_image,
@@ -122,9 +142,25 @@ async def get_product(product_id: int):
             "scheme_image": c["image"],     # изображение схемы узла (если есть)
             "trail": trail,
         })
-    p["applicability"] = applicability
     # Схемы узлов, где у детали есть позиция (для блока «Схема узла» в карточке).
+    # Берём из ПОЛНОГО набора — до фильтрации применимости.
     p["schemes"] = [a for a in applicability if a["scheme_image"]]
+
+    # Применимость для показа: убираем «пустые строки» (записи вне дерева витрины,
+    # напр. свалка «ЗАПЧАСТИ» id 451 — её путь не содержит корень каталога → trail пуст)
+    # и дубли (одинаковая хлебная тропа); при совпадении оставляем запись с позицией/схемой.
+    clean, seen_sig = [], {}
+    for a in applicability:
+        if not a["trail"]:
+            continue
+        sig = tuple(t["id"] for t in a["trail"])
+        prev = seen_sig.get(sig)
+        if prev is None:
+            seen_sig[sig] = len(clean)
+            clean.append(a)
+        elif (a["position"] or a["scheme_image"]) and not (clean[prev]["position"] or clean[prev]["scheme_image"]):
+            clean[prev] = a       # предпочитаем более информативную запись
+    p["applicability"] = clean
     return p
 
 
@@ -170,17 +206,21 @@ async def list_categories(parent_id: int | None = None):
 
 # --- Витринный каталог: просмотр по маркам техники и узлам ------------------
 
-async def _children(parent_id: int):
-    """Подкатегории с числом товаров в поддереве (по материализованному пути)."""
+async def _children(parent_id: int, include_hidden: bool = False):
+    """Подкатегории с числом товаров в поддереве (по материализованному пути).
+    В drill-down (include_hidden=True) показываем узлы с товарами даже если visible=false
+    (в legacy у части узлов флаг сброшен, иначе модель выглядит пустой)."""
     return await db.fetch(
-        """SELECT c.id, c.name, c.slug, c.image,
-                  (SELECT count(DISTINCT pc.product_id)
-                     FROM categories d JOIN product_categories pc ON pc.category_id = d.id
-                     WHERE d.path = c.path OR d.path LIKE c.path || '/%%') AS product_count
-           FROM categories c
-           WHERE c.parent_id = %s AND c.visible
-           ORDER BY product_count DESC, c.sort""",
-        (parent_id,))
+        """SELECT id, name, slug, image, product_count FROM (
+             SELECT c.id, c.name, c.slug, c.image, c.sort, c.visible,
+                    (SELECT count(DISTINCT pc.product_id)
+                       FROM categories d JOIN product_categories pc ON pc.category_id = d.id
+                       WHERE d.path = c.path OR d.path LIKE c.path || '/%%') AS product_count
+             FROM categories c WHERE c.parent_id = %s
+           ) t
+           WHERE product_count > 0 AND (visible OR %s)
+           ORDER BY product_count DESC, sort""",
+        (parent_id, include_hidden))
 
 
 def _classify(name: str) -> str:
@@ -208,23 +248,31 @@ async def catalog_browse(
     category: int = Query(..., description="id категории для просмотра"),
     sort: str = Query("default"),
     stock: bool = Query(False, description="только в наличии"),
+    q: str | None = Query(None, description="поиск внутри группы (по поддереву)"),
     page: int = Query(1, ge=1),
     per_page: int = Query(24, ge=1, le=96),
 ):
-    """Товары внутри категории (по всему поддереву) + подкатегории + хлебные крошки."""
+    """Товары внутри категории (по всему поддереву) + подкатегории + хлебные крошки.
+    q — поиск по артикулу/названию ВНУТРИ текущей группы (всё поддерево)."""
+    # без AND visible: в legacy у части узлов флаг сброшен, но товары есть — их нужно открывать
     cat = await db.fetchone(
-        "SELECT id, name, slug, path, level, image FROM categories WHERE id=%s AND visible", (category,))
+        "SELECT id, name, slug, path, level, image FROM categories WHERE id=%s", (category,))
     if not cat:
         raise HTTPException(404, "category not found")
 
     order = _SORTS.get(sort, _SORTS["default"])
     having = "WHERE in_stock" if stock else ""
     params = {"cat": category, "limit": per_page, "offset": (page - 1) * per_page}
+    q = (q or "").strip()
+    if q:
+        agg, params["path"], params["q"] = _SUBTREE_SEARCH, cat["path"], f"%{q}%"
+    else:
+        agg = _DIRECT_AGG
 
     total_row = await db.fetchone(
-        f"{_DIRECT_AGG} SELECT count(*) AS n FROM agg {having}", params)
+        f"{agg} SELECT count(*) AS n FROM agg {having}", params)
     products = await db.fetch(
-        f"{_DIRECT_AGG} SELECT * FROM agg {having} ORDER BY {order} LIMIT %(limit)s OFFSET %(offset)s",
+        f"{agg} SELECT * FROM agg {having} ORDER BY {order} LIMIT %(limit)s OFFSET %(offset)s",
         params)
 
     # хлебные крошки из материализованного пути, начиная от корня витрины
@@ -247,7 +295,7 @@ async def catalog_browse(
     return {
         "category": {"id": cat["id"], "name": cat["name"], "path": cat["path"], "image": cat["image"]},
         "breadcrumbs": crumbs,
-        "children": await _children(category),
+        "children": await _children(category, include_hidden=True),
         "total": total_row["n"],
         "page": page,
         "per_page": per_page,

@@ -7,6 +7,7 @@ import io
 import re
 from datetime import datetime, timezone
 from openpyxl import load_workbook
+from psycopg.types.json import Json
 from . import db
 
 FUZZY_THRESHOLD = 0.62  # порог pg_trgm для авто-сопоставления-кандидата (в очередь модерации)
@@ -51,6 +52,7 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS volume_m3 numeric;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery jsonb;        -- выбранная доставка (ДЛ и т.п.)
 ALTER TABLE supplier_prices ADD COLUMN IF NOT EXISTS weight_kg numeric;
 ALTER TABLE supplier_prices ADD COLUMN IF NOT EXISTS volume_m3 numeric;
+ALTER TABLE supplier_prices ADD COLUMN IF NOT EXISTS raw jsonb;  -- ВСЕ колонки прайса
 """
 
 
@@ -153,7 +155,14 @@ def detect_profile(rows: list[list], scan: int = 20) -> dict | None:
         for f, keys in EXTRA_KEYS.items():
             if f not in col_map and any(k in t for k in keys):
                 col_map[f] = idx
-    return {"header_row": header_row, "cols": col_map}
+    # оригинальные подписи колонок (для сохранения ВСЕХ данных прайса в raw)
+    ncol = max((len(rows[j]) for j in range(i, i + span)), default=0)
+    labels = []
+    for c in range(ncol):
+        parts = [str(rows[j][c]).strip() for j in range(i, i + span)
+                 if c < len(rows[j]) and rows[j][c] not in (None, "")]
+        labels.append(" ".join(parts))
+    return {"header_row": header_row, "cols": col_map, "header_labels": labels}
 
 
 def parse(data: bytes, filename: str = "", profile: dict | None = None) -> list[dict]:
@@ -167,11 +176,23 @@ def parse(data: bytes, filename: str = "", profile: dict | None = None) -> list[
         if not det:
             raise ValueError("не удалось определить структуру прайса (нет колонок артикул+цена)")
         cols, hr = det["cols"], det["header_row"]
+        labels = det.get("header_labels") or []
     else:
         cols = {k: prof.get("col_" + k) for k in
                 ("article", "name", "price", "qty", "maker", "code", "cross")}
         cols = {("external_code" if k == "code" else k): v for k, v in cols.items() if v is not None}
         hr = (prof.get("header_rows", 1) or 1) - 1
+        labels = [str(v).strip() if v not in (None, "") else "" for v in (rows[hr] if hr < len(rows) else [])]
+
+    def raw_of(row):
+        # ВСЕ данные прайса построчно: подпись колонки (или colN) → значение.
+        out = {}
+        for c, v in enumerate(row):
+            if v in (None, ""):
+                continue
+            key = (labels[c] if c < len(labels) and labels[c] else f"col{c}")
+            out[key] = v if isinstance(v, (int, float, str)) else str(v)
+        return out
 
     def cell(row, field):
         idx = cols.get("external_code" if field == "code" else field)
@@ -207,6 +228,7 @@ def parse(data: bytes, filename: str = "", profile: dict | None = None) -> list[
             "cross": _s(cell(r, "cross")),
             "weight_kg": cnum(r, "weight"),
             "volume_m3": vol,
+            "raw": raw_of(r),      # ВСЕ колонки прайса (остатки по городам, внутр. коды и т.д.)
         })
     return out
 
@@ -231,11 +253,12 @@ async def ingest(supplier_id: int, rows: list[dict]) -> dict:
                 await cur.execute(
                     """INSERT INTO supplier_prices
                        (supplier_id, article, external_code, name, maker, price, qty,
-                        cross_numbers, weight_kg, volume_m3, received_at)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        cross_numbers, weight_kg, volume_m3, raw, received_at)
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                     (supplier_id, r["article"], r["external_code"], r["name"],
                      r["maker"], r["price"], r["qty"], r.get("cross"),
-                     r.get("weight_kg"), r.get("volume_m3"), batch))
+                     r.get("weight_kg"), r.get("volume_m3"),
+                     Json(r["raw"]) if r.get("raw") else None, batch))
 
             # --- матчинг только что загруженной партии ---
             # 1) точное совпадение по нормализованному артикулу

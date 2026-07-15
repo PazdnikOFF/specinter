@@ -9,6 +9,7 @@
   --radius: 18px;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   --maxw: 1120px;
+  --nav-h: 53px;   /* высота хидера (.nav-inner 52px + 1px граница); используется для прилипания поиска */
 }
 :root[data-theme="dark"] {
   --bg: #000000; --surface: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6;
@@ -27,9 +28,9 @@ a { color: inherit; text-decoration: none; }
 
 /* Header */
 .nav {
-  position: sticky; top: 0; z-index: 50;
+  position: sticky; top: 0; z-index: 70;   /* всегда ВЫШЕ строки поиска (.topsearch z-55) */
   backdrop-filter: saturate(180%) blur(20px);
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
   border-bottom: 1px solid var(--line);
 }
 .nav-inner { display: flex; align-items: center; gap: 24px; height: 52px; }
@@ -116,8 +117,34 @@ a { color: inherit; text-decoration: none; }
 .admtab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .admbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 14px; }
 
+/* Закреплённый глобальный поиск ПОД хидером.
+   Жёсткая раскладка: хидер держит top:0/z выше, поиск прилипает на высоте хидера (--nav-h),
+   поэтому строка поиска НЕ наезжает на хидер при скролле. */
+.topsearch { position: sticky; top: var(--nav-h); z-index: 55; background: var(--surface);
+  border-bottom: 1px solid var(--line); padding: 10px 0; }
+.topsearch .searchbar { margin: 0; }
+/* Переключатель области поиска: «по разделу» ↔ «везде» */
+.scope-toggle { flex: none; display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+  font-size: 12px; font-weight: 600; padding: 6px 12px 6px 8px; border-radius: 980px;
+  cursor: pointer; white-space: nowrap; transition: all .15s; }
+.scope-toggle .scope-knob { flex: none; width: 30px; height: 18px; border-radius: 980px;
+  background: color-mix(in srgb, var(--muted) 40%, transparent); position: relative; transition: background .15s; }
+.scope-toggle .scope-knob::after { content: ""; position: absolute; top: 2px; left: 2px;
+  width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.3);
+  transition: transform .15s; }
+.scope-toggle.scoped { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+.scope-toggle.scoped .scope-knob { background: var(--accent); }
+.scope-toggle.scoped .scope-knob::after { transform: translateX(12px); }
+.scope-label { min-width: 62px; text-align: left; }
+
 /* Живой поиск-автодополнение */
 .searchwrap { position: relative; }
+.searchwrap.wide .searchbar { max-width: none; margin: 0; }
+.searchwrap.wide .suggest { max-width: none; }
+/* Поиск внутри группы */
+.group-search { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 8px 0 4px; }
+.group-search .fld { flex: 1; min-width: 240px; }
 .suggest {
   position: absolute; left: 0; right: 0; top: 100%; z-index: 40;
   max-width: 640px; margin: 8px auto 0; background: var(--surface);
@@ -192,11 +219,18 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
 .offer-buy { display: flex; align-items: center; gap: 14px; margin-left: auto; }
 .offer-buy .price { white-space: nowrap; font-size: 17px; }
 .offer-cart { width: 128px; display: inline-block; flex: none; }
-/* Лайтбокс (просмотр изображения во фрейме) */
-.lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.9);
-  display: flex; align-items: center; justify-content: center; padding: 12px; cursor: zoom-out; }
-.lightbox img { max-width: 98vw; max-height: 96vh; object-fit: contain; border-radius: 6px;
-  box-shadow: 0 10px 60px rgba(0,0,0,.6); cursor: default; background: #fff; }
+.offer-request { flex-wrap: nowrap; gap: 12px; }
+/* Лайтбокс (просмотр изображения во фрейме).
+   Изображение спозиционировано абсолютно, центрировано и ЖЁСТКО занимает 96vw×96vh
+   с object-fit: contain: мелкие УВЕЛИЧИВАЮТСЯ до кадра, крупные вписываются.
+   Без flex/процентов от родителя — размер детерминирован, ничего не «схлопывает» картинку. */
+.lightbox { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.92); cursor: zoom-out; }
+/* Картинка масштабируется до единой высоты (96vh), ширина — по пропорции, но не шире 96vw.
+   width:auto → ЭЛЕМЕНТ img по размеру равен самой картинке (без «пустых» полей), поэтому
+   всё вокруг неё — фон-оверлей: клик мимо картинки закрывает, клик по картинке — нет. */
+.lightbox img { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  height: 96vh; width: auto; max-width: 96vw; cursor: default;
+  border-radius: 6px; filter: drop-shadow(0 10px 40px rgba(0,0,0,.5)); }
 .lb-close { position: fixed; top: 16px; right: 20px; z-index: 201; width: 44px; height: 44px;
   border: none; border-radius: 50%; background: rgba(255,255,255,.15); color: #fff; font-size: 26px;
   line-height: 1; cursor: pointer; }
@@ -207,13 +241,13 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
 .scheme { width: 220px; }
 .scheme-img { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
   background: #fff; cursor: zoom-in; }
-.scheme-img img { width: 100%; height: 160px; object-fit: contain; display: block; }
+.scheme-img > img { width: 100%; height: 160px; object-fit: contain; display: block; }
 .scheme-cap { font-size: 13px; margin-top: 6px; }
-.scheme-cap .pos { font-weight: 600; color: var(--accent); }
+.scheme-cap .pos { font-weight: 600; color: var(--accent); white-space: nowrap; }
 /* Схема узла в подкаталоге (миниатюра — крупно в лайтбоксе) */
 .node-scheme { display: block; max-width: 440px; margin: 8px 0 18px; border: 1px solid var(--line);
   border-radius: 14px; overflow: hidden; background: #fff; cursor: zoom-in; }
-.node-scheme img { width: 100%; max-height: 300px; object-fit: contain; display: block; }
+.node-scheme > img { width: 100%; max-height: 300px; object-fit: contain; display: block; }
 /* Объединённая карточка позиции (несколько вариантов на одну позицию схемы) */
 .pos-card { grid-column: 1 / -1; background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 16px 18px; }
@@ -230,7 +264,8 @@ h2.section { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin:
 
 /* Позиция на схеме у плитки товара */
 .card-pos { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 980px; padding: 1px 8px; }
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 980px; padding: 1px 8px;
+  white-space: nowrap; }
 
 .applic { display: flex; flex-direction: column; }
 .applic-row { display: flex; align-items: baseline; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
