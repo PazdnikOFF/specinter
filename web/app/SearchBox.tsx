@@ -28,6 +28,9 @@ export default function SearchBox({ initial = "", wide = false }: { initial?: st
 
   const useGroup = inGroup && scoped;
 
+  // При входе в раздел (смене cat) кнопка возвращается в нажатое состояние — поиск по разделу.
+  useEffect(() => { setScoped(true); }, [cat]);
+
   useEffect(() => {
     const term = q.trim();
     if (term.length < 2) { setHits([]); setTotal(0); return; }
