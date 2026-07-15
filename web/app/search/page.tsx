@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { apiSearch, thumbUrl } from "../../lib/api";
 import QuoteForm from "../QuoteForm";
+import SearchBox from "../SearchBox";
 
 const PER_PAGE = 24;
 
