@@ -58,7 +58,7 @@ export default function ChannelPicker({
       </div>
       <input className="fld" style={{ marginTop: 8 }} placeholder={cur.placeholder}
         value={ref} onChange={(e) => setRef(e.target.value)}
-        type={channel === "email" ? "email" : "text"} required={channel !== "phone"} />
+        type={channel === "email" ? "email" : "text"} required />
       <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>{hint()}</p>
     </div>
   );

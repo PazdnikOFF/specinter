@@ -49,9 +49,9 @@ export default async function SearchPage({
                 <div className="name">{h.name || "Без названия"}</div>
                 {h.brand && <div className="muted" style={{ fontSize: 12 }}>{h.brand}</div>}
                 <div className="meta">
-                  <span className="price">
-                    {h.min_price ? `${Math.round(h.min_price).toLocaleString("ru-RU")} ₽` : "Цена по запросу"}
-                  </span>
+                  {h.min_price ? (
+                    <span className="price">{Math.round(h.min_price).toLocaleString("ru-RU")} ₽</span>
+                  ) : null}
                   <span className={`badge ${h.in_stock ? "in" : "out"}`}>
                     {h.in_stock ? "в наличии" : "под заказ"}
                   </span>

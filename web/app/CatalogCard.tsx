@@ -48,9 +48,9 @@ export default function CatalogCard({ p }: { p: P }) {
       {/* Низ карточки — всегда на своём месте: цена и кнопка */}
       <div className="card-foot">
         <div className="meta">
-          <span className="price">
-            {p.min_price ? `${price.toLocaleString("ru-RU")} ₽` : "по запросу"}
-          </span>
+          {p.min_price ? (
+            <span className="price">{price.toLocaleString("ru-RU")} ₽</span>
+          ) : null}
           <span className={`badge ${p.in_stock ? "in" : "out"}`}>
             {p.in_stock ? "в наличии" : "под заказ"}
           </span>

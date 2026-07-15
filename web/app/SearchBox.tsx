@@ -72,12 +72,11 @@ export default function SearchBox({ initial = "", wide = false }: { initial?: st
     <div className={`searchwrap${wide ? " wide" : ""}`} ref={boxRef}>
       <form className="searchbar" onSubmit={(e) => { e.preventDefault(); go(); }}>
         {inGroup && (
-          <button type="button" role="switch" aria-checked={scoped}
-            className={`scope-toggle${scoped ? " scoped" : ""}`}
+          <button type="button" aria-pressed={scoped}
+            className={`scope-btn${scoped ? " scoped" : ""}`}
             onClick={() => setScoped((s) => !s)}
-            title={scoped ? "Ищем в текущем разделе — нажмите, чтобы искать везде" : "Ищем по всему каталогу — нажмите, чтобы искать в разделе"}>
-            <span className="scope-knob" aria-hidden />
-            <span className="scope-label">{scoped ? "по разделу" : "везде"}</span>
+            title={scoped ? "Ищем только в текущем разделе — нажмите, чтобы искать везде" : "Ищем по всему каталогу — нажмите, чтобы искать только в разделе"}>
+            по разделу
           </button>
         )}
         <input autoFocus={!inGroup} value={q} onChange={(e) => setQ(e.target.value)}

@@ -12,7 +12,7 @@ const API = "";  // относительный путь через прокси 
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [kind, setKind] = useState<"person" | "legal">("person");
-  const [form, setForm] = useState({ name: "", phone: "", org_name: "", inn: "", kpp: "" });
+  const [form, setForm] = useState({ name: "", org_name: "", inn: "", kpp: "" });
   const [chan, setChan] = useState<{ channel: Channel; ref: string }>({ channel: "phone", ref: "" });
   const [delivery, setDelivery] = useState<Delivery>({ mode: "delivery", city: "" });
   const [result, setResult] = useState<any>(null);
@@ -46,11 +46,11 @@ export default function CartPage() {
       const r = await fetch(`${API}/api/orders`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer: { name: form.name, phone: form.phone, kind,
+          customer: { name: form.name, phone: chan.ref, kind,
             org_name: kind === "legal" ? form.org_name : null,
             inn: kind === "legal" ? form.inn : null,
             kpp: kind === "legal" ? form.kpp : null,
-            contact_channel: chan.channel, contact_ref: chan.ref || form.phone,
+            contact_channel: chan.channel, contact_ref: chan.ref,
             email: chan.channel === "email" ? chan.ref : null },
           channel: chan.channel === "phone" ? "web" : chan.channel,
           delivery,
@@ -66,15 +66,15 @@ export default function CartPage() {
   }
 
   async function requestQuote() {
-    if (!form.name || !form.phone) { alert("Укажите имя и телефон для обратной связи"); return; }
+    if (!form.name || !chan.ref.trim()) { alert("Укажите имя и контакт для обратной связи"); return; }
     setBusy("quote");
     try {
       const r = await fetch(`${API}/api/quote-requests`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.name, phone: form.phone, auto_process: true,
+          name: form.name, phone: chan.ref, auto_process: true,
           channel: chan.channel === "phone" ? "web" : chan.channel,
-          contact_ref: chan.ref || form.phone,
+          contact_ref: chan.ref,
           email: chan.channel === "email" ? chan.ref : null,
           items: quoteItems.map((i) => ({ product_id: i.product_id, article: i.article,
             name: i.name, qty: i.qty })),
@@ -168,8 +168,6 @@ export default function CartPage() {
               <h2 className="section" style={{ marginTop: 0 }}>Контактные данные</h2>
               <input className="fld" required placeholder="Имя / контактное лицо"
                 value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-              <input className="fld" required placeholder="Телефон"
-                value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
               <ChannelPicker onChange={setChan} />
 
               {/* Реквизиты/доставка нужны ТОЛЬКО при оформлении заказа */}

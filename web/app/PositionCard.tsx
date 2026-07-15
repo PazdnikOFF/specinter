@@ -32,7 +32,7 @@ export default function PositionCard({ position, products }: { position: string;
             </Link>
             <div className="pos-prod-buy">
               <div className="pos-prod-price">
-                <span className="price">{noPrice ? "по запросу" : `${price.toLocaleString("ru-RU")} ₽`}</span>
+                {!noPrice && <span className="price">{price.toLocaleString("ru-RU")} ₽</span>}
                 <span className="muted" style={{ fontSize: 12 }}>
                   {p.in_stock ? "в наличии" : "под заказ"}
                   {p.eta_days != null ? ` · ~${p.eta_days} дн.` : ""}
