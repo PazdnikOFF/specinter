@@ -92,12 +92,16 @@ async def my_price(q: str | None = None, only_priced: bool = False,
 
 @router.patch("/products/{product_id}")
 async def edit_product(product_id: int, body: dict = Body(...)):
-    """Правка карточки каталога: название и видимость."""
+    """Правка карточки каталога: название, видимость, бренд, артикул, фото, вес/объём."""
     fields, params = [], []
     if "name" in body:
         fields.append("name=%s"); params.append(body["name"])
     if "visible" in body:
         fields.append("visible=%s"); params.append(bool(body["visible"]))
+    for col in ("brand", "manufacturer_article", "primary_image", "slug",
+                "weight_kg", "volume_m3", "description_html"):
+        if col in body:
+            fields.append(f"{col}=%s"); params.append(body[col])
     if not fields:
         raise HTTPException(400, "нет полей для обновления")
     params.append(product_id)

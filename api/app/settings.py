@@ -30,6 +30,7 @@ KNOWN = {
     "LLM_BASE_URL":   ("ИИ: базовый URL OpenAI-совместимого API", False),
     "LLM_MODEL":      ("ИИ: имя модели", False),
     "AGENT_API_KEYS": ("Внешний ИИ-агент: ключи X-API-Key для шлюза /agent (через запятую)", True),
+    "AGENT_ADMIN_API_KEYS": ("Бот/агент-АДМИН: привилегированные ключи X-Admin-Key (полное управление, через запятую)", True),
 }
 
 _cache: dict[str, str] = {}

@@ -6,6 +6,7 @@ from . import auth, db, search, prices, unf, payments, settings as app_settings
 from .routers import catalog, admin_prices, orders, edo, admin_metrics, quotes, integrations
 from .routers import admin as admin_router
 from .routers import agent as agent_router
+from .routers import admin_catalog
 
 
 @asynccontextmanager
@@ -48,6 +49,7 @@ app.include_router(admin_router.auth_router)
 app.include_router(admin_router.router)
 app.include_router(admin_prices.router, dependencies=[Depends(auth.require_admin)])
 app.include_router(admin_metrics.router, dependencies=[Depends(auth.require_admin)])
+app.include_router(admin_catalog.router, dependencies=[Depends(auth.require_admin)])
 
 
 @app.get("/health")
