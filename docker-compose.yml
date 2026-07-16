@@ -172,7 +172,10 @@ services:
     environment:
       API_INTERNAL_URL: http://api:8000
     ports:
-      - "${BIND_ADDR:-}${WEB_PORT:-3000}:3000"
+      # Витрина — единственный сервис, публикуемый наружу (LAN/интернет).
+      # Отдельный WEB_BIND_ADDR (по умолчанию 0.0.0.0), чтобы общий BIND_ADDR=127.0.0.1
+      # мог запереть api/postgres/meili/media/bot, НЕ трогая доступ к сайту.
+      - "${WEB_BIND_ADDR:-}${WEB_PORT:-3000}:3000"
 
   # --- Legacy БД: нужна ТОЛЬКО для ETL/анализа. Профиль etl → в обычном
   #     `docker compose up` не поднимается (не ест память в проде). -----------
