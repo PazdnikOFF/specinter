@@ -170,6 +170,56 @@ async def catalog_upload(
     return {"file": file.filename, "rows_total": len(rows), "products": p_res, "crosses": c_res}
 
 
+@router.get("/export/products")
+async def export_products(
+    page: int = Query(1, ge=1), per_page: int = Query(200, ge=1, le=1000),
+    updated_since: str | None = Query(None, description="ISO-время для инкрементальной выгрузки"),
+    visible_only: bool = Query(False)):
+    """Полная пагинированная выгрузка каталога для синка боту: артикул, название,
+    бренд, фото, вес/объём, мин.цена, наличие, КРОССЫ (аналоги), id категорий, число
+    предложений. updated_since — только изменённые (инкремент). Стабильный порядок по id."""
+    params = {"limit": per_page, "offset": (page - 1) * per_page, "since": updated_since}
+    where = ["(%(since)s::timestamptz IS NULL OR p.updated_at >= %(since)s::timestamptz)"]
+    if visible_only:
+        where.append("p.visible")
+    wsql = " AND ".join(where)
+    total = (await db.fetchone(f"SELECT count(*) AS n FROM products p WHERE {wsql}", params))["n"]
+    rows = await db.fetch(f"""
+        SELECT p.id, p.manufacturer_article, p.name, p.brand, p.slug, p.primary_image,
+               p.visible, p.weight_kg, p.volume_m3, p.updated_at,
+               MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
+               BOOL_OR(o.in_stock) AS in_stock,
+               count(o.id) AS offers_count,
+               COALESCE(array_agg(DISTINCT a.analog_article)
+                        FILTER (WHERE a.analog_article IS NOT NULL), '{{}}') AS crosses,
+               COALESCE(array_agg(DISTINCT pc.category_id)
+                        FILTER (WHERE pc.category_id IS NOT NULL), '{{}}') AS category_ids
+        FROM products p
+        LEFT JOIN offers o ON o.product_id = p.id
+        LEFT JOIN analogs a ON a.product_id = p.id
+        LEFT JOIN product_categories pc ON pc.product_id = p.id
+        WHERE {wsql}
+        GROUP BY p.id
+        ORDER BY p.id
+        LIMIT %(limit)s OFFSET %(offset)s""", params)
+    for r in rows:
+        r["min_price"] = float(r["min_price"]) if r["min_price"] is not None else None
+        r["weight_kg"] = float(r["weight_kg"]) if r["weight_kg"] is not None else None
+        r["volume_m3"] = float(r["volume_m3"]) if r["volume_m3"] is not None else None
+    return {"total": total, "page": page, "per_page": per_page,
+            "pages": (total + per_page - 1) // per_page, "items": rows}
+
+
+@router.get("/export/categories")
+async def export_categories(visible_only: bool = Query(False)):
+    """Плоский дамп всего дерева категорий (id, parent_id, path, level) — для построения
+    навигации/каталогов на стороне бота. path = материализованный путь /40/65/…"""
+    where = "WHERE visible" if visible_only else ""
+    return await db.fetch(f"""
+        SELECT id, parent_id, name, slug, path, level, image, sort, visible
+        FROM categories {where} ORDER BY path, sort""")
+
+
 @router.delete("/products/{product_id}")
 async def delete_product(product_id: int):
     """Удаляет товар. Каскадно уходят фото/категории/аналоги/offers; в заказах ссылка

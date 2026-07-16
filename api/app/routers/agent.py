@@ -48,6 +48,31 @@ async def agent_eta(product_id: int, city: str | None = Query(None, description=
     return await _catalog.product_eta(product_id, city)
 
 
+# --- навигация по каталогу (дерево категорий/узлов) ------------------------
+
+@router.get("/catalog/roots")
+async def agent_catalog_roots():
+    """Верх витрины: модели техники / двигатели / каталоги производителей."""
+    return await _catalog.catalog_roots()
+
+
+@router.get("/catalog/browse")
+async def agent_catalog_browse(
+    category: int = Query(..., description="id категории"),
+    sort: str = Query("default"), stock: bool = Query(False),
+    q: str | None = Query(None), page: int = Query(1, ge=1),
+    per_page: int = Query(24, ge=1, le=96)):
+    """Товары узла (по поддереву) + подкатегории + хлебные крошки."""
+    return await _catalog.catalog_browse(category=category, sort=sort, stock=stock,
+                                         q=q, page=page, per_page=per_page)
+
+
+@router.get("/categories")
+async def agent_categories(parent_id: int | None = None):
+    """Дети категории (или корни, если parent_id не задан)."""
+    return await _catalog.list_categories(parent_id)
+
+
 @router.post("/delivery/estimate")
 async def agent_delivery(body: dict = Body(...)):
     """Срок и стоимость доставки по составу корзины (город + позиции)."""
