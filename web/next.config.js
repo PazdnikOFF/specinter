@@ -16,6 +16,8 @@ module.exports = {
     return [
       { source: "/api/:path*", destination: `${API_INTERNAL}/api/:path*` },
       { source: "/media/:path*", destination: `${MEDIA_INTERNAL}/:path*` },
+      // Аутентифицированный шлюз внешнего ИИ-агента (X-API-Key проверяет бэкенд).
+      { source: "/agent/:path*", destination: `${API_INTERNAL}/agent/:path*` },
     ];
   },
 };

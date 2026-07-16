@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import auth, db, search, prices, unf, payments, settings as app_settings
 from .routers import catalog, admin_prices, orders, edo, admin_metrics, quotes, integrations
 from .routers import admin as admin_router
+from .routers import agent as agent_router
 
 
 @asynccontextmanager
@@ -40,6 +41,8 @@ app.include_router(orders.router)
 app.include_router(edo.router)
 app.include_router(quotes.router)
 app.include_router(integrations.router)
+# Внешний ИИ-агент: шлюз /agent/* под X-API-Key (см. agent_auth). Отдельно от /api.
+app.include_router(agent_router.router)
 # Админка: логин/логаут открыты, остальные админ-роуты — под require_admin.
 app.include_router(admin_router.auth_router)
 app.include_router(admin_router.router)

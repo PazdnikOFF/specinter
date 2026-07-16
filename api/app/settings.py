@@ -29,6 +29,7 @@ KNOWN = {
     "LLM_API_KEY":    ("ИИ-оператор: ключ LLM (Grok/Hermes/OpenAI-совм.)", True),
     "LLM_BASE_URL":   ("ИИ: базовый URL OpenAI-совместимого API", False),
     "LLM_MODEL":      ("ИИ: имя модели", False),
+    "AGENT_API_KEYS": ("Внешний ИИ-агент: ключи X-API-Key для шлюза /agent (через запятую)", True),
 }
 
 _cache: dict[str, str] = {}
