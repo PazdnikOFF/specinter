@@ -9,11 +9,12 @@
 #   1) коммитит незакоммиченные правки (сообщение — из -m или по умолчанию) и
 #      пушит в origin/main;
 #   2) по SSH на прод-сервере подтягивает main и применяет изменения:
-#      - код web/api живёт в bind-mount (npm run dev / uvicorn --reload) →
-#        пересборка образа НЕ нужна, достаточно рестарта;
-#      - образ пересобирается ТОЛЬКО если сменились зависимости/Dockerfile
-#        (package*.json, requirements*.txt, Dockerfile).
+#      - прод работает на production-сборках (web=Next standalone, api=uvicorn
+#        без reload), код НЕ в bind-mount → изменённые сервисы пересобираются;
+#      - пересобираются только затронутые каталоги (web/ → web; api/ → api+worker;
+#        bot/ → bot), затем `up -d`.
 #   Тома БД (pgdata) и медиа (mediadata) при этом сохраняются.
+#   (Локальная разработка остаётся с hot-reload через docker-compose.override.yml.)
 #
 # Использование:
 #   ./scripts/deploy.sh                      # закоммитить (если грязно) и выкатить
@@ -88,24 +89,25 @@ else
   echo "  compose: base (LAN/IP)"
 fi
 
-# Нужна ли пересборка образов? Только при смене зависимостей / Dockerfile.
+# Прод работает на production-сборках (web=standalone, api=uvicorn без reload),
+# код НЕ в bind-mount → изменённые сервисы нужно ПЕРЕСОБРАТЬ. Определяем по каталогу.
 rebuild=""
-if echo "$changed" | grep -qE '^web/(package\.json|package-lock\.json|Dockerfile)$'; then
+if echo "$changed" | grep -qE '^web/'; then
   rebuild="$rebuild web"
 fi
-if echo "$changed" | grep -qE '^(api|bot)/(requirements.*\.txt|Dockerfile)$'; then
-  rebuild="$rebuild api worker bot"
+if echo "$changed" | grep -qE '^api/'; then
+  rebuild="$rebuild api worker"      # worker собирается из того же ./api
+fi
+if echo "$changed" | grep -qE '^bot/'; then
+  rebuild="$rebuild bot"
 fi
 
 if [ -n "$rebuild" ]; then
-  echo "→ Пересборка образов:$rebuild (сменились зависимости)"
+  echo "→ Пересборка изменённых сервисов:$rebuild"
   docker compose $COMPOSE build $rebuild
-  docker compose $COMPOSE up -d
-else
-  echo "→ Код в bind-mount: применяю compose и рестартую web/api"
-  docker compose $COMPOSE up -d            # подхватить возможные правки compose/.env
-  docker compose $COMPOSE restart web api  # пересборка не нужна — next dev/uvicorn перечитают исходники
 fi
+# up -d поднимет пересобранные образы и подхватит правки compose/.env.
+docker compose $COMPOSE up -d
 
 docker image prune -f >/dev/null 2>&1 || true
 

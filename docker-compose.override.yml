@@ -1,0 +1,27 @@
+# DEV-надстройка (hot-reload). Docker Compose подхватывает этот файл АВТОМАТИЧЕСКИ
+# при `docker compose up` без явных -f. Прод запускается с явными
+#   -f docker-compose.yml [-f docker-compose.prod.yml]
+# → этот override НЕ применяется, там работают лёгкие production-сборки.
+#
+# Здесь возвращаем режим правок «на лету»: bind-mount исходников + next dev /
+# uvicorn --reload. Тома с исходниками аддитивны к base (mediadata остаётся).
+
+services:
+  api:
+    # Пересобираем как есть (CMD образа — uvicorn без reload) и переопределяем на dev.
+    volumes:
+      - ./api/app:/app/app          # правки кода видны без пересборки
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  web:
+    build:
+      target: dev                   # next dev вместо standalone-сборки
+    environment:
+      # В dev next dev читает NEXT_PUBLIC_* в рантайме (в проде инлайнятся build-args).
+      NEXT_PUBLIC_TG_BOT: ${NEXT_PUBLIC_TG_BOT:-}
+      NEXT_PUBLIC_WA_NUMBER: ${NEXT_PUBLIC_WA_NUMBER:-}
+      NEXT_PUBLIC_MAX_BOT: ${NEXT_PUBLIC_MAX_BOT:-}
+    volumes:
+      - ./web:/app                  # исходники витрины с хоста
+      - /app/node_modules           # анонимные тома сохраняют node_modules и .next из образа
+      - /app/.next

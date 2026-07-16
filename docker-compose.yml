@@ -3,6 +3,7 @@ services:
   postgres:
     image: postgres:16-alpine
     mem_limit: 1g
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${PG_DB:-specinter}
       POSTGRES_USER: ${PG_USER:-specinter}
@@ -24,6 +25,7 @@ services:
   meilisearch:
     image: getmeili/meilisearch:v1.10
     mem_limit: 1g
+    restart: unless-stopped
     environment:
       MEILI_MASTER_KEY: ${MEILI_KEY:-specinter_dev_key}
       MEILI_NO_ANALYTICS: "true"
@@ -41,7 +43,8 @@ services:
   # --- API нового портала --------------------------------------------------
   api:
     build: ./api
-    mem_limit: 512m
+    mem_limit: 384m
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -80,16 +83,16 @@ services:
       WAREHOUSE_CITY: ${WAREHOUSE_CITY:-Екатеринбург}
     ports:
       - "${BIND_ADDR:-}${API_PORT:-8010}:8000"
-    # Dev: правки кода применяются на лету (без пересборки образа).
     volumes:
-      - ./api/app:/app/app
       - mediadata:/media            # запись загруженных фото товаров (админка)
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    # Прод: uvicorn БЕЗ --reload (CMD образа), без файлового watcher'а WatchFiles.
+    # Dev-режим (--reload + bind-mount ./api/app) включает docker-compose.override.yml.
 
   # --- Воркер приёма прайсов с почты (IMAP) --------------------------------
   worker:
     build: ./api
     mem_limit: 256m
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,7 +109,8 @@ services:
   # --- ИИ-оператор (LangGraph, Grok/Hermes) + каналы -----------------------
   bot:
     build: ./bot
-    mem_limit: 768m
+    mem_limit: 640m
+    restart: unless-stopped
     depends_on:
       - api
     environment:
@@ -141,7 +145,8 @@ services:
   # --- Медиа (изображения каталога со старого сайта) -----------------------
   media:
     image: nginx:alpine
-    mem_limit: 256m
+    mem_limit: 128m
+    restart: unless-stopped
     volumes:
       - mediadata:/usr/share/nginx/html:ro
       - ./media/default.conf:/etc/nginx/conf.d/default.conf:ro
@@ -150,26 +155,24 @@ services:
 
   # --- Витрина (Next.js, Apple-UI) -----------------------------------------
   web:
-    build: ./web
-    mem_limit: 1g
+    # Прод: standalone-сборка Next.js (node server.js) — лёгкий рантайм.
+    # Dev-режим (next dev + bind-mount исходников) включает docker-compose.override.yml.
+    build:
+      context: ./web
+      target: prod
+      # NEXT_PUBLIC_* инлайнятся на этапе сборки, поэтому передаются как build-args.
+      args:
+        NEXT_PUBLIC_TG_BOT: ${NEXT_PUBLIC_TG_BOT:-}
+        NEXT_PUBLIC_WA_NUMBER: ${NEXT_PUBLIC_WA_NUMBER:-}
+        NEXT_PUBLIC_MAX_BOT: ${NEXT_PUBLIC_MAX_BOT:-}
+    mem_limit: 512m
+    restart: unless-stopped
     depends_on:
       - api
     environment:
       API_INTERNAL_URL: http://api:8000
-      NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8010}
-      NEXT_PUBLIC_MEDIA_URL: http://localhost:${MEDIA_PORT:-8081}
-      # Ссылки для подключения каналов связи (публичные)
-      NEXT_PUBLIC_TG_BOT: ${NEXT_PUBLIC_TG_BOT:-}
-      NEXT_PUBLIC_WA_NUMBER: ${NEXT_PUBLIC_WA_NUMBER:-}
-      NEXT_PUBLIC_MAX_BOT: ${NEXT_PUBLIC_MAX_BOT:-}
     ports:
       - "${BIND_ADDR:-}${WEB_PORT:-3000}:3000"
-    # Dev: hot-reload правок витрины (next dev следит за исходниками хоста).
-    # Анонимные тома сохраняют node_modules и .next из образа.
-    volumes:
-      - ./web:/app
-      - /app/node_modules
-      - /app/.next
 
   # --- Legacy БД: нужна ТОЛЬКО для ETL/анализа. Профиль etl → в обычном
   #     `docker compose up` не поднимается (не ест память в проде). -----------
