@@ -17,6 +17,7 @@ async def lifespan(app: FastAPI):
         await unf.ensure_migrated()
         await payments.ensure_migrated()
         await quotes.ensure_migrated()
+        await catalog.ensure_misses()
         await app_settings.ensure_migrated()
         await app_settings.load()
     except Exception as e:

@@ -23,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="container nav-inner">
             <Link href="/" className="brand">СПЕЦИНТЕР</Link>
             <Link href="/catalog" className="link">Каталог</Link>
+            <Link href="/bystro" className="link">Быстрый заказ</Link>
             <Link href="/oplata" className="link">Оплата и доставка</Link>
             <Link href="/o-nas" className="link">О нас</Link>
             <CartLink />

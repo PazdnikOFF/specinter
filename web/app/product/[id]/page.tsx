@@ -1,5 +1,18 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { apiProduct, imgUrl, thumbUrl } from "../../../lib/api";
+
+// SEO: заголовок/описание из артикула+названия+бренда (длинный хвост по номерам).
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const p = await apiProduct(params.id);
+  if (!p) return { title: "Товар не найден — СПЕЦИНТЕР" };
+  const art = p.manufacturer_article || "";
+  const title = `${art}${p.name ? " " + p.name : ""} — купить, цена | СПЕЦИНТЕР`.trim();
+  const description =
+    `${p.name || art}${p.brand ? ", " + p.brand : ""} — цена, наличие, срок поставки. `
+    + `Артикул ${art}. Доставка по РФ, самовывоз Екатеринбург.`;
+  return { title, description, alternates: { canonical: `/product/${params.id}` } };
+}
 import CartStepper from "../../CartStepper";
 import ProductGallery from "./ProductGallery";
 import ZoomImage from "../../ZoomImage";

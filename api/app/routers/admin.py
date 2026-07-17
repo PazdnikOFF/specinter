@@ -178,6 +178,14 @@ async def reindex_catalog():
     return {"indexed": n}
 
 
+@router.get("/search-misses")
+async def search_misses(limit: int = Query(100, le=500)):
+    """Топ запросов «ничего не найдено» — что добавить в каталог/синонимы."""
+    return await db.fetch(
+        "SELECT q, misses, last_at FROM search_misses ORDER BY misses DESC, last_at DESC LIMIT %s",
+        (limit,))
+
+
 # --- Настройки интеграций (токены задаются здесь, без правки .env) ---
 @router.get("/settings")
 async def get_settings():

@@ -1,8 +1,21 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Body, Query, HTTPException
 from .. import db, search, logistics
 from ..config import CATALOG_ROOT_ID
 
 router = APIRouter(prefix="/api", tags=["catalog"])
+
+MISS_MIGRATION = """
+CREATE TABLE IF NOT EXISTS search_misses (
+  q       text PRIMARY KEY,
+  misses  int DEFAULT 1,
+  last_at timestamptz DEFAULT now()
+);
+"""
+
+
+async def ensure_misses():
+    async with db.pool.connection() as conn:
+        await conn.execute(MISS_MIGRATION)
 
 # Разрешённые сортировки витрины (защита от инъекций в ORDER BY).
 _SORTS = {
@@ -63,11 +76,62 @@ async def search_catalog(
 ):
     """Мгновенный поиск по артикулу/аналогу/названию через Meilisearch."""
     res = search.search(q, limit=limit, offset=offset, in_stock=in_stock)
-    return {
-        "query": q,
-        "total": res.get("estimatedTotalHits"),
-        "hits": res.get("hits", []),
-    }
+    total = res.get("estimatedTotalHits")
+    # Лог «ничего не найдено» — только по РЕАЛЬНОМУ поиску (limit>=20), не по автодополнению.
+    if not total and offset == 0 and limit >= 20 and q and len(q.strip()) >= 2:
+        try:
+            await db.fetchone(
+                """INSERT INTO search_misses (q, misses, last_at) VALUES (%s, 1, now())
+                   ON CONFLICT (q) DO UPDATE SET misses = search_misses.misses + 1, last_at = now()
+                   RETURNING q""", (q.strip().lower(),))
+        except Exception as e:
+            print("search miss log failed:", e)
+    return {"query": q, "total": total, "hits": res.get("hits", [])}
+
+
+@router.post("/quick-resolve")
+async def quick_resolve(body: dict = Body(...)):
+    """Быстрый заказ списком: строки «АРТИКУЛ [кол-во]» → товары с ценой/наличием.
+    Матч по норм-артикулу (точный + через аналоги). Найденные/ненайденные раздельно."""
+    lines = body.get("lines") or (body.get("text") or "").splitlines()
+    out = []
+    for raw in lines[:200]:
+        s = (raw or "").strip()
+        if not s:
+            continue
+        parts = s.split()
+        qty, art = 1, s
+        if len(parts) > 1 and parts[-1].replace(",", ".").replace(".", "", 1).isdigit():
+            try:
+                qty = max(1, int(float(parts[-1].replace(",", "."))))
+                art = " ".join(parts[:-1])
+            except ValueError:
+                pass
+        sql = """SELECT p.id, p.manufacturer_article, p.name, p.brand,
+                        (SELECT MIN(o.price) FROM offers o WHERE o.product_id=p.id AND o.price IS NOT NULL) AS price,
+                        (SELECT BOOL_OR(o.in_stock) FROM offers o WHERE o.product_id=p.id) AS in_stock
+                 FROM products p {join} WHERE p.visible AND {cond}=norm_article(%s)
+                 ORDER BY p.id LIMIT 1"""
+        row = await db.fetchone(sql.format(join="", cond="p.normalized_article"), (art,))
+        if not row:
+            row = await db.fetchone(
+                sql.format(join="JOIN analogs a ON a.product_id=p.id", cond="a.normalized_article"), (art,))
+        if row:
+            row["price"] = float(row["price"]) if row["price"] is not None else None
+            out.append({"input": art, "qty": qty, "matched": True, **row})
+        else:
+            out.append({"input": art, "qty": qty, "matched": False})
+    return {"items": out, "found": sum(1 for i in out if i["matched"]),
+            "missing": sum(1 for i in out if not i["matched"])}
+
+
+@router.get("/sitemap")
+async def sitemap_data():
+    """Данные для sitemap.xml: id видимых товаров (+updated) и категорий каталога."""
+    prods = await db.fetch(
+        "SELECT id, extract(epoch FROM updated_at)::bigint AS ts FROM products WHERE visible ORDER BY id")
+    cats = await db.fetch("SELECT id FROM categories WHERE visible ORDER BY id")
+    return {"products": prods, "categories": [c["id"] for c in cats]}
 
 
 @router.get("/products/{product_id}")

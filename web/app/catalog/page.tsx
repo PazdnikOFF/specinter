@@ -5,11 +5,34 @@ import CatalogFilters from "../CatalogFilters";
 import ZoomImage from "../ZoomImage";
 import BackButton from "../BackButton";
 import Breadcrumbs from "../Breadcrumbs";
+import type { Metadata } from "next";
 import { apiCatalogRoots, apiCatalogBrowse, imgUrl, thumbUrl } from "../../lib/api";
 
-export const metadata = { title: "Каталог запчастей — СПЕЦИНТЕР" };
-
 type SP = { cat?: string; sort?: string; stock?: string; page?: string; q?: string };
+
+// SEO: заголовок из названия узла; canonical на ЧИСТУЮ категорию; фильтры/сортировки/
+// страницы >1 — noindex (не плодить near-duplicate URL, не жечь краул-бюджет).
+export async function generateMetadata({ searchParams }: { searchParams: SP }): Promise<Metadata> {
+  const filtered = !!(searchParams.q || searchParams.stock === "1"
+    || (searchParams.sort && searchParams.sort !== "default")
+    || (searchParams.page && searchParams.page !== "1"));
+  const robots = filtered ? { index: false, follow: true } : undefined;
+  const cat = searchParams.cat;
+  if (!cat) {
+    return {
+      title: "Каталог запчастей спецтехники — СПЕЦИНТЕР",
+      description: "Запчасти китайской спецтехники: бульдозеры, погрузчики, экскаваторы, грузовики. Подбор по модели, узлу и артикулу.",
+      alternates: { canonical: "/catalog" }, robots,
+    };
+  }
+  let name = "Каталог";
+  try { const d = await apiCatalogBrowse({ category: cat, per_page: 1 }); name = d?.category?.name || name; } catch {}
+  return {
+    title: `${name} — запчасти | СПЕЦИНТЕР`,
+    description: `${name}: запчасти в наличии и под заказ, цены и сроки поставки. Подбор по артикулу и аналогам.`,
+    alternates: { canonical: `/catalog?cat=${cat}` }, robots,
+  };
+}
 
 // Разбиваем длинное имя узла на заголовок и уточнение из скобок.
 function splitName(name: string): { main: string; sub?: string } {
