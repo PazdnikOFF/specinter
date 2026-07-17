@@ -50,8 +50,44 @@ export default async function ProductPage({ params }: { params: { id: string } }
     (b.position ? 1 : 0) - (a.position ? 1 : 0) || (b.trail?.length || 0) - (a.trail?.length || 0))[0];
   const trail = bestAppl?.trail || [];
 
+  // --- SEO: Product + BreadcrumbList JSON-LD (rich-сниппеты цены/наличия в Google) ---
+  // Абсолютные URL — если задан NEXT_PUBLIC_SITE_URL (после go-live домена); иначе относительные.
+  const SITE = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const abs = (u?: string | null) => (u ? (SITE ? `${SITE}${u}` : u) : undefined);
+  const ldPriced = (p.offers || []).filter((o: any) => o.price != null).sort((a: any, b: any) => a.price - b.price);
+  const ldInStock = (p.offers || []).some((o: any) => o.in_stock);
+  const productLd: any = {
+    "@context": "https://schema.org/", "@type": "Product",
+    name: p.name || p.manufacturer_article,
+    sku: p.manufacturer_article, mpn: p.manufacturer_article,
+    ...(p.brand ? { brand: { "@type": "Brand", name: p.brand } } : {}),
+    ...(p.primary_image ? { image: [abs(imgUrl(p.primary_image))] } : {}),
+    ...(p.name ? { description: p.name } : {}),
+  };
+  if (ldPriced[0]) {
+    productLd.offers = {
+      "@type": "Offer", priceCurrency: "RUB", price: Math.round(ldPriced[0].price),
+      availability: ldInStock ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+      ...(SITE ? { url: `${SITE}/product/${p.id}` } : {}),
+    };
+  }
+  const ldCrumbs = [{ name: "Каталог", href: "/catalog" },
+    ...trail.map((t: any) => ({ name: t.name, href: `/catalog?cat=${t.id}` })),
+    { name: p.name || p.manufacturer_article, href: `/product/${p.id}` }];
+  const breadcrumbLd = {
+    "@context": "https://schema.org/", "@type": "BreadcrumbList",
+    itemListElement: ldCrumbs.map((c, i) => ({
+      "@type": "ListItem", position: i + 1, name: c.name,
+      ...(SITE ? { item: `${SITE}${c.href}` } : {}),
+    })),
+  };
+
   return (
     <main className="container">
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <div className="navrow">
         <BackButton />
         <Breadcrumbs items={[
