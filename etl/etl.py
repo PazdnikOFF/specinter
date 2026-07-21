@@ -3,11 +3,17 @@
 ETL: legacy MariaDB (specinter.dump.sql) -> Postgres доменное ядро.
 
 Переносит: категории (it_tree), товары-артикулы (it_b_catitem), связки категорий
-(it_b_ablock), аналоги (it_b_aarts), торговые предложения (it_b_variant),
-клиентов (it_b_user3), изображения (it_b_goodimage) и разобранные прайсы (it_suppliers).
+(it_b_ablock), аналоги (it_b_aarts), варианты установки (it_b_aarts2), торговые
+предложения (it_b_variant), клиентов (it_b_user3), изображения (it_b_goodimage)
+и разобранные прайсы (it_suppliers).
 
 Запуск: docker compose --profile etl run --rm etl
 Локально: PG_DSN=... MY_HOST=... python etl.py
+
+Частичные прогоны поверх уже наполненной БД (идемпотентны):
+  ETL_ONLY=images     — только изображения
+  ETL_ONLY=links      — только связки товар↔категория
+  ETL_ONLY=relations  — только связи товар↔товар (аналоги + варианты установки)
 """
 import os
 import sys
@@ -57,6 +63,12 @@ def main():
                     migrate_images(mc, pc, stats)
                 if "links" in steps:
                     migrate_product_categories(mc, pc, stats)
+                # ETL_ONLY=relations — донести связи товар↔товар поверх наполненной БД.
+                # Идемпотентно за счёт ux_analogs_uniq + ON CONFLICT DO NOTHING,
+                # поэтому безопасно для прода: offers/supplier_prices не трогаем.
+                if "relations" in steps:
+                    migrate_analogs(mc, pc, stats)
+                    migrate_install_options(mc, pc, stats)
                 pc.execute("INSERT INTO etl_runs (finished_at, stats) VALUES (now(), %s)",
                            (psycopg.types.json.Json(stats),))
                 pg.commit()
@@ -67,6 +79,7 @@ def main():
             migrate_products(mc, pc, stats)
             migrate_product_categories(mc, pc, stats)
             migrate_analogs(mc, pc, stats)
+            migrate_install_options(mc, pc, stats)
             migrate_offers(mc, pc, stats)
             migrate_customers(mc, pc, stats)
             migrate_images(mc, pc, stats)
@@ -158,9 +171,21 @@ def migrate_product_categories(mc, pc, stats):
     stats["product_categories"] = n
 
 
-def migrate_analogs(mc, pc, stats):
-    # it_b_aarts: blockparent -> товар-владелец, good_id_arts -> карточка-аналог
-    mc.execute("SELECT blockparent, art, name, good_id_arts FROM it_b_aarts WHERE art IS NOT NULL")
+def _ensure_relation_type(pc):
+    """На случай уже поднятой БД без колонки (схема применяется только при init)."""
+    pc.execute("ALTER TABLE analogs ADD COLUMN IF NOT EXISTS relation_type text "
+               "NOT NULL DEFAULT 'analog'")
+
+
+def _migrate_relations(mc, pc, table, relation_type):
+    """Переносит связи товар↔товар из legacy-таблицы (it_b_aarts / it_b_aarts2).
+
+    Обе таблицы структурно идентичны, различается только СМЫСЛ связи:
+      it_b_aarts  → analog         («Предложения по аналогам»)
+      it_b_aarts2 → install_option («Возможные варианты установки»)
+    """
+    _ensure_relation_type(pc)
+    mc.execute(f"SELECT blockparent, art, name, good_id_arts FROM {table} WHERE art IS NOT NULL")
     n = 0
     for r in mc.fetchall():
         art = clean(r["art"])
@@ -168,21 +193,39 @@ def migrate_analogs(mc, pc, stats):
             continue
         linked = r["good_id_arts"]
         linked = int(linked) if (linked and str(linked).isdigit()) else None
-        pc.execute("""INSERT INTO analogs (product_id, analog_article, analog_name, linked_product_id, source)
-                      SELECT p.id, %s, %s, lp.id, 'legacy'
+        # ON CONFLICT DO NOTHING — идемпотентность по ux_analogs_uniq
+        # (product_id, normalized_article, relation_type).
+        pc.execute("""INSERT INTO analogs
+                      (product_id, analog_article, analog_name, linked_product_id,
+                       relation_type, source)
+                      SELECT p.id, %s, %s, lp.id, %s, 'legacy'
                       FROM products p
                       LEFT JOIN products lp ON lp.legacy_id=%s
-                      WHERE p.legacy_id=%s""",
-                   (art, clean(r["name"]), linked, r["blockparent"]))
+                      WHERE p.legacy_id=%s
+                      ON CONFLICT DO NOTHING""",
+                   (art, clean(r["name"]), relation_type, linked, r["blockparent"]))
         n += pc.rowcount
     # Проставить связь по совпадению артикула там, где legacy не дал good_id_arts
     # (иначе аналог с существующей карточкой висел бы «отдельно» и некликабельным).
+    # Ограничиваем текущим типом связи, чтобы шаги не влияли друг на друга.
     pc.execute("""UPDATE analogs a SET linked_product_id = p.id
                   FROM products p
                   WHERE a.linked_product_id IS NULL
+                    AND a.relation_type = %s
                     AND a.normalized_article IS NOT NULL
-                    AND p.normalized_article = a.normalized_article""")
-    stats["analogs"] = n
+                    AND p.normalized_article = a.normalized_article""",
+               (relation_type,))
+    return n
+
+
+def migrate_analogs(mc, pc, stats):
+    # it_b_aarts: blockparent -> товар-владелец, good_id_arts -> карточка-аналог
+    stats["analogs"] = _migrate_relations(mc, pc, "it_b_aarts", "analog")
+
+
+def migrate_install_options(mc, pc, stats):
+    # it_b_aarts2 — «Возможные варианты установки» (legacy catalog.php:550, блок duplicates2).
+    stats["install_options"] = _migrate_relations(mc, pc, "it_b_aarts2", "install_option")
 
 
 def migrate_offers(mc, pc, stats):

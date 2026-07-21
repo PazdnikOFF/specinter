@@ -18,6 +18,7 @@ import ProductGallery from "./ProductGallery";
 import ZoomImage from "../../ZoomImage";
 import BackButton from "../../BackButton";
 import Breadcrumbs from "../../Breadcrumbs";
+import StockAlert from "./StockAlert";
 
 // Строка «аналог / деталь на позиции»: артикул, наименование, наличие, цена «от N ₽».
 function AnalogRow({ a }: { a: any }) {
@@ -146,13 +147,22 @@ export default async function ProductPage({ params }: { params: { id: string } }
             const priced = (p.offers || []).filter((o: any) => o.price != null)
               .sort((a: any, b: any) => a.price - b.price);
             const min = priced[0];
+            // Своей цены нет — показываем минимум по группе взаимозаменяемости
+            // (товар + аналоги), как это делал старый сайт. Помечаем «по аналогу»,
+            // чтобы клиент понимал, что цена не самой этой позиции.
+            const byGroup = !min && p.group_min_price != null;
             return (
               <div style={{ margin: "16px 0" }}>
                 <span className="price" style={{ fontSize: 26 }}>
                   {min
                     ? `${priced.length > 1 ? "от " : ""}${Math.round(min.price).toLocaleString("ru-RU")} ₽`
-                    : "Цена по запросу"}
+                    : byGroup
+                      ? `от ${Math.round(p.group_min_price).toLocaleString("ru-RU")} ₽`
+                      : "Цена по запросу"}
                 </span>
+                {byGroup && (
+                  <span className="muted" style={{ marginLeft: 8, fontSize: 13 }}>по аналогу</span>
+                )}
               </div>
             );
           })()}
@@ -185,6 +195,43 @@ export default async function ProductPage({ params }: { params: { id: string } }
                 </div>
               );
             })
+          ) : p.offers_via_analogs?.length ? (
+            /* Своих предложений нет — показываем предложения аналогов (как старый сайт).
+               В корзину кладём ИМЕННО аналог: article/name/id берём из via_*. */
+            <>
+              <p className="muted" style={{ margin: "-4px 0 8px", fontSize: 13 }}>
+                По этой позиции своих предложений нет — показаны предложения аналогов.
+                В заказ добавится аналог, его артикул указан в строке.
+              </p>
+              {p.offers_via_analogs.map((o: any) => {
+                const delivery = o.delivery_note
+                  || (o.delivery_days != null ? `срок поставки ~${o.delivery_days} раб. дн.` : "срок уточняется");
+                return (
+                  <div className="offer" key={`via-${o.id}`}>
+                    <div className="offer-info">
+                      <span className={`badge ${o.in_stock ? "in" : "out"}`}>
+                        {o.in_stock ? "в наличии" : "под заказ"}
+                      </span>
+                      <Link href={`/product/${o.via_product_id}`} className="analog-link art">
+                        {o.via_article}
+                      </Link>
+                      <span className="muted offer-delivery">{delivery}</span>
+                    </div>
+                    <div className="offer-buy">
+                      <span className="price">
+                        {o.price ? `${Math.round(o.price).toLocaleString("ru-RU")} ₽` : "по запросу"}
+                      </span>
+                      <span className="offer-cart">
+                        <CartStepper
+                          product={{ product_id: o.via_product_id, article: o.via_article,
+                            name: o.via_name, price: o.price ? Math.round(o.price) : 0 }}
+                          quote={o.price == null} />
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
           ) : (
             <div className="offer offer-request">
               <span className="muted" style={{ flex: 1, minWidth: 0 }}>Цена по запросу — укажите количество и запросите:</span>
@@ -193,6 +240,11 @@ export default async function ProductPage({ params }: { params: { id: string } }
                   name: p.name, price: 0 }} quote />
               </span>
             </div>
+          )}
+
+          {/* Подписка на поступление — если товара нет в наличии ни по одному предложению. */}
+          {!(p.offers || []).some((o: any) => o.in_stock) && (
+            <StockAlert productId={p.id} />
           )}
 
           {p.applicability?.length > 0 && (
@@ -220,6 +272,17 @@ export default async function ProductPage({ params }: { params: { id: string } }
             <>
               <h2 className="section">Аналоги ({p.analogs.length})</h2>
               {p.analogs.map((a: any, i: number) => <AnalogRow a={a} key={i} />)}
+            </>
+          )}
+
+          {p.install_options?.length > 0 && (
+            <>
+              <h2 className="section">Возможные варианты установки ({p.install_options.length})</h2>
+              <p className="muted" style={{ margin: "-4px 0 8px", fontSize: 13 }}>
+                Детали, которые встают на это место как вариант, но не являются прямой
+                заменой — уточните применимость перед заказом.
+              </p>
+              {p.install_options.map((a: any, i: number) => <AnalogRow a={a} key={i} />)}
             </>
           )}
 

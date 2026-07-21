@@ -1,6 +1,11 @@
-"""Приём прайсов с почты. Опрашивает IMAP-ящик, сопоставляет отправителя с
-поставщиком (suppliers.sender_email), парсит XLSX-вложения и прогоняет через
-конвейер prices.ingest. Env-gated: без IMAP-кредов просто простаивает.
+"""Фоновый воркер.
+
+1) Приём прайсов с почты: опрашивает IMAP-ящик, сопоставляет отправителя с
+   поставщиком (suppliers.sender_email), парсит XLSX-вложения и прогоняет через
+   конвейер prices.ingest. Env-gated: без IMAP-кредов просто простаивает.
+2) Рассылка уведомлений «товар поступил в наличие» (notify). Env-gated по SMTP.
+
+Оба шага независимы: сбой одного не мешает другому.
 
 Запуск: python -m app.imap_worker  (docker-сервис worker).
 """
@@ -10,7 +15,7 @@ import imaplib
 import os
 from email.header import decode_header
 
-from . import db, prices, search
+from . import db, notify, prices, search
 
 IMAP_HOST = os.environ.get("IMAP_HOST")
 IMAP_USER = os.environ.get("IMAP_USER")
@@ -83,12 +88,19 @@ async def main():
     await db.pool.open()
     configured = bool(IMAP_HOST and IMAP_USER and IMAP_PASSWORD)
     print(f"[imap] worker запущен. IMAP {'настроен' if configured else 'НЕ настроен (простой)'}, "
+          f"SMTP {'настроен' if notify.configured() else 'НЕ настроен (уведомления копятся)'}, "
           f"интервал {POLL_INTERVAL}s")
     while True:
         try:
             await process_once()
         except Exception as e:
             print(f"[imap] цикл: {e}")
+        # Уведомления о поступлении — отдельным try, чтобы сбой IMAP их не блокировал
+        # (и наоборот). Подписки без SMTP просто копятся до настройки.
+        try:
+            await notify.dispatch_stock_alerts()
+        except Exception as e:
+            print(f"[notify] цикл: {e}")
         await asyncio.sleep(POLL_INTERVAL)
 
 

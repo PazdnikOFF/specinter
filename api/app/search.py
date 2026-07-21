@@ -64,7 +64,9 @@ async def reindex() -> int:
                MIN(o.price) FILTER (WHERE o.price IS NOT NULL) AS min_price,
                BOOL_OR(o.in_stock) AS in_stock
         FROM products p
-        LEFT JOIN analogs a ON a.product_id = p.id
+        -- Только relation_type='analog': варианты установки в searchable-артикулы НЕ
+        -- добавляем, иначе поиск по номеру начнёт выдавать деталь, которая ему не замена.
+        LEFT JOIN analogs a ON a.product_id = p.id AND a.relation_type = 'analog'
         LEFT JOIN product_categories pc ON pc.product_id = p.id
         LEFT JOIN offers o ON o.product_id = p.id
         WHERE p.visible

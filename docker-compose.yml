@@ -104,6 +104,13 @@ services:
       IMAP_PASSWORD: ${IMAP_PASSWORD:-}
       IMAP_FOLDER: ${IMAP_FOLDER:-INBOX}
       POLL_INTERVAL: ${POLL_INTERVAL:-300}
+      # Отправка уведомлений «товар в наличии». Пусто = подписки копятся, писем нет.
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SITE_URL: ${SITE_URL:-https://specinter.ru}
     command: ["python", "-m", "app.imap_worker"]
 
   # --- ИИ-оператор (LangGraph, Grok/Hermes) + каналы -----------------------
